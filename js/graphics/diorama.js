@@ -7,29 +7,29 @@ import { playSound } from '../audio/soundEngine.js';
 import { SPRITES, drawPixelSprite } from './sprites.js';
 
 let dioramaCanvas = null;
-let dctx = null;
+let dioramaContext = null;
 let dioramaParticles = [];
 let dioramaTick = 0;
 
 let bgCanvas = null;
-let bgCtx = null;
-let bgStars = [];
+let backgroundContext = null;
+let backgroundStars = [];
 
 export function resizeDiorama() {
     if (!dioramaCanvas || !dioramaCanvas.parentElement) return;
-    const rect = dioramaCanvas.parentElement.getBoundingClientRect();
-    dioramaCanvas.width = Math.max(300, Math.floor(rect.width));
-    dioramaCanvas.height = Math.max(140, Math.floor(rect.height));
+    const containerRect = dioramaCanvas.parentElement.getBoundingClientRect();
+    dioramaCanvas.width = Math.max(300, Math.floor(containerRect.width));
+    dioramaCanvas.height = Math.max(140, Math.floor(containerRect.height));
 }
 
-export function spawnDioramaBurst(x, y, count = 16) {
+export function spawnDioramaBurst(originX, originY, particleCount = 16) {
     const palette = THEME_PALETTES[getCurrentTheme()];
-    for (let i = 0; i < count; i++) {
+    for (let index = 0; index < particleCount; index++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 0.8 + Math.random() * 3.2;
         dioramaParticles.push({
-            x,
-            y,
+            x: originX,
+            y: originY,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed - 0.8,
             size: Math.random() > 0.5 ? 4 : 3,
@@ -39,177 +39,214 @@ export function spawnDioramaBurst(x, y, count = 16) {
     }
 }
 
-export function spawnCenterDioramaBurst(count = 24) {
+export function spawnCenterDioramaBurst(particleCount = 24) {
     if (!dioramaCanvas) return;
-    spawnDioramaBurst(dioramaCanvas.width / 2, dioramaCanvas.height / 2, count);
+    spawnDioramaBurst(dioramaCanvas.width / 2, dioramaCanvas.height / 2, particleCount);
 }
 
 export function initDiorama() {
     dioramaCanvas = document.getElementById('dioramaCanvas');
     if (!dioramaCanvas) return;
-    dctx = dioramaCanvas.getContext('2d');
+    dioramaContext = dioramaCanvas.getContext('2d');
 
     resizeDiorama();
 
-    const container = dioramaCanvas.parentElement;
-    if (container) {
-        container.addEventListener('click', (e) => {
-            const rect = dioramaCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            spawnDioramaBurst(x, y, 22);
+    const dioramaContainer = dioramaCanvas.parentElement;
+    if (dioramaContainer) {
+        dioramaContainer.addEventListener('click', (event) => {
+            const canvasRect = dioramaCanvas.getBoundingClientRect();
+            const clickX = event.clientX - canvasRect.left;
+            const clickY = event.clientY - canvasRect.top;
+            spawnDioramaBurst(clickX, clickY, 22);
             playSound('click');
         });
     }
 }
 
-export function updateAndDrawDiorama() {
-    if (!dioramaCanvas || !dctx) return;
+function drawSkyGradient(width, height, palette) {
+    const skyGradient = dioramaContext.createLinearGradient(0, 0, 0, height);
+    skyGradient.addColorStop(0, palette.bgSkyTop);
+    skyGradient.addColorStop(1, palette.bgSkyBottom);
+    dioramaContext.fillStyle = skyGradient;
+    dioramaContext.fillRect(0, 0, width, height);
+}
 
-    dioramaTick++;
-    const w = dioramaCanvas.width;
-    const h = dioramaCanvas.height;
-    const currentTheme = getCurrentTheme();
-    const palette = THEME_PALETTES[currentTheme];
+function drawFantasyDioramaScene(width, height) {
+    // Mystic Dragon Moon (Escamas Base #7A1F73, Escamas Luz #B92B92, Bronce #D4957A)
+    dioramaContext.fillStyle = 'rgba(185, 43, 146, 0.22)';
+    dioramaContext.fillRect(width - 110, 14, 56, 56);
+    dioramaContext.fillStyle = '#7A1F73';
+    dioramaContext.fillRect(width - 102, 22, 40, 40);
+    dioramaContext.fillStyle = '#B92B92';
+    dioramaContext.fillRect(width - 96, 28, 28, 28);
+    dioramaContext.fillStyle = '#D4957A';
+    dioramaContext.fillRect(width - 90, 34, 16, 16);
 
-    // Background Gradient (#0D0D0F -> #231C1A in Dark Fantasy)
-    const grad = dctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, palette.bgSkyTop);
-    grad.addColorStop(1, palette.bgSkyBottom);
-    dctx.fillStyle = grad;
-    dctx.fillRect(0, 0, w, h);
-
-    if (currentTheme === 'fantasy') {
-        // Draw Mystic Dragon Moon (Escamas Base #7A1F73, Escamas Luz #B92B92, Bronce #D4957A)
-        dctx.fillStyle = 'rgba(185, 43, 146, 0.22)';
-        dctx.fillRect(w - 110, 14, 56, 56);
-        dctx.fillStyle = '#7A1F73';
-        dctx.fillRect(w - 102, 22, 40, 40);
-        dctx.fillStyle = '#B92B92';
-        dctx.fillRect(w - 96, 28, 28, 28);
-        dctx.fillStyle = '#D4957A';
-        dctx.fillRect(w - 90, 34, 16, 16);
-
-        // Distant Dragon Keep / Monoliths Silhouette (#231C1A & #7A1F73 accents)
-        for (let x = 0; x < w; x += 24) {
-            const towerH = 28 + ((x * 17) % 45);
-            dctx.fillStyle = '#0D0D0F';
-            dctx.fillRect(x, h - 28 - towerH, 20, towerH);
-            dctx.fillStyle = '#231C1A';
-            dctx.fillRect(x + 2, h - 28 - towerH + 2, 16, towerH - 2);
-            if (x % 48 === 0) {
-                dctx.fillStyle = '#D4957A';
-                dctx.fillRect(x + 8, h - 20 - towerH, 4, 6);
-            }
-        }
-
-        // Dragon Forge Brazier in Center (#8A4E3B, #B92B92, #7A1F73, #D4957A)
-        const fireX = Math.floor(w / 2);
-        const fireY = h - 32;
-        dctx.fillStyle = '#56616E';
-        dctx.fillRect(fireX - 15, fireY + 4, 30, 6);
-        dctx.fillStyle = '#8A4E3B';
-        dctx.fillRect(fireX - 12, fireY + 2, 24, 4);
-
-        const flameH = 10 + Math.floor(Math.sin(dioramaTick * 0.2) * 4);
-        dctx.fillStyle = '#7A1F73';
-        dctx.fillRect(fireX - 10, fireY - flameH + 2, 20, flameH + 2);
-        dctx.fillStyle = '#B92B92';
-        dctx.fillRect(fireX - 7, fireY - flameH, 14, flameH + 2);
-        dctx.fillStyle = '#D4957A';
-        dctx.fillRect(fireX - 4, fireY - flameH + 4, 8, flameH - 2);
-
-        // Spawn gentle rising dragon embers (#B92B92, #D4957A, #7A1F73)
-        if (dioramaTick % 4 === 0) {
-            const emberColors = ['#B92B92', '#D4957A', '#7A1F73'];
-            dioramaParticles.push({
-                x: fireX + (Math.random() * 20 - 10),
-                y: fireY - 6,
-                vx: (Math.random() - 0.5) * 0.6,
-                vy: -0.7 - Math.random() * 1.1,
-                size: 3,
-                life: 1,
-                color: emberColors[Math.floor(Math.random() * emberColors.length)]
-            });
-        }
-    } else {
-        // CYBER NEON SCENE: Retro Synth Sun & Perspective Grid
-        const sunX = Math.floor(w / 2);
-        const sunY = h - 42;
-        dctx.fillStyle = '#ff007f';
-        dctx.fillRect(sunX - 36, sunY - 36, 72, 42);
-        dctx.fillStyle = '#00f5d4';
-        dctx.fillRect(sunX - 28, sunY - 28, 56, 12);
-
-        // Skyline Buildings with Neon Windows
-        dctx.fillStyle = '#07091e';
-        for (let x = 10; x < w; x += 38) {
-            const bH = 35 + ((x * 23) % 55);
-            dctx.fillRect(x, h - 28 - bH, 30, bH);
-            dctx.fillStyle = (x % 76 === 0) ? '#00f5d4' : '#ff007f';
-            dctx.fillRect(x + 6, h - 22 - bH, 4, 4);
-            dctx.fillRect(x + 16, h - 12 - bH, 4, 4);
-            dctx.fillStyle = '#07091e';
-        }
-
-        // Ambient digital rain
-        if (dioramaTick % 3 === 0) {
-            dioramaParticles.push({
-                x: Math.random() * w,
-                y: 0,
-                vx: 0,
-                vy: 1.5 + Math.random() * 2,
-                size: 3,
-                life: 1,
-                color: Math.random() > 0.5 ? '#00f5d4' : '#ff007f'
-            });
+    // Distant Dragon Keep / Monoliths Silhouette
+    for (let towerX = 0; towerX < width; towerX += 24) {
+        const towerHeight = 28 + ((towerX * 17) % 45);
+        dioramaContext.fillStyle = '#0D0D0F';
+        dioramaContext.fillRect(towerX, height - 28 - towerHeight, 20, towerHeight);
+        dioramaContext.fillStyle = '#231C1A';
+        dioramaContext.fillRect(towerX + 2, height - 28 - towerHeight + 2, 16, towerHeight - 2);
+        if (towerX % 48 === 0) {
+            dioramaContext.fillStyle = '#D4957A';
+            dioramaContext.fillRect(towerX + 8, height - 20 - towerHeight, 4, 6);
         }
     }
 
-    // Ground Platform (#231C1A base with #B92B92 & #56616E border in Dark Fantasy)
-    dctx.fillStyle = palette.groundColor;
-    dctx.fillRect(0, h - 28, w, 28);
-    dctx.fillStyle = palette.groundLine;
-    dctx.fillRect(0, h - 28, w, 3);
-    dctx.fillStyle = palette.steelBorder;
-    dctx.fillRect(0, h - 25, w, 2);
+    // Dragon Forge Brazier in Center
+    const fireX = Math.floor(width / 2);
+    const fireY = height - 32;
+    dioramaContext.fillStyle = '#56616E';
+    dioramaContext.fillRect(fireX - 15, fireY + 4, 30, 6);
+    dioramaContext.fillStyle = '#8A4E3B';
+    dioramaContext.fillRect(fireX - 12, fireY + 2, 24, 4);
+
+    const flameHeight = 10 + Math.floor(Math.sin(dioramaTick * 0.2) * 4);
+    dioramaContext.fillStyle = '#7A1F73';
+    dioramaContext.fillRect(fireX - 10, fireY - flameHeight + 2, 20, flameHeight + 2);
+    dioramaContext.fillStyle = '#B92B92';
+    dioramaContext.fillRect(fireX - 7, fireY - flameHeight, 14, flameHeight + 2);
+    dioramaContext.fillStyle = '#D4957A';
+    dioramaContext.fillRect(fireX - 4, fireY - flameHeight + 4, 8, flameHeight - 2);
+
+    // Spawn gentle rising dragon embers
+    if (dioramaTick % 4 === 0) {
+        const emberColors = ['#B92B92', '#D4957A', '#7A1F73'];
+        dioramaParticles.push({
+            x: fireX + (Math.random() * 20 - 10),
+            y: fireY - 6,
+            vx: (Math.random() - 0.5) * 0.6,
+            vy: -0.7 - Math.random() * 1.1,
+            size: 3,
+            life: 1,
+            color: emberColors[Math.floor(Math.random() * emberColors.length)]
+        });
+    }
+}
+
+function drawCyberDioramaScene(width, height) {
+    const sunX = Math.floor(width / 2);
+    const sunY = height - 42;
+    dioramaContext.fillStyle = '#ff007f';
+    dioramaContext.fillRect(sunX - 36, sunY - 36, 72, 42);
+    dioramaContext.fillStyle = '#00f5d4';
+    dioramaContext.fillRect(sunX - 28, sunY - 28, 56, 12);
+
+    // Skyline Buildings with Neon Windows
+    dioramaContext.fillStyle = '#07091e';
+    for (let buildingX = 10; buildingX < width; buildingX += 38) {
+        const buildingHeight = 35 + ((buildingX * 23) % 55);
+        dioramaContext.fillRect(buildingX, height - 28 - buildingHeight, 30, buildingHeight);
+        dioramaContext.fillStyle = (buildingX % 76 === 0) ? '#00f5d4' : '#ff007f';
+        dioramaContext.fillRect(buildingX + 6, height - 22 - buildingHeight, 4, 4);
+        dioramaContext.fillRect(buildingX + 16, height - 12 - buildingHeight, 4, 4);
+        dioramaContext.fillStyle = '#07091e';
+    }
+
+    // Ambient digital rain
+    if (dioramaTick % 3 === 0) {
+        dioramaParticles.push({
+            x: Math.random() * width,
+            y: 0,
+            vx: 0,
+            vy: 1.5 + Math.random() * 2,
+            size: 3,
+            life: 1,
+            color: Math.random() > 0.5 ? '#00f5d4' : '#ff007f'
+        });
+    }
+}
+
+function drawDioramaForeground(width, height, currentTheme, palette) {
+    // Ground Platform
+    dioramaContext.fillStyle = palette.groundColor;
+    dioramaContext.fillRect(0, height - 28, width, 28);
+    dioramaContext.fillStyle = palette.groundLine;
+    dioramaContext.fillRect(0, height - 28, width, 3);
+    dioramaContext.fillStyle = palette.steelBorder;
+    dioramaContext.fillRect(0, height - 25, width, 2);
 
     // Animated Hero Sprite standing in Diorama
     const bobOffset = Math.sin(dioramaTick * 0.1) > 0 ? -3 : 0;
     const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
-    drawPixelSprite(dctx, heroSprite, Math.floor(w * 0.22), h - 64 + bobOffset, 3, palette.spriteColors);
+    drawPixelSprite(
+        dioramaContext,
+        heroSprite,
+        Math.floor(width * 0.22),
+        height - 64 + bobOffset,
+        3,
+        palette.spriteColors
+    );
 
     // Floating Gem / Artifact on the right
-    const gemBob = Math.floor(Math.sin(dioramaTick * 0.08) * 5);
-    drawPixelSprite(dctx, SPRITES.commitGem, Math.floor(w * 0.75), h - 62 + gemBob, 3, palette.gemColors);
+    const gemBobOffset = Math.floor(Math.sin(dioramaTick * 0.08) * 5);
+    drawPixelSprite(
+        dioramaContext,
+        SPRITES.commitGem,
+        Math.floor(width * 0.75),
+        height - 62 + gemBobOffset,
+        3,
+        palette.gemColors
+    );
+}
 
-    // Update & Draw Diorama Particles
-    for (let i = dioramaParticles.length - 1; i >= 0; i--) {
-        const p = dioramaParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.02;
-        if (p.life <= 0) {
-            dioramaParticles.splice(i, 1);
+function updateAndDrawDioramaParticles() {
+    for (let index = dioramaParticles.length - 1; index >= 0; index--) {
+        const particle = dioramaParticles[index];
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life -= 0.02;
+
+        if (particle.life <= 0) {
+            dioramaParticles.splice(index, 1);
         } else {
-            dctx.fillStyle = p.color;
-            dctx.globalAlpha = Math.max(0, p.life);
-            dctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
-            dctx.globalAlpha = 1.0;
+            dioramaContext.fillStyle = particle.color;
+            dioramaContext.globalAlpha = Math.max(0, particle.life);
+            dioramaContext.fillRect(
+                Math.floor(particle.x),
+                Math.floor(particle.y),
+                particle.size,
+                particle.size
+            );
+            dioramaContext.globalAlpha = 1.0;
         }
     }
+}
+
+export function updateAndDrawDiorama() {
+    if (!dioramaCanvas || !dioramaContext) return;
+
+    dioramaTick++;
+    const width = dioramaCanvas.width;
+    const height = dioramaCanvas.height;
+    const currentTheme = getCurrentTheme();
+    const palette = THEME_PALETTES[currentTheme];
+
+    drawSkyGradient(width, height, palette);
+
+    if (currentTheme === 'fantasy') {
+        drawFantasyDioramaScene(width, height);
+    } else {
+        drawCyberDioramaScene(width, height);
+    }
+
+    drawDioramaForeground(width, height, currentTheme, palette);
+    updateAndDrawDioramaParticles();
 }
 
 export function initBgCanvas() {
     bgCanvas = document.getElementById('bgCanvas');
     if (!bgCanvas) return;
-    bgCtx = bgCanvas.getContext('2d');
+    backgroundContext = bgCanvas.getContext('2d');
 
     bgCanvas.width = window.innerWidth;
     bgCanvas.height = window.innerHeight;
-    bgStars = [];
-    for (let i = 0; i < 45; i++) {
-        bgStars.push({
+    backgroundStars = [];
+
+    for (let index = 0; index < 45; index++) {
+        backgroundStars.push({
             x: Math.random() * bgCanvas.width,
             y: Math.random() * bgCanvas.height,
             size: Math.random() > 0.7 ? 3 : 2,
@@ -220,25 +257,25 @@ export function initBgCanvas() {
 }
 
 export function updateAndDrawBg() {
-    if (!bgCanvas || !bgCtx) return;
+    if (!bgCanvas || !backgroundContext) return;
 
-    bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    backgroundContext.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
     const currentTheme = getCurrentTheme();
     const palette = THEME_PALETTES[currentTheme];
 
-    for (let i = 0; i < bgStars.length; i++) {
-        const star = bgStars[i];
+    for (let index = 0; index < backgroundStars.length; index++) {
+        const star = backgroundStars[index];
         star.y = (currentTheme === 'fantasy')
-            ? star.y - star.speedY // rising embers
-            : star.y + star.speedY * 1.6; // falling cyber data
+            ? star.y - star.speedY
+            : star.y + star.speedY * 1.6;
 
         if (star.y < 0) star.y = bgCanvas.height;
         if (star.y > bgCanvas.height) star.y = 0;
 
         const alpha = 0.25 + 0.35 * Math.sin(dioramaTick * 0.04 + star.phase);
-        bgCtx.fillStyle = palette.particleColors[i % palette.particleColors.length];
-        bgCtx.globalAlpha = alpha;
-        bgCtx.fillRect(Math.floor(star.x), Math.floor(star.y), star.size, star.size);
+        backgroundContext.fillStyle = palette.particleColors[index % palette.particleColors.length];
+        backgroundContext.globalAlpha = alpha;
+        backgroundContext.fillRect(Math.floor(star.x), Math.floor(star.y), star.size, star.size);
     }
-    bgCtx.globalAlpha = 1;
+    backgroundContext.globalAlpha = 1;
 }

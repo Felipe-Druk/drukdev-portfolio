@@ -2,18 +2,67 @@
  * RETRO 8-BIT WEB AUDIO SYNTHESIZER (NO EXTERNAL MP3s)
  **************************************************************/
 
-let audioCtx = null;
+let audioContext = null;
 let soundEnabled = true;
 
+const SOUND_PRESETS = {
+    jump: {
+        waveType: 'square',
+        startFrequency: 180,
+        endFrequency: 520,
+        rampType: 'exponential',
+        gainVolume: 0.08,
+        duration: 0.14
+    },
+    attack: {
+        waveType: 'sawtooth',
+        startFrequency: 480,
+        endFrequency: 110,
+        rampType: 'exponential',
+        gainVolume: 0.09,
+        duration: 0.12
+    },
+    coin: {
+        waveType: 'square',
+        startFrequency: 587.33, // D5
+        stepFrequency: 880,     // A5
+        stepTimeOffset: 0.06,
+        gainVolume: 0.08,
+        duration: 0.18
+    },
+    hit: {
+        waveType: 'triangle',
+        startFrequency: 260,
+        endFrequency: 70,
+        rampType: 'exponential',
+        gainVolume: 0.11,
+        duration: 0.15
+    },
+    gameover: {
+        waveType: 'sawtooth',
+        startFrequency: 300,
+        endFrequency: 120,
+        rampType: 'linear',
+        gainVolume: 0.1,
+        duration: 0.35
+    },
+    click: {
+        waveType: 'square',
+        startFrequency: 660,
+        gainVolume: 0.05,
+        duration: 0.05
+    }
+};
+
 export function initAudio() {
-    if (!audioCtx) {
+    if (!audioContext) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (AudioContextClass) {
-            audioCtx = new AudioContextClass();
+            audioContext = new AudioContextClass();
         }
     }
-    if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
+    if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
     }
 }
 
@@ -21,67 +70,42 @@ export function isSoundEnabled() {
     return soundEnabled;
 }
 
-export function playSound(type) {
-    if (!soundEnabled) return;
+function synthesizeTone(preset) {
+    const currentTime = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.type = preset.waveType;
+    oscillator.frequency.setValueAtTime(preset.startFrequency, currentTime);
+
+    if (preset.stepFrequency && preset.stepTimeOffset) {
+        oscillator.frequency.setValueAtTime(preset.stepFrequency, currentTime + preset.stepTimeOffset);
+    } else if (preset.endFrequency) {
+        if (preset.rampType === 'linear') {
+            oscillator.frequency.linearRampToValueAtTime(preset.endFrequency, currentTime + preset.duration);
+        } else {
+            oscillator.frequency.exponentialRampToValueAtTime(preset.endFrequency, currentTime + preset.duration);
+        }
+    }
+
+    gainNode.gain.setValueAtTime(preset.gainVolume, currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.01, currentTime + preset.duration);
+
+    oscillator.start(currentTime);
+    oscillator.stop(currentTime + preset.duration);
+}
+
+export function playSound(soundType) {
+    const preset = SOUND_PRESETS[soundType];
+    if (!soundEnabled || !preset) return;
 
     try {
         initAudio();
-        if (!audioCtx) return;
-
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'jump') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(180, now);
-            osc.frequency.exponentialRampToValueAtTime(520, now + 0.14);
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
-            osc.start(now);
-            osc.stop(now + 0.14);
-        } else if (type === 'attack') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(480, now);
-            osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
-            gain.gain.setValueAtTime(0.09, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-            osc.start(now);
-            osc.stop(now + 0.12);
-        } else if (type === 'coin') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(587.33, now); // D5
-            osc.frequency.setValueAtTime(880, now + 0.06); // A5
-            gain.gain.setValueAtTime(0.08, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
-            osc.start(now);
-            osc.stop(now + 0.18);
-        } else if (type === 'hit') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(260, now);
-            osc.frequency.exponentialRampToValueAtTime(70, now + 0.15);
-            gain.gain.setValueAtTime(0.11, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-            osc.start(now);
-            osc.stop(now + 0.15);
-        } else if (type === 'gameover') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(300, now);
-            osc.frequency.linearRampToValueAtTime(120, now + 0.35);
-            gain.gain.setValueAtTime(0.1, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-            osc.start(now);
-            osc.stop(now + 0.35);
-        } else if (type === 'click') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(660, now);
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-            osc.start(now);
-            osc.stop(now + 0.05);
-        }
+        if (!audioContext) return;
+        synthesizeTone(preset);
     } catch {
         // Ignore browser audio context autoplay lock errors
     }

@@ -3,7 +3,6 @@
  **************************************************************/
 
 export const DEFAULT_THEME = 'fantasy';
-export const CONTACT_EMAIL = 'contacto@druk.dev';
 export const HISCORE_STORAGE_KEY = 'drukdev_hiscore';
 
 let currentTheme = DEFAULT_THEME;

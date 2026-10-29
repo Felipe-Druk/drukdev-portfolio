@@ -26,41 +26,41 @@ let crtEnabled = true;
 let toastTimeout = null;
 let emailBtnResetTimeout = null;
 
+function setElementText(elementId, textValue) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = textValue;
+    }
+}
+
+function setElementClass(elementId, classNameValue) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.className = classNameValue;
+    }
+}
+
 export function setTheme(theme) {
     const activeTheme = setCurrentTheme(theme);
     const uiConfig = THEME_UI[activeTheme];
     if (!uiConfig) return;
 
     playSound('coin');
-
     document.body.classList.toggle('theme-cyber', uiConfig.isCyber);
 
-    const btnFantasy = document.getElementById('btnFantasy');
-    const btnCyber = document.getElementById('btnCyber');
-    if (btnFantasy) btnFantasy.className = uiConfig.btnFantasyClass;
-    if (btnCyber) btnCyber.className = uiConfig.btnCyberClass;
+    setElementClass('btnFantasy', uiConfig.btnFantasyClass);
+    setElementClass('btnCyber', uiConfig.btnCyberClass);
+    setElementClass('brandSuffix', uiConfig.brandSuffixClass);
+    setElementClass('statusBadge', uiConfig.statusBadgeClass);
 
-    const brandSuffix = document.getElementById('brandSuffix');
-    const statusBadge = document.getElementById('statusBadge');
-    const themeSubtitle = document.getElementById('themeSubtitle');
-    const heroTitle = document.getElementById('heroTitle');
-    const progressTask = document.getElementById('progressTask');
-    const gameTitle = document.getElementById('gameTitle');
-    const attackBtnLabel = document.getElementById('attackBtnLabel');
-    const featIcon1 = document.getElementById('featIcon1');
-    const featIcon2 = document.getElementById('featIcon2');
-    const featIcon3 = document.getElementById('featIcon3');
-
-    if (brandSuffix) brandSuffix.className = uiConfig.brandSuffixClass;
-    if (statusBadge) statusBadge.className = uiConfig.statusBadgeClass;
-    if (themeSubtitle) themeSubtitle.textContent = uiConfig.themeSubtitle;
-    if (heroTitle) heroTitle.textContent = uiConfig.heroTitle;
-    if (progressTask) progressTask.textContent = uiConfig.progressTask;
-    if (gameTitle) gameTitle.textContent = uiConfig.gameTitle;
-    if (attackBtnLabel) attackBtnLabel.textContent = uiConfig.attackBtnLabel;
-    if (featIcon1) featIcon1.textContent = uiConfig.featIcons[0];
-    if (featIcon2) featIcon2.textContent = uiConfig.featIcons[1];
-    if (featIcon3) featIcon3.textContent = uiConfig.featIcons[2];
+    setElementText('themeSubtitle', uiConfig.themeSubtitle);
+    setElementText('heroTitle', uiConfig.heroTitle);
+    setElementText('progressTask', uiConfig.progressTask);
+    setElementText('gameTitle', uiConfig.gameTitle);
+    setElementText('attackBtnLabel', uiConfig.attackBtnLabel);
+    setElementText('featIcon1', uiConfig.featIcons[0]);
+    setElementText('featIcon2', uiConfig.featIcons[1]);
+    setElementText('featIcon3', uiConfig.featIcons[2]);
 
     renderStaticPreviews(activeTheme);
     spawnCenterDioramaBurst(24);
@@ -68,72 +68,40 @@ export function setTheme(theme) {
 
 export function handleToggleSound() {
     const enabled = toggleSound();
-    const icon = document.getElementById('soundIcon');
-    const label = document.getElementById('soundLabel');
-
     if (enabled) {
-        if (icon) icon.className = 'fa-solid fa-volume-high text-bronze';
-        if (label) label.textContent = 'SFX ON';
+        setElementClass('soundIcon', 'fa-solid fa-volume-high text-bronze');
+        setElementText('soundLabel', 'SFX ON');
     } else {
-        if (icon) icon.className = 'fa-solid fa-volume-xmark text-gray-400';
-        if (label) label.textContent = 'MUTE';
+        setElementClass('soundIcon', 'fa-solid fa-volume-xmark text-gray-400');
+        setElementText('soundLabel', 'MUTE');
     }
 }
 
 export function toggleCRT() {
     crtEnabled = !crtEnabled;
-    const overlay = document.getElementById('crtOverlay');
-    if (overlay) {
-        overlay.style.display = crtEnabled ? 'block' : 'none';
+    const crtOverlayElement = document.getElementById('crtOverlay');
+    if (crtOverlayElement) {
+        crtOverlayElement.style.display = crtEnabled ? 'block' : 'none';
     }
     playSound('click');
 }
 
-export function showToast(icon, title, msg) {
-    const toast = document.getElementById('toast');
-    const toastIcon = document.getElementById('toastIcon');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMsg = document.getElementById('toastMsg');
+export function showToast(icon, title, message) {
+    setElementText('toastIcon', icon);
+    setElementText('toastTitle', title);
+    setElementText('toastMsg', message);
 
-    if (toastIcon) toastIcon.textContent = icon;
-    if (toastTitle) toastTitle.textContent = title;
-    if (toastMsg) toastMsg.textContent = msg;
-
-    if (toast) {
-        toast.classList.remove('translate-y-24', 'opacity-0');
+    const toastElement = document.getElementById('toast');
+    if (toastElement) {
+        toastElement.classList.remove('translate-y-24', 'opacity-0');
         clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => {
-            toast.classList.add('translate-y-24', 'opacity-0');
+            toastElement.classList.add('translate-y-24', 'opacity-0');
         }, 3200);
     }
 }
 
-export function copyEmail() {
-    const email = CONTACT_LINKS.email;
-    if (!email) return;
-
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(email).catch(() => {
-            fallbackCopyText(email);
-        });
-    } else {
-        fallbackCopyText(email);
-    }
-
-    playSound('coin');
-    showToast('📜', '¡EMAIL COPIADO!', `${email} listo para pegar.`);
-
-    const emailBtnText = document.getElementById('emailBtnText');
-    if (emailBtnText) {
-        emailBtnText.textContent = `¡Copiado! (${email})`;
-        clearTimeout(emailBtnResetTimeout);
-        emailBtnResetTimeout = setTimeout(() => {
-            emailBtnText.textContent = `Copiar Email (${email})`;
-        }, 2200);
-    }
-}
-
-function fallbackCopyText(text) {
+function fallbackCopyTextToClipboard(text) {
     const clipboardTextarea = document.createElement('textarea');
     clipboardTextarea.value = text;
     document.body.appendChild(clipboardTextarea);
@@ -142,46 +110,58 @@ function fallbackCopyText(text) {
     document.body.removeChild(clipboardTextarea);
 }
 
+export function copyEmail() {
+    const emailAddress = CONTACT_LINKS.email;
+    if (!emailAddress) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(emailAddress).catch(() => {
+            fallbackCopyTextToClipboard(emailAddress);
+        });
+    } else {
+        fallbackCopyTextToClipboard(emailAddress);
+    }
+
+    playSound('coin');
+    showToast('📜', '¡EMAIL COPIADO!', `${emailAddress} listo para pegar.`);
+
+    setElementText('emailBtnText', `¡Copiado! (${emailAddress})`);
+    clearTimeout(emailBtnResetTimeout);
+    emailBtnResetTimeout = setTimeout(() => {
+        setElementText('emailBtnText', `Copiar Email (${emailAddress})`);
+    }, 2200);
+}
+
+function configureExternalLinkElement(linkElement, rawUrl) {
+    const normalizedUrl = typeof rawUrl === 'string' ? rawUrl.trim() : '';
+    if (normalizedUrl !== '') {
+        linkElement.setAttribute('href', normalizedUrl);
+        linkElement.setAttribute('target', '_blank');
+        linkElement.setAttribute('rel', 'noopener noreferrer');
+        linkElement.style.display = '';
+    } else {
+        linkElement.style.display = 'none';
+    }
+}
+
 export function initContactLinks() {
-    // 1. Bind all [data-social] buttons dynamically from CONTACT_LINKS.socials
     const socialElements = document.querySelectorAll('[data-social]');
-    socialElements.forEach((el) => {
-        const networkKey = el.getAttribute('data-social');
-        const url = CONTACT_LINKS.socials?.[networkKey];
-
-        if (url && url.trim() !== '') {
-            el.setAttribute('href', url.trim());
-            el.setAttribute('target', '_blank');
-            el.setAttribute('rel', 'noopener noreferrer');
-            el.style.display = '';
-        } else {
-            el.style.display = 'none';
-        }
+    socialElements.forEach((socialElement) => {
+        const networkKey = socialElement.getAttribute('data-social');
+        const socialUrl = CONTACT_LINKS.socials?.[networkKey];
+        configureExternalLinkElement(socialElement, socialUrl);
     });
 
-    // 2. Bind CV link if present ([data-contact="cv"])
     const cvElements = document.querySelectorAll('[data-contact="cv"]');
-    cvElements.forEach((el) => {
-        const cvUrl = CONTACT_LINKS.cv;
-        if (cvUrl && cvUrl.trim() !== '') {
-            el.setAttribute('href', cvUrl.trim());
-            el.setAttribute('target', '_blank');
-            el.setAttribute('rel', 'noopener noreferrer');
-            el.style.display = '';
-        } else {
-            el.style.display = 'none';
-        }
+    cvElements.forEach((cvElement) => {
+        configureExternalLinkElement(cvElement, CONTACT_LINKS.cv);
     });
 
-    // 3. Connect Copy Email button (#copy-email-btn / [data-contact="email"])
     const copyEmailBtn = document.getElementById('copy-email-btn') || document.querySelector('[data-contact="email"]');
-    const emailBtnText = document.getElementById('emailBtnText');
-
     if (copyEmailBtn) {
-        if (CONTACT_LINKS.email && CONTACT_LINKS.email.trim() !== '') {
-            if (emailBtnText) {
-                emailBtnText.textContent = `Copiar Email (${CONTACT_LINKS.email})`;
-            }
+        const emailAddress = typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
+        if (emailAddress !== '') {
+            setElementText('emailBtnText', `Copiar Email (${emailAddress})`);
             copyEmailBtn.addEventListener('click', copyEmail);
         } else {
             copyEmailBtn.style.display = 'none';
@@ -201,8 +181,8 @@ function bindUIEvents() {
     if (btnSound) btnSound.addEventListener('click', handleToggleSound);
     if (btnCrt) btnCrt.addEventListener('click', toggleCRT);
 
-    sfxLinks.forEach((link) => {
-        link.addEventListener('click', () => playSound('click'));
+    sfxLinks.forEach((linkElement) => {
+        linkElement.addEventListener('click', () => playSound('click'));
     });
 
     window.addEventListener('resize', () => {

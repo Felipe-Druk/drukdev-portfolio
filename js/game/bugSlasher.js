@@ -6,12 +6,16 @@ import { THEME_PALETTES, HISCORE_STORAGE_KEY, getCurrentTheme } from '../config/
 import { playSound } from '../audio/soundEngine.js';
 import { SPRITES, drawPixelSprite } from '../graphics/sprites.js';
 
-const GAME_W = 400;
-const GAME_H = 300;
+const GAME_WIDTH = 400;
+const GAME_HEIGHT = 300;
 const GROUND_Y = 248;
+const GRAVITY = 0.52;
+const JUMP_VELOCITY = -9.6;
+const INITIAL_GAME_SPEED = 3.2;
+const MAX_GAME_SPEED = 7.2;
 
 let gameCanvas = null;
-let gctx = null;
+let gameContext = null;
 
 let gameRunning = false;
 let score = 0;
@@ -27,25 +31,43 @@ const player = {
     attackTimer: 0
 };
 
-let entities = []; // bugs and commit gems
+let entities = [];
 let gameParticles = [];
 let spawnTimer = 0;
-let gameSpeed = 3.2;
+let gameSpeed = INITIAL_GAME_SPEED;
 
-function rectIntersect(a, b) {
+function rectIntersect(rectA, rectB) {
     return (
-        a.x < b.x + b.w &&
-        a.x + a.w > b.x &&
-        a.y < b.y + b.h &&
-        a.y + a.h > b.y
+        rectA.x < rectB.x + rectB.w &&
+        rectA.x + rectA.w > rectB.x &&
+        rectA.y < rectB.y + rectB.h &&
+        rectA.y + rectA.h > rectB.y
     );
 }
 
-function spawnGameParticles(x, y, count, color) {
-    for (let i = 0; i < count; i++) {
+function getPlayerSlashHitbox() {
+    return {
+        x: player.x + player.w - 4,
+        y: player.y - 8,
+        w: 48,
+        h: player.h + 16
+    };
+}
+
+function getPlayerBodyHitbox() {
+    return {
+        x: player.x + 6,
+        y: player.y + 4,
+        w: player.w - 12,
+        h: player.h - 6
+    };
+}
+
+function spawnGameParticles(originX, originY, particleCount, color) {
+    for (let index = 0; index < particleCount; index++) {
         gameParticles.push({
-            x,
-            y,
+            x: originX,
+            y: originY,
             vx: (Math.random() - 0.5) * 5,
             vy: (Math.random() - 0.5) * 5,
             size: 4,
@@ -55,20 +77,31 @@ function spawnGameParticles(x, y, count, color) {
     }
 }
 
+function destroyBugEntity(entityIndex, slashColor, particleCount = 15) {
+    const targetBug = entities[entityIndex];
+    if (!targetBug) return;
+
+    spawnGameParticles(targetBug.x + 12, targetBug.y + 12, particleCount, slashColor);
+    entities.splice(entityIndex, 1);
+    score += 15;
+    playSound('hit');
+    updateScoreUI();
+}
+
 export function updateScoreUI() {
-    const scoreEl = document.getElementById('scoreDisplay');
-    const hiScoreEl = document.getElementById('hiScoreDisplay');
-    if (scoreEl) scoreEl.textContent = score;
-    if (hiScoreEl) hiScoreEl.textContent = hiScore;
+    const scoreElement = document.getElementById('scoreDisplay');
+    const hiScoreElement = document.getElementById('hiScoreDisplay');
+    if (scoreElement) scoreElement.textContent = score;
+    if (hiScoreElement) hiScoreElement.textContent = hiScore;
 }
 
 export function startGame() {
     playSound('coin');
-    const overlay = document.getElementById('gameOverlay');
-    if (overlay) overlay.classList.add('hidden');
+    const overlayElement = document.getElementById('gameOverlay');
+    if (overlayElement) overlayElement.classList.add('hidden');
 
     score = 0;
-    gameSpeed = 3.2;
+    gameSpeed = INITIAL_GAME_SPEED;
     entities = [];
     gameParticles = [];
     player.y = GROUND_Y - player.h;
@@ -89,8 +122,8 @@ export function gameOver() {
     }
     updateScoreUI();
 
-    const overlay = document.getElementById('gameOverlay');
-    if (overlay) overlay.classList.remove('hidden');
+    const overlayElement = document.getElementById('gameOverlay');
+    if (overlayElement) overlayElement.classList.remove('hidden');
 
     const overlayTitle = document.getElementById('overlayTitle');
     const overlayDesc = document.getElementById('overlayDesc');
@@ -107,41 +140,30 @@ export function gameOver() {
     }
 }
 
-export function triggerJump(e) {
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    if (!gameRunning) return;
-    if (player.grounded) {
-        player.vy = -9.6;
-        player.grounded = false;
-        playSound('jump');
-        spawnGameParticles(player.x + 12, player.y + 34, 6, '#ffffff');
-    }
+export function triggerJump(event) {
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
+    if (!gameRunning || !player.grounded) return;
+
+    player.vy = JUMP_VELOCITY;
+    player.grounded = false;
+    playSound('jump');
+    spawnGameParticles(player.x + 12, player.y + 34, 6, '#ffffff');
 }
 
-export function triggerAttack(e) {
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    if (!gameRunning) return;
-    if (player.attackTimer <= 0) {
-        player.attackTimer = 14;
-        playSound('attack');
+export function triggerAttack(event) {
+    if (event && typeof event.preventDefault === 'function') event.preventDefault();
+    if (!gameRunning || player.attackTimer > 0) return;
 
-        const currentTheme = getCurrentTheme();
-        const slashBox = {
-            x: player.x + player.w - 4,
-            y: player.y - 8,
-            w: 48,
-            h: player.h + 16
-        };
+    player.attackTimer = 14;
+    playSound('attack');
 
-        for (let i = entities.length - 1; i >= 0; i--) {
-            const ent = entities[i];
-            if (ent.type === 'bug' && rectIntersect(slashBox, ent)) {
-                spawnGameParticles(ent.x + 12, ent.y + 12, 16, THEME_PALETTES[currentTheme].slashColor);
-                entities.splice(i, 1);
-                score += 15;
-                playSound('hit');
-                updateScoreUI();
-            }
+    const palette = THEME_PALETTES[getCurrentTheme()];
+    const slashHitbox = getPlayerSlashHitbox();
+
+    for (let index = entities.length - 1; index >= 0; index--) {
+        const entity = entities[index];
+        if (entity.type === 'bug' && rectIntersect(slashHitbox, entity)) {
+            destroyBugEntity(index, palette.slashColor, 16);
         }
     }
 }
@@ -149,53 +171,46 @@ export function triggerAttack(e) {
 export function initGame() {
     gameCanvas = document.getElementById('gameCanvas');
     if (!gameCanvas) return;
-    gctx = gameCanvas.getContext('2d');
+    gameContext = gameCanvas.getContext('2d');
 
-    gameCanvas.width = GAME_W;
-    gameCanvas.height = GAME_H;
+    gameCanvas.width = GAME_WIDTH;
+    gameCanvas.height = GAME_HEIGHT;
 
     updateScoreUI();
 
-    // Start button
     const btnStartGame = document.getElementById('btnStartGame');
     if (btnStartGame) {
         btnStartGame.addEventListener('click', startGame);
     }
 
-    // Touch / Mouse control buttons
     const btnJump = document.getElementById('btnJump');
     if (btnJump) {
         btnJump.addEventListener('mousedown', () => triggerJump());
-        btnJump.addEventListener('touchstart', (e) => triggerJump(e), { passive: false });
+        btnJump.addEventListener('touchstart', (event) => triggerJump(event), { passive: false });
     }
 
     const btnAttack = document.getElementById('btnAttack');
     if (btnAttack) {
         btnAttack.addEventListener('mousedown', () => triggerAttack());
-        btnAttack.addEventListener('touchstart', (e) => triggerAttack(e), { passive: false });
+        btnAttack.addEventListener('touchstart', (event) => triggerAttack(event), { passive: false });
     }
 
-    // Keyboard controls
-    window.addEventListener('keydown', (e) => {
-        if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
-            if (gameRunning) {
-                e.preventDefault();
-                triggerJump();
-            }
-        } else if (['KeyK', 'KeyJ', 'ArrowRight', 'Enter'].includes(e.code)) {
-            if (gameRunning) {
-                e.preventDefault();
-                triggerAttack();
-            }
+    window.addEventListener('keydown', (event) => {
+        if (!gameRunning) return;
+        if (['Space', 'ArrowUp', 'KeyW'].includes(event.code)) {
+            event.preventDefault();
+            triggerJump();
+        } else if (['KeyK', 'KeyJ', 'ArrowRight', 'Enter'].includes(event.code)) {
+            event.preventDefault();
+            triggerAttack();
         }
     });
 
-    // Click on Game Canvas to attack/jump
-    gameCanvas.addEventListener('mousedown', (e) => {
+    gameCanvas.addEventListener('mousedown', (event) => {
         if (!gameRunning) return;
-        const rect = gameCanvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        if (clickX < rect.width / 2) {
+        const canvasRect = gameCanvas.getBoundingClientRect();
+        const clickX = event.clientX - canvasRect.left;
+        if (clickX < canvasRect.width / 2) {
             triggerJump();
         } else {
             triggerAttack();
@@ -203,152 +218,152 @@ export function initGame() {
     });
 }
 
+function updatePlayerPhysics() {
+    player.y += player.vy;
+    player.vy += GRAVITY;
+
+    if (player.y >= GROUND_Y - player.h) {
+        player.y = GROUND_Y - player.h;
+        player.vy = 0;
+        player.grounded = true;
+    }
+
+    if (player.attackTimer > 0) {
+        player.attackTimer--;
+    }
+}
+
+function updateEntitySpawner() {
+    spawnTimer--;
+    if (spawnTimer > 0) return;
+
+    const isGem = Math.random() < 0.35;
+    entities.push({
+        type: isGem ? 'gem' : 'bug',
+        x: GAME_WIDTH + 20,
+        y: isGem ? (GROUND_Y - 32 - (Math.random() > 0.5 ? 42 : 0)) : (GROUND_Y - 26),
+        w: 26,
+        h: 26
+    });
+    spawnTimer = Math.floor(45 + Math.random() * 45);
+}
+
+function updateGameEntities(palette) {
+    const slashHitbox = getPlayerSlashHitbox();
+    const playerHitbox = getPlayerBodyHitbox();
+
+    for (let index = entities.length - 1; index >= 0; index--) {
+        const entity = entities[index];
+        entity.x -= gameSpeed;
+
+        // Destroy bugs inside active slash wave
+        if (player.attackTimer > 4 && entity.type === 'bug' && rectIntersect(slashHitbox, entity)) {
+            destroyBugEntity(index, palette.slashColor, 14);
+            continue;
+        }
+
+        // Check collision with player body
+        if (rectIntersect(playerHitbox, entity)) {
+            if (entity.type === 'gem') {
+                score += 25;
+                playSound('coin');
+                spawnGameParticles(entity.x + 10, entity.y + 10, 12, palette.warmBronze);
+                entities.splice(index, 1);
+                updateScoreUI();
+                continue;
+            }
+            spawnGameParticles(player.x + 16, player.y + 16, 24, palette.slashColor);
+            gameOver();
+            break;
+        }
+
+        // Entity passed left screen edge safely
+        if (entity.x + entity.w < 0) {
+            if (entity.type === 'bug') {
+                score += 5;
+                updateScoreUI();
+            }
+            entities.splice(index, 1);
+        }
+    }
+}
+
+function drawGameScene(currentTheme, palette) {
+    // Clear Sky
+    gameContext.fillStyle = palette.bgSkyTop;
+    gameContext.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+
+    // Retro Horizon Grid Lines
+    gameContext.fillStyle = 'rgba(255,255,255,0.04)';
+    for (let gridY = 40; gridY < GROUND_Y; gridY += 35) {
+        gameContext.fillRect(0, gridY, GAME_WIDTH, 1);
+    }
+
+    // Ground
+    gameContext.fillStyle = palette.groundColor;
+    gameContext.fillRect(0, GROUND_Y, GAME_WIDTH, GAME_HEIGHT - GROUND_Y);
+    gameContext.fillStyle = palette.groundLine;
+    gameContext.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
+
+    // Player Sprite
+    const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
+    drawPixelSprite(gameContext, heroSprite, player.x, player.y, 3, palette.spriteColors);
+
+    // Attack Slash Wave
+    if (player.attackTimer > 0) {
+        gameContext.fillStyle = palette.slashColor;
+        const slashOffset = (14 - player.attackTimer) * 2;
+        gameContext.fillRect(player.x + player.w + slashOffset, player.y + 2, 10, 30);
+        gameContext.fillRect(player.x + player.w + slashOffset + 10, player.y + 8, 6, 18);
+    }
+
+    // Entities (Bugs & Commit Gems)
+    const bugSprite = currentTheme === 'fantasy' ? SPRITES.fantasyBug : SPRITES.cyberBug;
+    for (const entity of entities) {
+        if (entity.type === 'bug') {
+            drawPixelSprite(gameContext, bugSprite, entity.x, entity.y, 3, palette.bugColors);
+        } else {
+            drawPixelSprite(gameContext, SPRITES.commitGem, entity.x, entity.y, 3, palette.gemColors);
+        }
+    }
+}
+
+function updateAndDrawGameParticles() {
+    for (let index = gameParticles.length - 1; index >= 0; index--) {
+        const particle = gameParticles[index];
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life -= 0.05;
+
+        if (particle.life <= 0) {
+            gameParticles.splice(index, 1);
+        } else {
+            gameContext.fillStyle = particle.color;
+            gameContext.globalAlpha = Math.max(0, particle.life);
+            gameContext.fillRect(
+                Math.floor(particle.x),
+                Math.floor(particle.y),
+                particle.size,
+                particle.size
+            );
+            gameContext.globalAlpha = 1;
+        }
+    }
+}
+
 export function updateAndDrawGame() {
-    if (!gameCanvas || !gctx) return;
+    if (!gameCanvas || !gameContext) return;
 
     const currentTheme = getCurrentTheme();
     const palette = THEME_PALETTES[currentTheme];
 
-    // Clear Sky
-    gctx.fillStyle = palette.bgSkyTop;
-    gctx.fillRect(0, 0, GAME_W, GAME_H);
-
-    // Retro Horizon Grid Lines
-    gctx.fillStyle = 'rgba(255,255,255,0.04)';
-    for (let y = 40; y < GROUND_Y; y += 35) {
-        gctx.fillRect(0, y, GAME_W, 1);
-    }
-
-    // Ground
-    gctx.fillStyle = palette.groundColor;
-    gctx.fillRect(0, GROUND_Y, GAME_W, GAME_H - GROUND_Y);
-    gctx.fillStyle = palette.groundLine;
-    gctx.fillRect(0, GROUND_Y, GAME_W, 4);
-
     if (gameRunning) {
-        // Physics
-        player.y += player.vy;
-        player.vy += 0.52; // gravity
-
-        if (player.y >= GROUND_Y - player.h) {
-            player.y = GROUND_Y - player.h;
-            player.vy = 0;
-            player.grounded = true;
-        }
-
-        if (player.attackTimer > 0) {
-            player.attackTimer--;
-        }
-
-        // Increase speed gradually
-        gameSpeed = Math.min(7.2, 3.2 + score * 0.012);
-
-        // Spawn Bugs and Commit Gems
-        spawnTimer--;
-        if (spawnTimer <= 0) {
-            const isGem = Math.random() < 0.35;
-            entities.push({
-                type: isGem ? 'gem' : 'bug',
-                x: GAME_W + 20,
-                y: isGem ? (GROUND_Y - 32 - (Math.random() > 0.5 ? 42 : 0)) : (GROUND_Y - 26),
-                w: 26,
-                h: 26
-            });
-            spawnTimer = Math.floor(45 + Math.random() * 45);
-        }
-
-        // Update Entities
-        const slashBox = {
-            x: player.x + player.w - 4,
-            y: player.y - 8,
-            w: 48,
-            h: player.h + 16
-        };
-
-        for (let i = entities.length - 1; i >= 0; i--) {
-            const ent = entities[i];
-            ent.x -= gameSpeed;
-
-            // If player is actively slashing, destroy bugs in front
-            if (player.attackTimer > 4 && ent.type === 'bug' && rectIntersect(slashBox, ent)) {
-                spawnGameParticles(ent.x + 12, ent.y + 12, 14, palette.slashColor);
-                entities.splice(i, 1);
-                score += 15;
-                playSound('hit');
-                updateScoreUI();
-                continue;
-            }
-
-            // Check collision with player body
-            const playerHitbox = {
-                x: player.x + 6,
-                y: player.y + 4,
-                w: player.w - 12,
-                h: player.h - 6
-            };
-
-            if (rectIntersect(playerHitbox, ent)) {
-                if (ent.type === 'gem') {
-                    score += 25;
-                    playSound('coin');
-                    spawnGameParticles(ent.x + 10, ent.y + 10, 12, palette.warmBronze);
-                    entities.splice(i, 1);
-                    updateScoreUI();
-                    continue;
-                } else {
-                    // Hit a Bug!
-                    spawnGameParticles(player.x + 16, player.y + 16, 24, palette.slashColor);
-                    gameOver();
-                    break;
-                }
-            }
-
-            // Passed screen safely
-            if (ent.x + ent.w < 0) {
-                if (ent.type === 'bug') {
-                    score += 5;
-                    updateScoreUI();
-                }
-                entities.splice(i, 1);
-            }
-        }
+        updatePlayerPhysics();
+        gameSpeed = Math.min(MAX_GAME_SPEED, INITIAL_GAME_SPEED + score * 0.012);
+        updateEntitySpawner();
+        updateGameEntities(palette);
     }
 
-    // Draw Player Sprite
-    const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
-    drawPixelSprite(gctx, heroSprite, player.x, player.y, 3, palette.spriteColors);
-
-    // Draw Attack Slash Wave
-    if (player.attackTimer > 0) {
-        gctx.fillStyle = palette.slashColor;
-        const offset = (14 - player.attackTimer) * 2;
-        gctx.fillRect(player.x + player.w + offset, player.y + 2, 10, 30);
-        gctx.fillRect(player.x + player.w + offset + 10, player.y + 8, 6, 18);
-    }
-
-    // Draw Entities
-    const bugSprite = currentTheme === 'fantasy' ? SPRITES.fantasyBug : SPRITES.cyberBug;
-    for (const ent of entities) {
-        if (ent.type === 'bug') {
-            drawPixelSprite(gctx, bugSprite, ent.x, ent.y, 3, palette.bugColors);
-        } else {
-            drawPixelSprite(gctx, SPRITES.commitGem, ent.x, ent.y, 3, palette.gemColors);
-        }
-    }
-
-    // Draw Game Particles
-    for (let i = gameParticles.length - 1; i >= 0; i--) {
-        const p = gameParticles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.05;
-        if (p.life <= 0) {
-            gameParticles.splice(i, 1);
-        } else {
-            gctx.fillStyle = p.color;
-            gctx.globalAlpha = Math.max(0, p.life);
-            gctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
-            gctx.globalAlpha = 1;
-        }
-    }
+    drawGameScene(currentTheme, palette);
+    updateAndDrawGameParticles();
 }
