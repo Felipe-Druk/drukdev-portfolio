@@ -1,17 +1,63 @@
-/* Crisp Pixel Borders */
-.pixel-box {
+/* Forged Steel Frame (Inspired by DrukDev Dragon Logo Ring) */
+.pixel-box,
+.canvas-frame {
     background: var(--bg-panel);
-    border: 3px solid var(--border-color);
+    border: 3px solid #56616E;
+    outline: 2px solid #0D0D0F;
     box-shadow:
-        0 0 0 3px var(--bg-primary),
-        0 0 24px var(--accent-glow),
-        inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+        inset 0 0 0 2px #2B3138,
+        6px 6px 0px #0D0D0F;
     position: relative;
     transition: all 0.3s ease;
 }
 
+body.theme-cyber .pixel-box,
+body.theme-cyber .canvas-frame {
+    border-color: var(--border-color);
+    box-shadow:
+        inset 0 0 0 2px #121738,
+        6px 6px 0px #050510,
+        0 0 20px var(--accent-glow);
+}
+
 .pixel-box-active {
     border-color: var(--border-highlight);
+    box-shadow:
+        inset 0 0 0 2px #2B3138,
+        6px 6px 0px #0D0D0F,
+        0 0 22px var(--accent-glow);
+}
+
+/* Circular Forged Steel Avatar Ring */
+.avatar-steel-ring {
+    background-color: #231C1A;
+    border: 3px solid #56616E;
+    outline: 2px solid #0D0D0F;
+    box-shadow:
+        inset 0 0 0 2px #2B3138,
+        0 0 0 1px #D8E2EB,
+        4px 4px 0px #0D0D0F;
+    border-radius: 9999px;
+    image-rendering: pixelated;
+    overflow: hidden;
+}
+
+.avatar-steel-ring img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Warm Bronze & Dragon Scale Accent Typography */
+.text-bronze {
+    color: var(--accent-warm);
+}
+
+.text-dragon {
+    color: var(--accent-main);
+}
+
+.text-steel {
+    color: var(--steel-light);
 }
 
 /* Corner Pixel Rivets */
@@ -21,42 +67,61 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    background: var(--accent-secondary);
+    background: var(--steel-light);
     pointer-events: none;
 }
 
 .pixel-corners::before {
     top: -4px;
     left: -4px;
-    box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+    box-shadow: calc(100% + 0px) 0 0 var(--steel-light);
 }
 
 .pixel-corners::after {
     bottom: -4px;
     left: -4px;
-    box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+    box-shadow: calc(100% + 0px) 0 0 var(--steel-light);
 }
 
-/* Arcade Pixel Button */
+/* Arcade Pixel Button (Dragon Scales & Beveled Steel) */
 .pixel-btn {
-    background: var(--bg-panel-alt);
-    border: 2px solid var(--border-highlight);
-    color: var(--text-main);
-    box-shadow: 4px 4px 0px var(--accent-main);
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+    background: linear-gradient(180deg, #B92B92 0%, #7A1F73 100%);
+    border: 2px solid #56616E;
+    outline: 1px solid #0D0D0F;
+    color: #D8E2EB;
+    box-shadow:
+        inset 0 1px 0 rgba(216, 226, 235, 0.25),
+        4px 4px 0px #0D0D0F;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.2s ease, filter 0.2s ease;
     cursor: pointer;
     user-select: none;
 }
 
 .pixel-btn:hover {
+    background: linear-gradient(180deg, #c938a0 0%, #B92B92 100%);
+    border-color: #D8E2EB;
     transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0px var(--accent-secondary);
-    background: rgba(255, 255, 255, 0.06);
+    box-shadow:
+        inset 0 1px 0 rgba(216, 226, 235, 0.45),
+        5px 5px 0px #0D0D0F,
+        0 0 14px var(--accent-glow);
 }
 
 .pixel-btn:active {
     transform: translate(3px, 3px);
-    box-shadow: 1px 1px 0px var(--accent-main);
+    box-shadow: 1px 1px 0px #0D0D0F;
+}
+
+body.theme-cyber .pixel-btn {
+    background: var(--bg-panel-alt);
+    border-color: var(--border-highlight);
+    color: var(--text-main);
+    box-shadow: 4px 4px 0px var(--accent-main);
+}
+
+body.theme-cyber .pixel-btn:hover {
+    border-color: #ffffff;
+    box-shadow: 5px 5px 0px var(--accent-secondary);
 }
 
 /* Custom Progress Bar Stripes */

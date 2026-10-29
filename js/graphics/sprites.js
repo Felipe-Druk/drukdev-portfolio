@@ -5,25 +5,25 @@
 import { THEME_PALETTES, getCurrentTheme } from '../config/themes.js';
 
 // Pixel Art Sprite Matrices (8x8 or 12x12 grids encoded as strings)
-// Legend:
+// Legend (Dark Fantasy / Dragon Palette):
 // '.' = transparent
-// '1' = Primary Armor / Suit
-// '2' = Secondary Accent (Gold / Magenta)
-// '3' = Glow / Visor / Eyes / Blade Energy
-// '4' = Dark Outline / Shadow
+// '1' = Escamas luz (#B92B92) / Cyber Slate
+// '2' = Escamas base (#7A1F73) / Neon Magenta
+// '3' = Pecho bronce (#D4957A) / Cyber Cyan
+// '4' = Carbón oscuro (#231C1A) / Dark Outline
 export const SPRITES = {
     fantasyKnight: [
-        "....2222....",
-        "...111111...",
-        "..11444411..",
+        "..3.2222.3..",
+        ".3211111123.",
+        "..21444412..",
         "..14333341..",
-        "..11444411..",
-        "...112211...",
-        "..21111112..",
-        ".2111221112.",
-        ".2.111111.2.",
-        "...11..11...",
-        "...11..11...",
+        ".2114334112.",
+        "22.133331.22",
+        "2..133331..2",
+        ".2113333112.",
+        "..21333312..",
+        "...12..21...",
+        "...22..22...",
         "..44....44.."
     ],
     cyberRunner: [
@@ -94,7 +94,7 @@ export function renderStaticPreviews(theme = getCurrentTheme()) {
     const palette = THEME_PALETTES[theme];
     const sprite = theme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
 
-    // Header small avatar
+    // Header fallback sprite canvas (if used alongside circular logo)
     const logoCanvas = document.getElementById('logoSpriteCanvas');
     if (logoCanvas) {
         const lctx = logoCanvas.getContext('2d');

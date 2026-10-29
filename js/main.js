@@ -70,7 +70,7 @@ export function handleToggleSound() {
     const label = document.getElementById('soundLabel');
 
     if (enabled) {
-        if (icon) icon.className = 'fa-solid fa-volume-high text-amber-400';
+        if (icon) icon.className = 'fa-solid fa-volume-high text-bronze';
         if (label) label.textContent = 'SFX ON';
     } else {
         if (icon) icon.className = 'fa-solid fa-volume-xmark text-gray-400';

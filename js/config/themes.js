@@ -21,35 +21,43 @@ export function setCurrentTheme(theme) {
 
 export const THEME_PALETTES = {
     fantasy: {
-        bgSkyTop: '#08050b',
-        bgSkyBottom: '#1c0d1f',
-        groundColor: '#251329',
-        groundLine: '#ff3b30',
+        bgSkyTop: '#0D0D0F',
+        bgSkyBottom: '#231C1A',
+        groundColor: '#231C1A',
+        groundLine: '#B92B92',
+        steelBorder: '#56616E',
+        steelHighlight: '#D8E2EB',
+        warmBronze: '#D4957A',
+        warmShadow: '#8A4E3B',
         spriteColors: {
-            '1': '#d8dee9', // Silver Steel
-            '2': '#ffb703', // Royal Gold
-            '3': '#ff3b30', // Crimson Ember
-            '4': '#1a1423'  // Dark Obsidian
+            '1': '#B92B92', // Escamas luz (Primary Dragon Scales)
+            '2': '#7A1F73', // Escamas base (Secondary Dragon Scales)
+            '3': '#D4957A', // Pecho bronce (Warm Bronze Accent)
+            '4': '#231C1A'  // Marrón carbón oscuro (Shadow / Outline)
         },
         bugColors: {
-            '1': '#7f1d1d',
-            '2': '#ffb703',
-            '3': '#ff3b30',
-            '4': '#2b0909'
+            '1': '#7A1F73',
+            '2': '#D4957A',
+            '3': '#B92B92',
+            '4': '#231C1A'
         },
         gemColors: {
-            '1': '#ffffff',
-            '2': '#ffb703',
-            '3': '#fb8500'
+            '1': '#D8E2EB',
+            '2': '#D4957A',
+            '3': '#B92B92'
         },
-        particleColors: ['#ff3b30', '#ffb703', '#fb8500', '#fde047'],
-        slashColor: '#ffb703'
+        particleColors: ['#B92B92', '#7A1F73', '#D4957A', '#D8E2EB'],
+        slashColor: '#B92B92'
     },
     cyber: {
         bgSkyTop: '#03030c',
         bgSkyBottom: '#0f1035',
         groundColor: '#0b0c24',
         groundLine: '#00f5d4',
+        steelBorder: '#1d2b64',
+        steelHighlight: '#e2f1ff',
+        warmBronze: '#00f5d4',
+        warmShadow: '#121738',
         spriteColors: {
             '1': '#1e293b', // Cyber Slate
             '2': '#ff007f', // Neon Magenta
@@ -75,16 +83,16 @@ export const THEME_PALETTES = {
 export const THEME_UI = {
     fantasy: {
         isCyber: false,
-        btnFantasyClass: 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-red-600 text-white shadow',
+        btnFantasyClass: 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-[#B92B92] border border-[#D8E2EB] text-[#D8E2EB] shadow',
         btnCyberClass: 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white',
-        brandSuffixClass: 'text-amber-400',
-        statusBadgeClass: 'text-[10px] font-pixel px-2 py-0.5 rounded bg-red-500/20 border border-red-500/50 text-red-300 animate-pulse',
+        brandSuffixClass: 'text-bronze',
+        statusBadgeClass: 'text-[10px] font-pixel px-2 py-0.5 rounded bg-[#7A1F73]/40 border border-[#B92B92] text-[#D4957A] animate-pulse',
         themeSubtitle: 'Grimorio Digital & Código Artesanal',
         heroTitle: 'FORJANDO EL PORTAFOLIO DE DRUKDEV',
-        progressTask: '🔨 FORJANDO SHADERS & PROYECTOS...',
+        progressTask: '🐉 FORJANDO SHADERS & PROYECTOS...',
         gameTitle: "DRUK'S BUG SLASHER",
         attackBtnLabel: 'ESPADAZO (K / CLICK)',
-        featIcons: ['🗡️', '👾', '🕹️']
+        featIcons: ['🐉', '👾', '🕹️']
     },
     cyber: {
         isCyber: true,

@@ -1,15 +1,20 @@
 :root {
-    /* Default: Dark Fantasy Theme */
-    --bg-primary: #0b070e;
-    --bg-panel: #160e1d;
-    --bg-panel-alt: #1f1429;
-    --accent-main: #ff3b30;
-    --accent-secondary: #ffb703;
-    --accent-glow: rgba(255, 59, 48, 0.45);
-    --text-main: #f4ece1;
-    --text-muted: #a393b3;
-    --border-color: #4a2c40;
-    --border-highlight: #ffb703;
+    /* Default: Druk Dark Fantasy Theme (Official Dragon Logo Palette) */
+    --bg-primary: #0D0D0F;
+    --bg-panel: #231C1A;
+    --bg-panel-alt: #2B3138;
+    --accent-main: #B92B92;
+    --accent-secondary: #7A1F73;
+    --accent-warm: #D4957A;
+    --shadow-warm: #8A4E3B;
+    --steel-mid: #56616E;
+    --steel-dark: #2B3138;
+    --steel-light: #D8E2EB;
+    --accent-glow: rgba(185, 43, 146, 0.45);
+    --text-main: #D8E2EB;
+    --text-muted: #9BA7B4;
+    --border-color: #56616E;
+    --border-highlight: #D8E2EB;
 }
 
 body.theme-cyber {
@@ -19,6 +24,11 @@ body.theme-cyber {
     --bg-panel-alt: #121738;
     --accent-main: #00f5d4;
     --accent-secondary: #ff007f;
+    --accent-warm: #00f5d4;
+    --shadow-warm: #1d2b64;
+    --steel-mid: #1d2b64;
+    --steel-dark: #0b0d21;
+    --steel-light: #e2f1ff;
     --accent-glow: rgba(0, 245, 212, 0.45);
     --text-main: #e2f1ff;
     --text-muted: #7b8cde;

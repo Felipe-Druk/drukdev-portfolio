@@ -72,7 +72,7 @@ export function updateAndDrawDiorama() {
     const currentTheme = getCurrentTheme();
     const palette = THEME_PALETTES[currentTheme];
 
-    // Background Gradient
+    // Background Gradient (#0D0D0F -> #231C1A in Dark Fantasy)
     const grad = dctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, palette.bgSkyTop);
     grad.addColorStop(1, palette.bgSkyBottom);
@@ -80,34 +80,48 @@ export function updateAndDrawDiorama() {
     dctx.fillRect(0, 0, w, h);
 
     if (currentTheme === 'fantasy') {
-        // Draw Pixel Blood Moon
-        dctx.fillStyle = 'rgba(255, 59, 48, 0.18)';
+        // Draw Mystic Dragon Moon (Escamas Base #7A1F73, Escamas Luz #B92B92, Bronce #D4957A)
+        dctx.fillStyle = 'rgba(185, 43, 146, 0.22)';
         dctx.fillRect(w - 110, 14, 56, 56);
-        dctx.fillStyle = '#ff3b30';
+        dctx.fillStyle = '#7A1F73';
         dctx.fillRect(w - 102, 22, 40, 40);
-        dctx.fillStyle = '#ffb703';
-        dctx.fillRect(w - 94, 30, 24, 24);
+        dctx.fillStyle = '#B92B92';
+        dctx.fillRect(w - 96, 28, 28, 28);
+        dctx.fillStyle = '#D4957A';
+        dctx.fillRect(w - 90, 34, 16, 16);
 
-        // Distant Gothic Castle / Monoliths Silhouette
-        dctx.fillStyle = '#120817';
+        // Distant Dragon Keep / Monoliths Silhouette (#231C1A & #7A1F73 accents)
         for (let x = 0; x < w; x += 24) {
             const towerH = 28 + ((x * 17) % 45);
+            dctx.fillStyle = '#0D0D0F';
             dctx.fillRect(x, h - 28 - towerH, 20, towerH);
+            dctx.fillStyle = '#231C1A';
+            dctx.fillRect(x + 2, h - 28 - towerH + 2, 16, towerH - 2);
+            if (x % 48 === 0) {
+                dctx.fillStyle = '#D4957A';
+                dctx.fillRect(x + 8, h - 20 - towerH, 4, 6);
+            }
         }
 
-        // Campfire & Flickering Torches in Center
+        // Dragon Forge Brazier in Center (#8A4E3B, #B92B92, #7A1F73, #D4957A)
         const fireX = Math.floor(w / 2);
         const fireY = h - 32;
-        dctx.fillStyle = '#4a2c40';
-        dctx.fillRect(fireX - 14, fireY + 4, 28, 6);
-        const flameH = 10 + Math.floor(Math.sin(dioramaTick * 0.2) * 4);
-        dctx.fillStyle = '#ff3b30';
-        dctx.fillRect(fireX - 8, fireY - flameH, 16, flameH + 4);
-        dctx.fillStyle = '#ffb703';
-        dctx.fillRect(fireX - 4, fireY - flameH + 4, 8, flameH);
+        dctx.fillStyle = '#56616E';
+        dctx.fillRect(fireX - 15, fireY + 4, 30, 6);
+        dctx.fillStyle = '#8A4E3B';
+        dctx.fillRect(fireX - 12, fireY + 2, 24, 4);
 
-        // Spawn gentle rising embers
+        const flameH = 10 + Math.floor(Math.sin(dioramaTick * 0.2) * 4);
+        dctx.fillStyle = '#7A1F73';
+        dctx.fillRect(fireX - 10, fireY - flameH + 2, 20, flameH + 2);
+        dctx.fillStyle = '#B92B92';
+        dctx.fillRect(fireX - 7, fireY - flameH, 14, flameH + 2);
+        dctx.fillStyle = '#D4957A';
+        dctx.fillRect(fireX - 4, fireY - flameH + 4, 8, flameH - 2);
+
+        // Spawn gentle rising dragon embers (#B92B92, #D4957A, #7A1F73)
         if (dioramaTick % 4 === 0) {
+            const emberColors = ['#B92B92', '#D4957A', '#7A1F73'];
             dioramaParticles.push({
                 x: fireX + (Math.random() * 20 - 10),
                 y: fireY - 6,
@@ -115,7 +129,7 @@ export function updateAndDrawDiorama() {
                 vy: -0.7 - Math.random() * 1.1,
                 size: 3,
                 life: 1,
-                color: Math.random() > 0.4 ? '#ffb703' : '#ff3b30'
+                color: emberColors[Math.floor(Math.random() * emberColors.length)]
             });
         }
     } else {
@@ -152,11 +166,13 @@ export function updateAndDrawDiorama() {
         }
     }
 
-    // Ground Platform
+    // Ground Platform (#231C1A base with #B92B92 & #56616E border in Dark Fantasy)
     dctx.fillStyle = palette.groundColor;
     dctx.fillRect(0, h - 28, w, 28);
     dctx.fillStyle = palette.groundLine;
     dctx.fillRect(0, h - 28, w, 3);
+    dctx.fillStyle = palette.steelBorder;
+    dctx.fillRect(0, h - 25, w, 2);
 
     // Animated Hero Sprite standing in Diorama
     const bobOffset = Math.sin(dioramaTick * 0.1) > 0 ? -3 : 0;

@@ -100,7 +100,7 @@ export function gameOver() {
         overlayTitle.textContent = `¡BUG EN PRODUCCIÓN! (SCORE: ${score})`;
     }
     if (overlayDesc) {
-        overlayDesc.innerHTML = `Tu récord actual es <b class="text-amber-400">${hiScore} pts</b>. ¿Otra partida rápida mientras DrukDev termina el deploy?`;
+        overlayDesc.innerHTML = `Tu récord actual es <b class="text-bronze">${hiScore} pts</b>. ¿Otra partida rápida mientras DrukDev termina el deploy?`;
     }
     if (startBtnText) {
         startBtnText.textContent = 'REINTENTAR / PLAY AGAIN';
@@ -291,13 +291,13 @@ export function updateAndDrawGame() {
                 if (ent.type === 'gem') {
                     score += 25;
                     playSound('coin');
-                    spawnGameParticles(ent.x + 10, ent.y + 10, 12, '#fde047');
+                    spawnGameParticles(ent.x + 10, ent.y + 10, 12, palette.warmBronze);
                     entities.splice(i, 1);
                     updateScoreUI();
                     continue;
                 } else {
                     // Hit a Bug!
-                    spawnGameParticles(player.x + 16, player.y + 16, 24, '#ff3b30');
+                    spawnGameParticles(player.x + 16, player.y + 16, 24, palette.slashColor);
                     gameOver();
                     break;
                 }
