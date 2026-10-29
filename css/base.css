@@ -1,0 +1,49 @@
+* {
+    box-sizing: border-box;
+    image-rendering: pixelated;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: 'JetBrains Mono', monospace;
+    overflow-x: hidden;
+    transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+.font-pixel {
+    font-family: 'Press Start 2P', monospace;
+}
+
+.font-vt {
+    font-family: 'VT323', monospace;
+}
+
+canvas {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Scanlines Overlay */
+.scanlines {
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.32) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+}
+
+/* Glitch / Glow Title Animation */
+@keyframes pulseGlow {
+    0%, 100% {
+        text-shadow: 3px 3px 0px var(--accent-main), 0 0 18px var(--accent-glow);
+    }
+    50% {
+        text-shadow: 3px 3px 0px var(--accent-secondary), 0 0 28px var(--accent-main);
+    }
+}
+
+.title-glow {
+    animation: pulseGlow 3s infinite ease-in-out;
+}

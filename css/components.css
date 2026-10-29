@@ -1,0 +1,78 @@
+/* Crisp Pixel Borders */
+.pixel-box {
+    background: var(--bg-panel);
+    border: 3px solid var(--border-color);
+    box-shadow:
+        0 0 0 3px var(--bg-primary),
+        0 0 24px var(--accent-glow),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.pixel-box-active {
+    border-color: var(--border-highlight);
+}
+
+/* Corner Pixel Rivets */
+.pixel-corners::before,
+.pixel-corners::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-secondary);
+    pointer-events: none;
+}
+
+.pixel-corners::before {
+    top: -4px;
+    left: -4px;
+    box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+}
+
+.pixel-corners::after {
+    bottom: -4px;
+    left: -4px;
+    box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+}
+
+/* Arcade Pixel Button */
+.pixel-btn {
+    background: var(--bg-panel-alt);
+    border: 2px solid var(--border-highlight);
+    color: var(--text-main);
+    box-shadow: 4px 4px 0px var(--accent-main);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pixel-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px var(--accent-secondary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.pixel-btn:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0px var(--accent-main);
+}
+
+/* Custom Progress Bar Stripes */
+.pixel-progress {
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--accent-main),
+        var(--accent-main) 10px,
+        var(--accent-secondary) 10px,
+        var(--accent-secondary) 20px
+    );
+    background-size: 28px 28px;
+    animation: moveStripes 1s linear infinite;
+}
+
+@keyframes moveStripes {
+    0% { background-position: 0 0; }
+    100% { background-position: 28px 0; }
+}

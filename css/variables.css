@@ -1,0 +1,27 @@
+:root {
+    /* Default: Dark Fantasy Theme */
+    --bg-primary: #0b070e;
+    --bg-panel: #160e1d;
+    --bg-panel-alt: #1f1429;
+    --accent-main: #ff3b30;
+    --accent-secondary: #ffb703;
+    --accent-glow: rgba(255, 59, 48, 0.45);
+    --text-main: #f4ece1;
+    --text-muted: #a393b3;
+    --border-color: #4a2c40;
+    --border-highlight: #ffb703;
+}
+
+body.theme-cyber {
+    /* Cyber Neon Theme */
+    --bg-primary: #050510;
+    --bg-panel: #0b0d21;
+    --bg-panel-alt: #121738;
+    --accent-main: #00f5d4;
+    --accent-secondary: #ff007f;
+    --accent-glow: rgba(0, 245, 212, 0.45);
+    --text-main: #e2f1ff;
+    --text-muted: #7b8cde;
+    --border-color: #1d2b64;
+    --border-highlight: #00f5d4;
+}
