@@ -118,27 +118,43 @@
                     </div>
                 </div>
 
-                <!-- Recruiter Quick Access / Contact Buttons -->
+                <!-- Recruiter Quick Access / Contact Buttons (Linked via js/config/links.js) -->
                 <div>
                     <p class="font-pixel text-[11px] uppercase tracking-wider mb-3 text-bronze">
                         <i class="fa-solid fa-dragon mr-1"></i> ¿Eres reclutador, suscriptor o quieres colaborar? Conecta conmigo:
                     </p>
                     <div class="flex flex-wrap gap-3">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                        <a href="#" data-social="github" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-brands fa-github text-lg"></i>
                             <span>GitHub</span>
                         </a>
-                        <a href="https://www.youtube.com/@DrukDev" target="_blank" rel="noopener noreferrer" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                        <a href="#" data-social="youtube" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-brands fa-youtube text-lg text-[#D4957A]"></i>
                             <span>YouTube</span>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                        <a href="#" data-social="linkedin" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-brands fa-linkedin text-lg text-[#D8E2EB]"></i>
                             <span>LinkedIn</span>
                         </a>
-                        <button id="btnCopyEmail" type="button" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                        <a href="#" data-social="itchio" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-brands fa-itch-io text-lg text-[#D4957A]"></i>
+                            <span>Itch.io</span>
+                        </a>
+                        <a href="#" data-social="discord" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-brands fa-discord text-lg text-[#D8E2EB]"></i>
+                            <span>Discord</span>
+                        </a>
+                        <a href="#" data-social="twitter" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-brands fa-x-twitter text-lg text-[#D8E2EB]"></i>
+                            <span>Twitter / X</span>
+                        </a>
+                        <a href="#" data-contact="cv" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-file-arrow-down text-bronze"></i>
+                            <span>Descargar CV</span>
+                        </a>
+                        <button id="copy-email-btn" data-contact="email" type="button" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-solid fa-envelope text-bronze"></i>
-                            <span id="emailBtnText">Copiar Email (contacto@druk.dev)</span>
+                            <span id="emailBtnText">Copiar Email (contacto@drukdev.com)</span>
                         </button>
                     </div>
                 </div>
@@ -230,7 +246,7 @@
             <span class="text-xl" id="toastIcon">📜</span>
             <div>
                 <p class="font-pixel text-[10px] text-bronze" id="toastTitle">¡COPIADO AL PORTAPAPELES!</p>
-                <p class="text-xs text-steel" id="toastMsg">contacto@druk.dev listo para pegar.</p>
+                <p class="text-xs text-steel" id="toastMsg">contacto@drukdev.com listo para pegar.</p>
             </div>
         </div>
     </div>

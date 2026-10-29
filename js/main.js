@@ -2,7 +2,8 @@
  * MAIN APPLICATION ENTRY POINT
  **************************************************************/
 
-import { THEME_UI, CONTACT_EMAIL, setCurrentTheme } from './config/themes.js';
+import { THEME_UI, setCurrentTheme } from './config/themes.js';
+import { CONTACT_LINKS } from './config/links.js';
 import { playSound, toggleSound } from './audio/soundEngine.js';
 import { renderStaticPreviews } from './graphics/sprites.js';
 import {
@@ -23,6 +24,7 @@ import {
 
 let crtEnabled = true;
 let toastTimeout = null;
+let emailBtnResetTimeout = null;
 
 export function setTheme(theme) {
     const activeTheme = setCurrentTheme(theme);
@@ -107,15 +109,84 @@ export function showToast(icon, title, msg) {
 }
 
 export function copyEmail() {
+    const email = CONTACT_LINKS.email;
+    if (!email) return;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(email).catch(() => {
+            fallbackCopyText(email);
+        });
+    } else {
+        fallbackCopyText(email);
+    }
+
+    playSound('coin');
+    showToast('📜', '¡EMAIL COPIADO!', `${email} listo para pegar.`);
+
+    const emailBtnText = document.getElementById('emailBtnText');
+    if (emailBtnText) {
+        emailBtnText.textContent = `¡Copiado! (${email})`;
+        clearTimeout(emailBtnResetTimeout);
+        emailBtnResetTimeout = setTimeout(() => {
+            emailBtnText.textContent = `Copiar Email (${email})`;
+        }, 2200);
+    }
+}
+
+function fallbackCopyText(text) {
     const clipboardTextarea = document.createElement('textarea');
-    clipboardTextarea.value = CONTACT_EMAIL;
+    clipboardTextarea.value = text;
     document.body.appendChild(clipboardTextarea);
     clipboardTextarea.select();
     document.execCommand('copy');
     document.body.removeChild(clipboardTextarea);
+}
 
-    playSound('coin');
-    showToast('📜', '¡EMAIL COPIADO!', `${CONTACT_EMAIL} listo para pegar.`);
+export function initContactLinks() {
+    // 1. Bind all [data-social] buttons dynamically from CONTACT_LINKS.socials
+    const socialElements = document.querySelectorAll('[data-social]');
+    socialElements.forEach((el) => {
+        const networkKey = el.getAttribute('data-social');
+        const url = CONTACT_LINKS.socials?.[networkKey];
+
+        if (url && url.trim() !== '') {
+            el.setAttribute('href', url.trim());
+            el.setAttribute('target', '_blank');
+            el.setAttribute('rel', 'noopener noreferrer');
+            el.style.display = '';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+
+    // 2. Bind CV link if present ([data-contact="cv"])
+    const cvElements = document.querySelectorAll('[data-contact="cv"]');
+    cvElements.forEach((el) => {
+        const cvUrl = CONTACT_LINKS.cv;
+        if (cvUrl && cvUrl.trim() !== '') {
+            el.setAttribute('href', cvUrl.trim());
+            el.setAttribute('target', '_blank');
+            el.setAttribute('rel', 'noopener noreferrer');
+            el.style.display = '';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+
+    // 3. Connect Copy Email button (#copy-email-btn / [data-contact="email"])
+    const copyEmailBtn = document.getElementById('copy-email-btn') || document.querySelector('[data-contact="email"]');
+    const emailBtnText = document.getElementById('emailBtnText');
+
+    if (copyEmailBtn) {
+        if (CONTACT_LINKS.email && CONTACT_LINKS.email.trim() !== '') {
+            if (emailBtnText) {
+                emailBtnText.textContent = `Copiar Email (${CONTACT_LINKS.email})`;
+            }
+            copyEmailBtn.addEventListener('click', copyEmail);
+        } else {
+            copyEmailBtn.style.display = 'none';
+        }
+    }
 }
 
 function bindUIEvents() {
@@ -123,14 +194,12 @@ function bindUIEvents() {
     const btnCyber = document.getElementById('btnCyber');
     const btnSound = document.getElementById('btnSound');
     const btnCrt = document.getElementById('btnCrt');
-    const btnCopyEmail = document.getElementById('btnCopyEmail');
     const sfxLinks = document.querySelectorAll('[data-sfx="click"]');
 
     if (btnFantasy) btnFantasy.addEventListener('click', () => setTheme('fantasy'));
     if (btnCyber) btnCyber.addEventListener('click', () => setTheme('cyber'));
     if (btnSound) btnSound.addEventListener('click', handleToggleSound);
     if (btnCrt) btnCrt.addEventListener('click', toggleCRT);
-    if (btnCopyEmail) btnCopyEmail.addEventListener('click', copyEmail);
 
     sfxLinks.forEach((link) => {
         link.addEventListener('click', () => playSound('click'));
@@ -150,6 +219,7 @@ function mainLoop() {
 }
 
 function initApp() {
+    initContactLinks();
     bindUIEvents();
     initBgCanvas();
     initDiorama();

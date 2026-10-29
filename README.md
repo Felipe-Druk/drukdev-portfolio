@@ -19,6 +19,7 @@ drukdev-portfolio/
 └── js/
     ├── main.js                 # Punto de entrada: inicializa temas, eventos UI, diorama, juego y loop principal
     ├── config/
+    │   ├── links.js            # Configuración centralizada de email, redes sociales y CV
     │   └── themes.js           # Configuración de paletas de color, textos UI y constantes de ambos mundos
     ├── audio/
     │   └── soundEngine.js      # Sintetizador de efectos de sonido 8-bit con Web Audio API (sin MP3 externos)
