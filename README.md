@@ -19,6 +19,7 @@ drukdev-portfolio/
 └── js/
     ├── main.js                 # Punto de entrada: inicializa temas, eventos UI, diorama, juego y loop principal
     ├── config/
+    │   ├── i18n.js             # Sistema de internacionalización (ES / EN)
     │   ├── links.js            # Configuración centralizada de email, redes sociales y CV
     │   └── themes.js           # Configuración de paletas de color, textos UI y constantes de ambos mundos
     ├── audio/

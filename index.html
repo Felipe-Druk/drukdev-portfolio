@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <!-- Theme Switcher & Audio/CRT Controls -->
+        <!-- Theme Switcher, Language Toggle & Audio/CRT Controls -->
         <div class="flex flex-wrap items-center gap-2 sm:gap-3">
             <div class="flex items-center bg-[#0D0D0F]/80 p-1 rounded border-2 border-[#56616E]">
                 <button id="btnFantasy" type="button" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-[#B92B92] border border-[#D8E2EB] text-[#D8E2EB] shadow">
@@ -59,12 +59,18 @@
                 </button>
             </div>
 
-            <button id="btnSound" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" title="Efectos de sonido 8-bit">
+            <button id="lang-toggle" type="button" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.langTitle" title="Cambiar idioma (ES / EN)">
+                <span id="langEsOption" class="lang-option active">ES</span>
+                <span class="opacity-40">|</span>
+                <span id="langEnOption" class="lang-option">EN</span>
+            </button>
+
+            <button id="btnSound" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
                 <i id="soundIcon" class="fa-solid fa-volume-high text-bronze"></i>
                 <span id="soundLabel" class="hidden md:inline">SFX ON</span>
             </button>
 
-            <button id="btnCrt" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" title="Filtro Monitor Retro CRT">
+            <button id="btnCrt" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.crtTitle" title="Filtro Monitor Retro CRT">
                 <i class="fa-solid fa-tv"></i>
                 <span class="hidden md:inline">CRT</span>
             </button>
@@ -80,9 +86,9 @@
             <!-- Hero Card -->
             <div class="pixel-box rounded-lg p-6 sm:p-8">
                 <!-- Interactive Pixel Diorama Banner -->
-                <div class="canvas-frame relative w-full h-36 sm:h-44 mb-6 rounded overflow-hidden bg-[#0D0D0F] group cursor-crosshair" id="dioramaContainer" title="Haz clic en el escenario para invocar partículas">
+                <div class="canvas-frame relative w-full h-36 sm:h-44 mb-6 rounded overflow-hidden bg-[#0D0D0F] group cursor-crosshair" id="dioramaContainer" data-i18n-title="hero.dioramaTitle" title="Haz clic en el escenario para interactuar">
                     <canvas id="dioramaCanvas" class="w-full h-full block"></canvas>
-                    <div class="absolute bottom-2 right-2 bg-[#0D0D0F]/85 px-2.5 py-1 rounded text-[11px] font-vt tracking-wider text-bronze border border-[#56616E] pointer-events-none">
+                    <div class="absolute bottom-2 right-2 bg-[#0D0D0F]/85 px-2.5 py-1 rounded text-[11px] font-vt tracking-wider text-bronze border border-[#56616E] pointer-events-none" data-i18n="hero.dioramaHint">
                         ✨ Click en la escena para interactuar
                     </div>
                 </div>
@@ -90,7 +96,7 @@
                 <!-- Coming Soon Tag -->
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#0D0D0F]/60 border border-[#56616E] mb-3">
                     <span class="w-2 h-2 rounded-full bg-[#B92B92] animate-ping"></span>
-                    <span class="font-pixel text-[10px] sm:text-xs tracking-widest uppercase text-bronze" id="comingSoonBadge">PRÓXIMAMENTE // COMING SOON</span>
+                    <span class="font-pixel text-[10px] sm:text-xs tracking-widest uppercase text-bronze" id="comingSoonBadge" data-i18n="hero.comingSoonBadge">PRÓXIMAMENTE // COMING SOON</span>
                 </div>
 
                 <!-- Main Headline -->
@@ -98,7 +104,7 @@
                     FORJANDO EL PORTAFOLIO DE DRUKDEV
                 </h1>
 
-                <p class="text-sm sm:text-base leading-relaxed opacity-90 mb-6" id="heroDescription">
+                <p class="text-sm sm:text-base leading-relaxed opacity-90 mb-6" id="heroDescription" data-i18n-html="hero.descriptionHtml">
                     ¡Hola! Estoy construyendo un portafolio interactivo fuera de lo común: gráficos <strong class="text-bronze">pixel-art generados 100% por código</strong>, minijuegos integrados y mis mejores proyectos de desarrollo. Mientras termino de pulir los últimos niveles, puedes jugar una partida rápida o contactarme directamente.
                 </p>
 
@@ -112,16 +118,17 @@
                         <div class="h-full pixel-progress rounded-sm transition-all duration-500" style="width: 42%"></div>
                     </div>
                     <div class="mt-2.5 flex flex-wrap gap-2 text-[11px] opacity-90 font-vt text-base">
-                        <span class="px-2 py-0.5 rounded bg-[#7A1F73]/30 text-[#D8E2EB] border border-[#B92B92]/60">✔ Dominio & Hosting</span>
-                        <span class="px-2 py-0.5 rounded bg-[#8A4E3B]/30 text-bronze border border-[#D4957A]/60">⚙ Motor Pixel-Art Procedural</span>
-                        <span class="px-2 py-0.5 rounded bg-white/5 text-gray-400 border border-[#56616E]/50">⏳ Casos de Estudio & Demos</span>
+                        <span class="px-2 py-0.5 rounded bg-[#7A1F73]/30 text-[#D8E2EB] border border-[#B92B92]/60" data-i18n="hero.stepDomain">✔ Dominio & Hosting</span>
+                        <span class="px-2 py-0.5 rounded bg-[#8A4E3B]/30 text-bronze border border-[#D4957A]/60" data-i18n="hero.stepEngine">⚙ Motor Pixel-Art Procedural</span>
+                        <span class="px-2 py-0.5 rounded bg-white/5 text-gray-400 border border-[#56616E]/50" data-i18n="hero.stepCases">⏳ Casos de Estudio & Demos</span>
                     </div>
                 </div>
 
                 <!-- Recruiter Quick Access / Contact Buttons (Linked via js/config/links.js) -->
                 <div>
                     <p class="font-pixel text-[11px] uppercase tracking-wider mb-3 text-bronze">
-                        <i class="fa-solid fa-dragon mr-1"></i> ¿Eres reclutador, suscriptor o quieres colaborar? Conecta conmigo:
+                        <i class="fa-solid fa-dragon mr-1"></i>
+                        <span data-i18n="hero.recruiterPrompt">¿Eres reclutador, suscriptor o quieres colaborar? Conecta conmigo:</span>
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <a href="#" data-social="github" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
@@ -150,7 +157,7 @@
                         </a>
                         <a href="#" data-contact="cv" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-solid fa-file-arrow-down text-bronze"></i>
-                            <span>Descargar CV</span>
+                            <span data-i18n="hero.downloadCv">Descargar CV</span>
                         </a>
                         <button id="copy-email-btn" data-contact="email" type="button" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
                             <i class="fa-solid fa-envelope text-bronze"></i>
@@ -165,22 +172,22 @@
                 <div class="pixel-box rounded p-3.5 flex items-center gap-3">
                     <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon1">🐉</div>
                     <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle1">PROYECTOS REALES</h3>
-                        <p class="text-xs opacity-75">Arquitectura, código limpio y demos en vivo.</p>
+                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle1" data-i18n="features.feat1Title">PROYECTOS REALES</h3>
+                        <p class="text-xs opacity-75" data-i18n="features.feat1Desc">Arquitectura, código limpio y demos en vivo.</p>
                     </div>
                 </div>
                 <div class="pixel-box rounded p-3.5 flex items-center gap-3">
                     <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon2">👾</div>
                     <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle2">ARTE POR CÓDIGO</h3>
-                        <p class="text-xs opacity-75">Canvas 2D, partículas y diseño con personalidad.</p>
+                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle2" data-i18n="features.feat2Title">ARTE POR CÓDIGO</h3>
+                        <p class="text-xs opacity-75" data-i18n="features.feat2Desc">Canvas 2D, partículas y diseño con personalidad.</p>
                     </div>
                 </div>
                 <div class="pixel-box rounded p-3.5 flex items-center gap-3">
                     <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon3">🕹️</div>
                     <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle3">GAMIFICACIÓN</h3>
-                        <p class="text-xs opacity-75">Explora mi experiencia como si fuera un RPG.</p>
+                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle3" data-i18n="features.feat3Title">GAMIFICACIÓN</h3>
+                        <p class="text-xs opacity-75" data-i18n="features.feat3Desc">Explora mi experiencia como si fuera un RPG.</p>
                     </div>
                 </div>
             </div>
@@ -193,7 +200,7 @@
                 <!-- Arcade Header -->
                 <div class="flex items-center justify-between border-b border-[#56616E] pb-3 mb-3">
                     <div>
-                        <span class="text-[10px] font-pixel text-bronze block mb-0.5">🕹️ MINIJUEGO MIENTRAS ESPERAS</span>
+                        <span class="text-[10px] font-pixel text-bronze block mb-0.5" data-i18n="game.eyebrow">🕹️ MINIJUEGO MIENTRAS ESPERAS</span>
                         <h2 class="font-pixel text-sm sm:text-base text-steel" id="gameTitle">DRUK'S BUG SLASHER</h2>
                     </div>
                     <div class="text-right font-vt text-lg leading-tight bg-[#0D0D0F]/80 px-3 py-1 rounded border border-[#56616E]">
@@ -209,13 +216,13 @@
                     <!-- Start / Game Over Overlay -->
                     <div id="gameOverlay" class="absolute inset-0 bg-[#0D0D0F]/85 backdrop-blur-[2px] flex flex-col items-center justify-center p-5 text-center z-10">
                         <canvas id="heroPreviewCanvas" width="64" height="64" class="w-16 h-16 mb-3"></canvas>
-                        <h3 id="overlayTitle" class="font-pixel text-sm sm:text-base text-bronze mb-2">¡DEFIENDE EL REPOSITORIO!</h3>
-                        <p id="overlayDesc" class="text-xs sm:text-sm opacity-90 max-w-xs mb-4">
+                        <h3 id="overlayTitle" class="font-pixel text-sm sm:text-base text-bronze mb-2" data-i18n="game.overlayTitle">¡DEFIENDE EL REPOSITORIO!</h3>
+                        <p id="overlayDesc" class="text-xs sm:text-sm opacity-90 max-w-xs mb-4" data-i18n-html="game.overlayDescHtml">
                             Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span> para acelerar el deploy.
                         </p>
                         <button id="btnStartGame" type="button" class="pixel-btn px-5 py-3 rounded font-pixel text-xs sm:text-sm flex items-center gap-2">
                             <i class="fa-solid fa-play text-bronze"></i>
-                            <span id="startBtnText">INSERT COIN / JUGAR</span>
+                            <span id="startBtnText" data-i18n="game.startBtn">INSERT COIN / JUGAR</span>
                         </button>
                     </div>
                 </div>
@@ -224,7 +231,7 @@
                 <div class="grid grid-cols-2 gap-3 mb-3">
                     <button id="btnJump" type="button" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
                         <i class="fa-solid fa-arrow-up text-bronze"></i>
-                        <span>SALTAR (W / ESPACIO)</span>
+                        <span data-i18n="game.jumpBtn">SALTAR (W / ESPACIO)</span>
                     </button>
                     <button id="btnAttack" type="button" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt text-bronze"></i>
@@ -233,7 +240,7 @@
                 </div>
 
                 <div class="text-[11px] opacity-75 flex items-center justify-between px-1">
-                    <span>💡 Cambia entre <b>Dark Fantasy</b> y <b>Cyber Neon</b> arriba para transformar al héroe.</span>
+                    <span data-i18n-html="game.themeTipHtml">💡 Cambia entre <b>Dark Fantasy</b> y <b>Cyber Neon</b> arriba para transformar al héroe.</span>
                 </div>
             </div>
         </section>
@@ -245,7 +252,7 @@
         <div class="pixel-box pixel-box-active px-4 py-3 rounded flex items-center gap-3 bg-[#0D0D0F]/95">
             <span class="text-xl" id="toastIcon">📜</span>
             <div>
-                <p class="font-pixel text-[10px] text-bronze" id="toastTitle">¡COPIADO AL PORTAPAPELES!</p>
+                <p class="font-pixel text-[10px] text-bronze" id="toastTitle" data-i18n="toast.copiedTitle">¡EMAIL COPIADO!</p>
                 <p class="text-xs text-steel" id="toastMsg">fedalto@fi.uba.ar listo para pegar.</p>
             </div>
         </div>
@@ -254,11 +261,11 @@
     <!-- Footer -->
     <footer class="relative z-10 w-full max-w-6xl mx-auto px-4 py-4 border-t border-[#56616E]/40 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 opacity-80">
         <div>
-            <span class="font-pixel text-[10px] text-bronze">DRUKDEV</span> — Hecho desde cero con HTML5 Canvas & Pixel Art Procedural.
+            <span class="font-pixel text-[10px] text-bronze">DRUKDEV</span> <span data-i18n="footer.madeWith">— Hecho desde cero con HTML5 Canvas & Pixel Art Procedural.</span>
         </div>
         <div class="font-vt text-base">
-            <span>Estado del servidor: </span>
-            <span class="text-bronze">● ONLINE (Esperando Deploy Final)</span>
+            <span data-i18n="footer.serverStatusLabel">Estado del servidor: </span>
+            <span class="text-bronze" data-i18n="footer.serverStatusOnline">● ONLINE (Esperando Deploy Final)</span>
         </div>
     </footer>
 

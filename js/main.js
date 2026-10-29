@@ -2,9 +2,15 @@
  * MAIN APPLICATION ENTRY POINT
  **************************************************************/
 
-import { THEME_UI, setCurrentTheme } from './config/themes.js';
+import { THEME_UI, getCurrentTheme, setCurrentTheme } from './config/themes.js';
 import { CONTACT_LINKS } from './config/links.js';
-import { playSound, toggleSound } from './audio/soundEngine.js';
+import {
+    TRANSLATIONS,
+    getCurrentLanguage,
+    setCurrentLanguage,
+    getTranslationByKey
+} from './config/i18n.js';
+import { playSound, toggleSound, isSoundEnabled } from './audio/soundEngine.js';
 import { renderStaticPreviews } from './graphics/sprites.js';
 import {
     initDiorama,
@@ -19,6 +25,7 @@ import {
     startGame,
     triggerJump,
     triggerAttack,
+    refreshGameOverlayLanguage,
     updateAndDrawGame
 } from './game/bugSlasher.js';
 
@@ -40,6 +47,79 @@ function setElementClass(elementId, classNameValue) {
     }
 }
 
+function applyThemeTexts(theme = getCurrentTheme(), language = getCurrentLanguage()) {
+    const themeTexts = TRANSLATIONS[language]?.themes?.[theme];
+    if (!themeTexts) return;
+
+    setElementText('themeSubtitle', themeTexts.themeSubtitle);
+    setElementText('heroTitle', themeTexts.heroTitle);
+    setElementText('progressTask', themeTexts.progressTask);
+    setElementText('gameTitle', themeTexts.gameTitle);
+    setElementText('attackBtnLabel', themeTexts.attackBtnLabel);
+}
+
+function updateEmailButtonLabel(language = getCurrentLanguage()) {
+    const emailAddress = typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
+    if (!emailAddress) return;
+    const copyLabel = TRANSLATIONS[language].hero.copyEmailBtn;
+    setElementText('emailBtnText', `${copyLabel} (${emailAddress})`);
+}
+
+function updateSoundButtonLabel(language = getCurrentLanguage()) {
+    const navTexts = TRANSLATIONS[language].nav;
+    setElementText('soundLabel', isSoundEnabled() ? navTexts.sfxOn : navTexts.sfxMute);
+}
+
+export function setLanguage(language) {
+    const activeLanguage = setCurrentLanguage(language);
+    document.documentElement.lang = activeLanguage;
+
+    // 1. Update all [data-i18n] text elements
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        const translatedValue = getTranslationByKey(key, activeLanguage);
+        if (typeof translatedValue === 'string') {
+            element.textContent = translatedValue;
+        }
+    });
+
+    // 2. Update all [data-i18n-html] rich-text elements
+    document.querySelectorAll('[data-i18n-html]').forEach((element) => {
+        const key = element.getAttribute('data-i18n-html');
+        const translatedHtml = getTranslationByKey(key, activeLanguage);
+        if (typeof translatedHtml === 'string') {
+            element.innerHTML = translatedHtml;
+        }
+    });
+
+    // 3. Update all [data-i18n-title] tooltip attributes
+    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+        const key = element.getAttribute('data-i18n-title');
+        const translatedTitle = getTranslationByKey(key, activeLanguage);
+        if (typeof translatedTitle === 'string') {
+            element.setAttribute('title', translatedTitle);
+        }
+    });
+
+    // 4. Update dynamic theme-dependent texts, game overlay, and control labels
+    applyThemeTexts(getCurrentTheme(), activeLanguage);
+    updateEmailButtonLabel(activeLanguage);
+    updateSoundButtonLabel(activeLanguage);
+    refreshGameOverlayLanguage();
+
+    // 5. Update #lang-toggle visual state (ES | EN)
+    const langEsOption = document.getElementById('langEsOption');
+    const langEnOption = document.getElementById('langEnOption');
+    if (langEsOption) langEsOption.classList.toggle('active', activeLanguage === 'es');
+    if (langEnOption) langEnOption.classList.toggle('active', activeLanguage === 'en');
+}
+
+export function toggleLanguage() {
+    const nextLanguage = getCurrentLanguage() === 'es' ? 'en' : 'es';
+    playSound('click');
+    setLanguage(nextLanguage);
+}
+
 export function setTheme(theme) {
     const activeTheme = setCurrentTheme(theme);
     const uiConfig = THEME_UI[activeTheme];
@@ -53,27 +133,24 @@ export function setTheme(theme) {
     setElementClass('brandSuffix', uiConfig.brandSuffixClass);
     setElementClass('statusBadge', uiConfig.statusBadgeClass);
 
-    setElementText('themeSubtitle', uiConfig.themeSubtitle);
-    setElementText('heroTitle', uiConfig.heroTitle);
-    setElementText('progressTask', uiConfig.progressTask);
-    setElementText('gameTitle', uiConfig.gameTitle);
-    setElementText('attackBtnLabel', uiConfig.attackBtnLabel);
     setElementText('featIcon1', uiConfig.featIcons[0]);
     setElementText('featIcon2', uiConfig.featIcons[1]);
     setElementText('featIcon3', uiConfig.featIcons[2]);
 
+    applyThemeTexts(activeTheme, getCurrentLanguage());
     renderStaticPreviews(activeTheme);
     spawnCenterDioramaBurst(24);
 }
 
 export function handleToggleSound() {
     const enabled = toggleSound();
+    const navTexts = TRANSLATIONS[getCurrentLanguage()].nav;
     if (enabled) {
         setElementClass('soundIcon', 'fa-solid fa-volume-high text-bronze');
-        setElementText('soundLabel', 'SFX ON');
+        setElementText('soundLabel', navTexts.sfxOn);
     } else {
         setElementClass('soundIcon', 'fa-solid fa-volume-xmark text-gray-400');
-        setElementText('soundLabel', 'MUTE');
+        setElementText('soundLabel', navTexts.sfxMute);
     }
 }
 
@@ -122,13 +199,14 @@ export function copyEmail() {
         fallbackCopyTextToClipboard(emailAddress);
     }
 
+    const activeLangTexts = TRANSLATIONS[getCurrentLanguage()];
     playSound('coin');
-    showToast('📜', '¡EMAIL COPIADO!', `${emailAddress} listo para pegar.`);
+    showToast('📜', activeLangTexts.toast.copiedTitle, activeLangTexts.toast.copiedMsg(emailAddress));
 
-    setElementText('emailBtnText', `¡Copiado! (${emailAddress})`);
+    setElementText('emailBtnText', `${activeLangTexts.hero.copiedEmailBtn} (${emailAddress})`);
     clearTimeout(emailBtnResetTimeout);
     emailBtnResetTimeout = setTimeout(() => {
-        setElementText('emailBtnText', `Copiar Email (${emailAddress})`);
+        updateEmailButtonLabel();
     }, 2200);
 }
 
@@ -161,7 +239,7 @@ export function initContactLinks() {
     if (copyEmailBtn) {
         const emailAddress = typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
         if (emailAddress !== '') {
-            setElementText('emailBtnText', `Copiar Email (${emailAddress})`);
+            updateEmailButtonLabel();
             copyEmailBtn.addEventListener('click', copyEmail);
         } else {
             copyEmailBtn.style.display = 'none';
@@ -172,12 +250,14 @@ export function initContactLinks() {
 function bindUIEvents() {
     const btnFantasy = document.getElementById('btnFantasy');
     const btnCyber = document.getElementById('btnCyber');
+    const langToggleBtn = document.getElementById('lang-toggle');
     const btnSound = document.getElementById('btnSound');
     const btnCrt = document.getElementById('btnCrt');
     const sfxLinks = document.querySelectorAll('[data-sfx="click"]');
 
     if (btnFantasy) btnFantasy.addEventListener('click', () => setTheme('fantasy'));
     if (btnCyber) btnCyber.addEventListener('click', () => setTheme('cyber'));
+    if (langToggleBtn) langToggleBtn.addEventListener('click', toggleLanguage);
     if (btnSound) btnSound.addEventListener('click', handleToggleSound);
     if (btnCrt) btnCrt.addEventListener('click', toggleCRT);
 
@@ -200,6 +280,7 @@ function mainLoop() {
 
 function initApp() {
     initContactLinks();
+    setLanguage(getCurrentLanguage());
     bindUIEvents();
     initBgCanvas();
     initDiorama();
@@ -211,6 +292,8 @@ function initApp() {
 // Expose helpers on window for backwards compatibility or debugging
 Object.assign(window, {
     setTheme,
+    setLanguage,
+    toggleLanguage,
     toggleSound: handleToggleSound,
     toggleCRT,
     copyEmail,

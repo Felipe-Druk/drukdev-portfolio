@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { THEME_PALETTES, HISCORE_STORAGE_KEY, getCurrentTheme } from '../config/themes.js';
+import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound } from '../audio/soundEngine.js';
 import { SPRITES, drawPixelSprite } from '../graphics/sprites.js';
 
@@ -18,6 +19,7 @@ let gameCanvas = null;
 let gameContext = null;
 
 let gameRunning = false;
+let isGameOverState = false;
 let score = 0;
 let hiScore = parseInt(localStorage.getItem(HISCORE_STORAGE_KEY) || '0', 10);
 
@@ -41,7 +43,7 @@ function rectIntersect(rectA, rectB) {
         rectA.x < rectB.x + rectB.w &&
         rectA.x + rectA.w > rectB.x &&
         rectA.y < rectB.y + rectB.h &&
-        rectA.y + rectA.h > rectB.y
+        rectA.y + rectB.h > rectB.y
     );
 }
 
@@ -95,6 +97,23 @@ export function updateScoreUI() {
     if (hiScoreElement) hiScoreElement.textContent = hiScore;
 }
 
+export function refreshGameOverlayLanguage() {
+    const gameTexts = TRANSLATIONS[getCurrentLanguage()].game;
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+    const startBtnText = document.getElementById('startBtnText');
+
+    if (isGameOverState) {
+        if (overlayTitle) overlayTitle.textContent = gameTexts.gameOverTitle(score);
+        if (overlayDesc) overlayDesc.innerHTML = gameTexts.gameOverDescHtml(hiScore);
+        if (startBtnText) startBtnText.textContent = gameTexts.retryBtn;
+    } else {
+        if (overlayTitle) overlayTitle.textContent = gameTexts.overlayTitle;
+        if (overlayDesc) overlayDesc.innerHTML = gameTexts.overlayDescHtml;
+        if (startBtnText) startBtnText.textContent = gameTexts.startBtn;
+    }
+}
+
 export function startGame() {
     playSound('coin');
     const overlayElement = document.getElementById('gameOverlay');
@@ -108,12 +127,14 @@ export function startGame() {
     player.vy = 0;
     player.grounded = true;
     player.attackTimer = 0;
+    isGameOverState = false;
     gameRunning = true;
     updateScoreUI();
 }
 
 export function gameOver() {
     gameRunning = false;
+    isGameOverState = true;
     playSound('gameover');
 
     if (score > hiScore) {
@@ -125,19 +146,7 @@ export function gameOver() {
     const overlayElement = document.getElementById('gameOverlay');
     if (overlayElement) overlayElement.classList.remove('hidden');
 
-    const overlayTitle = document.getElementById('overlayTitle');
-    const overlayDesc = document.getElementById('overlayDesc');
-    const startBtnText = document.getElementById('startBtnText');
-
-    if (overlayTitle) {
-        overlayTitle.textContent = `¡BUG EN PRODUCCIÓN! (SCORE: ${score})`;
-    }
-    if (overlayDesc) {
-        overlayDesc.innerHTML = `Tu récord actual es <b class="text-bronze">${hiScore} pts</b>. ¿Otra partida rápida mientras DrukDev termina el deploy?`;
-    }
-    if (startBtnText) {
-        startBtnText.textContent = 'REINTENTAR / PLAY AGAIN';
-    }
+    refreshGameOverlayLanguage();
 }
 
 export function triggerJump(event) {

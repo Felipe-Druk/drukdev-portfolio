@@ -7,6 +7,7 @@
     --accent-secondary: #7A1F73;
     --accent-warm: #D4957A;
     --shadow-warm: #8A4E3B;
+    --steel-base: #56616E;
     --steel-mid: #56616E;
     --steel-dark: #2B3138;
     --steel-light: #D8E2EB;
@@ -26,6 +27,7 @@ body.theme-cyber {
     --accent-secondary: #ff007f;
     --accent-warm: #00f5d4;
     --shadow-warm: #1d2b64;
+    --steel-base: #1d2b64;
     --steel-mid: #1d2b64;
     --steel-dark: #0b0d21;
     --steel-light: #e2f1ff;
