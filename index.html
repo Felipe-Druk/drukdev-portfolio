@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrukDev | Coming Soon — Pixel Art & Code</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Pixel & Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            /* Default: Dark Fantasy Theme */
+            --bg-primary: #0b070e;
+            --bg-panel: #160e1d;
+            --bg-panel-alt: #1f1429;
+            --accent-main: #ff3b30;
+            --accent-secondary: #ffb703;
+            --accent-glow: rgba(255, 59, 48, 0.45);
+            --text-main: #f4ece1;
+            --text-muted: #a393b3;
+            --border-color: #4a2c40;
+            --border-highlight: #ffb703;
+        }
+
+        body.theme-cyber {
+            /* Cyber Neon Theme */
+            --bg-primary: #050510;
+            --bg-panel: #0b0d21;
+            --bg-panel-alt: #121738;
+            --accent-main: #00f5d4;
+            --accent-secondary: #ff007f;
+            --accent-glow: rgba(0, 245, 212, 0.45);
+            --text-main: #e2f1ff;
+            --text-muted: #7b8cde;
+            --border-color: #1d2b64;
+            --border-highlight: #00f5d4;
+        }
+
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+            transition: background-color 0.35s ease, color 0.35s ease;
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .font-vt {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Crisp Pixel Borders */
+        .pixel-box {
+            background: var(--bg-panel);
+            border: 3px solid var(--border-color);
+            box-shadow: 
+                0 0 0 3px var(--bg-primary),
+                0 0 24px var(--accent-glow),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .pixel-box-active {
+            border-color: var(--border-highlight);
+        }
+
+        /* Corner Pixel Rivets */
+        .pixel-corners::before,
+        .pixel-corners::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-secondary);
+            pointer-events: none;
+        }
+        .pixel-corners::before {
+            top: -4px;
+            left: -4px;
+            box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+        }
+        .pixel-corners::after {
+            bottom: -4px;
+            left: -4px;
+            box-shadow: calc(100% + 0px) 0 0 var(--accent-secondary);
+        }
+
+        /* Arcade Pixel Button */
+        .pixel-btn {
+            background: var(--bg-panel-alt);
+            border: 2px solid var(--border-highlight);
+            color: var(--text-main);
+            box-shadow: 4px 4px 0px var(--accent-main);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .pixel-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px var(--accent-secondary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .pixel-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0px var(--accent-main);
+        }
+
+        /* Scanlines Overlay */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.32) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Glitch / Glow Title Animation */
+        @keyframes pulseGlow {
+            0%, 100% {
+                text-shadow: 3px 3px 0px var(--accent-main), 0 0 18px var(--accent-glow);
+            }
+            50% {
+                text-shadow: 3px 3px 0px var(--accent-secondary), 0 0 28px var(--accent-main);
+            }
+        }
+        .title-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        /* Custom Progress Bar Stripes */
+        .pixel-progress {
+            background-image: repeating-linear-gradient(
+                45deg,
+                var(--accent-main),
+                var(--accent-main) 10px,
+                var(--accent-secondary) 10px,
+                var(--accent-secondary) 20px
+            );
+            background-size: 28px 28px;
+            animation: moveStripes 1s linear infinite;
+        }
+        @keyframes moveStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 28px 0; }
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-amber-500 selection:text-black">
+
+    <!-- Background Interactive Particle Canvas -->
+    <canvas id="bgCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- CRT Scanline Overlay (Toggleable) -->
+    <div id="crtOverlay" class="fixed inset-0 scanlines z-40 opacity-60"></div>
+
+    <!-- Top Navigation / Theme & FX Bar -->
+    <header class="relative z-20 w-full max-w-6xl mx-auto px-4 pt-5 pb-2 flex flex-wrap items-center justify-between gap-4">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+            <canvas id="logoSpriteCanvas" width="44" height="44" class="w-11 h-11 rounded border-2 border-amber-400/60 bg-black/50"></canvas>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="font-pixel text-base sm:text-lg tracking-wider text-white">DRUK<span id="brandSuffix" class="text-amber-400">.DEV</span></span>
+                    <span class="text-[10px] font-pixel px-2 py-0.5 rounded bg-red-500/20 border border-red-500/50 text-red-300 animate-pulse" id="statusBadge">BUILD v0.35</span>
+                </div>
+                <p class="text-xs opacity-75" id="themeSubtitle">Grimorio Digital & Código Artesanal</p>
+            </div>
+        </div>
+
+        <!-- Theme Switcher & Audio/CRT Controls -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div class="flex items-center bg-black/60 p-1 rounded border border-white/15">
+                <button id="btnFantasy" onclick="setTheme('fantasy')" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-red-600 text-white shadow">
+                    <span>⚔️</span> <span class="hidden sm:inline">DARK FANTASY</span>
+                </button>
+                <button id="btnCyber" onclick="setTheme('cyber')" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white">
+                    <span>⚡</span> <span class="hidden sm:inline">CYBER NEON</span>
+                </button>
+            </div>
+
+            <button id="btnSound" onclick="toggleSound()" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" title="Efectos de sonido 8-bit">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-amber-400"></i>
+                <span id="soundLabel" class="hidden md:inline">SFX ON</span>
+            </button>
+
+            <button id="btnCrt" onclick="toggleCRT()" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" title="Filtro Monitor Retro CRT">
+                <i class="fa-solid fa-tv"></i>
+                <span class="hidden md:inline">CRT</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="relative z-10 w-full max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start my-auto">
+        
+        <!-- Left Column: Hero "Coming Soon", Progress & Recruiter Info (7 cols) -->
+        <section class="lg:col-span-7 flex flex-col gap-5">
+            
+            <!-- Hero Card -->
+            <div class="pixel-box rounded-lg p-6 sm:p-8">
+                <!-- Interactive Pixel Diorama Banner -->
+                <div class="relative w-full h-36 sm:h-44 mb-6 rounded border-2 border-white/15 overflow-hidden bg-black group cursor-crosshair" id="dioramaContainer" title="Haz clic en el escenario para invocar partículas">
+                    <canvas id="dioramaCanvas" class="w-full h-full block"></canvas>
+                    <div class="absolute bottom-2 right-2 bg-black/75 px-2.5 py-1 rounded text-[11px] font-vt tracking-wider text-amber-300 border border-white/10 pointer-events-none">
+                        ✨ Click en la escena para interactuar
+                    </div>
+                </div>
+
+                <!-- Coming Soon Tag -->
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/5 border border-white/15 mb-3">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="font-pixel text-[10px] sm:text-xs tracking-widest uppercase" id="comingSoonBadge">PRÓXIMAMENTE // COMING SOON</span>
+                </div>
+
+                <!-- Main Headline -->
+                <h1 class="font-pixel text-2xl sm:text-4xl leading-snug mb-4 title-glow" id="heroTitle">
+                    FORJANDO EL PORTAFOLIO DE DRUKDEV
+                </h1>
+
+                <p class="text-sm sm:text-base leading-relaxed opacity-90 mb-6" id="heroDescription">
+                    ¡Hola! Estoy construyendo un portafolio interactivo fuera de lo común: gráficos <strong class="text-amber-400">pixel-art generados 100% por código</strong>, minijuegos integrados y mis mejores proyectos de desarrollo. Mientras termino de pulir los últimos niveles, puedes jugar una partida rápida o contactarme directamente.
+                </p>
+
+                <!-- Build Progress Bar -->
+                <div class="bg-black/50 p-4 rounded border border-white/10 mb-6">
+                    <div class="flex justify-between items-center text-xs font-pixel mb-2">
+                        <span id="progressTask">🔨 COMPILANDO SHADERS & PROYECTOS...</span>
+                        <span id="progressPercent" class="text-amber-400">42%</span>
+                    </div>
+                    <div class="w-full h-4 bg-black rounded overflow-hidden border border-white/20 p-0.5">
+                        <div class="h-full pixel-progress rounded-sm transition-all duration-500" style="width: 42%"></div>
+                    </div>
+                    <div class="mt-2.5 flex flex-wrap gap-2 text-[11px] opacity-80 font-vt text-base">
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">✔ Dominio & Hosting</span>
+                        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">⚙ Motor Pixel-Art Procedural</span>
+                        <span class="px-2 py-0.5 rounded bg-white/5 text-gray-400 border border-white/10">⏳ Casos de Estudio & Demos</span>
+                    </div>
+                </div>
+
+                <!-- Recruiter Quick Access / Contact Buttons -->
+                <div>
+                    <p class="font-pixel text-[11px] uppercase tracking-wider mb-3 opacity-80">
+                        <i class="fa-solid fa-user-astronaut mr-1"></i> ¿Eres reclutador o quieres colaborar? No esperes al lanzamiento:
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" onclick="playSound('click')" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-brands fa-github text-lg"></i>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" onclick="playSound('click')" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-brands fa-linkedin text-lg text-sky-400"></i>
+                            <span>LinkedIn</span>
+                        </a>
+                        <button onclick="copyEmail()" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-envelope text-amber-400"></i>
+                            <span id="emailBtnText">Copiar Email (contacto@druk.dev)</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Preview Pills (What's coming) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-xl shrink-0" id="featIcon1">🗡️</div>
+                    <div>
+                        <h3 class="font-pixel text-[10px] text-amber-400 mb-0.5" id="featTitle1">PROYECTOS REALES</h3>
+                        <p class="text-xs opacity-75">Arquitectura, código limpio y demos en vivo.</p>
+                    </div>
+                </div>
+                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-xl shrink-0" id="featIcon2">👾</div>
+                    <div>
+                        <h3 class="font-pixel text-[10px] text-amber-400 mb-0.5" id="featTitle2">ARTE POR CÓDIGO</h3>
+                        <p class="text-xs opacity-75">Canvas 2D, partículas y diseño con personalidad.</p>
+                    </div>
+                </div>
+                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded bg-white/5 flex items-center justify-center text-xl shrink-0" id="featIcon3">🕹️</div>
+                    <div>
+                        <h3 class="font-pixel text-[10px] text-amber-400 mb-0.5" id="featTitle3">GAMIFICACIÓN</h3>
+                        <p class="text-xs opacity-75">Explora mi experiencia como si fuera un RPG.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Playable Arcade Mini-Game ("While you wait...") (5 cols) -->
+        <section class="lg:col-span-5 flex flex-col">
+            <div class="pixel-box pixel-box-active rounded-lg p-5 flex flex-col">
+                
+                <!-- Arcade Header -->
+                <div class="flex items-center justify-between border-b border-white/15 pb-3 mb-3">
+                    <div>
+                        <span class="text-[10px] font-pixel text-amber-400 block mb-0.5">🕹️ MINIJUEGO MIENTRAS ESPERAS</span>
+                        <h2 class="font-pixel text-sm sm:text-base text-white" id="gameTitle">DRUK'S BUG SLASHER</h2>
+                    </div>
+                    <div class="text-right font-vt text-lg leading-tight bg-black/60 px-3 py-1 rounded border border-white/15">
+                        <div>SCORE: <span id="scoreDisplay" class="text-amber-400 font-bold">0</span></div>
+                        <div class="text-xs opacity-75">HI-SCORE: <span id="hiScoreDisplay">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Game Canvas Wrapper -->
+                <div class="relative w-full aspect-[4/3] bg-black rounded border-2 border-white/20 overflow-hidden mb-4 select-none">
+                    <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+                    <!-- Start / Game Over Overlay -->
+                    <div id="gameOverlay" class="absolute inset-0 bg-black/80 backdrop-blur-[2px] flex flex-col items-center justify-center p-5 text-center z-10">
+                        <canvas id="heroPreviewCanvas" width="64" height="64" class="w-16 h-16 mb-3"></canvas>
+                        <h3 id="overlayTitle" class="font-pixel text-sm sm:text-base text-amber-400 mb-2">¡DEFIENDE EL REPOSITORIO!</h3>
+                        <p id="overlayDesc" class="text-xs sm:text-sm opacity-90 max-w-xs mb-4">
+                            Salta los <span class="text-red-400 font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-emerald-400 font-bold">Commits</span> para acelerar el deploy.
+                        </p>
+                        <button onclick="startGame()" class="pixel-btn px-5 py-3 rounded font-pixel text-xs sm:text-sm text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span id="startBtnText">INSERT COIN / JUGAR</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- On-Screen Touch / Mouse Controls (Great for Mobile & Desktop) -->
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <button onmousedown="triggerJump()" ontouchstart="triggerJump(event)" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-up"></i>
+                        <span>SALTAR (W / ESPACIO)</span>
+                    </button>
+                    <button onmousedown="triggerAttack()" ontouchstart="triggerAttack(event)" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-bolt text-amber-400"></i>
+                        <span id="attackBtnLabel">ESPADAZO (K / CLICK)</span>
+                    </button>
+                </div>
+
+                <div class="text-[11px] opacity-75 flex items-center justify-between px-1">
+                    <span>💡 Cambia entre <b>Dark Fantasy</b> y <b>Cyber Neon</b> arriba para transformar al héroe.</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification for Copy Email / Easter Eggs -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="pixel-box pixel-box-active px-4 py-3 rounded flex items-center gap-3 bg-black/95">
+            <span class="text-xl" id="toastIcon">📜</span>
+            <div>
+                <p class="font-pixel text-[10px] text-amber-400" id="toastTitle">¡COPIADO AL PORTAPAPELES!</p>
+                <p class="text-xs text-white" id="toastMsg">contacto@druk.dev listo para pegar.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="relative z-10 w-full max-w-6xl mx-auto px-4 py-4 border-t border-white/10 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 opacity-75">
+        <div>
+            <span class="font-pixel text-[10px]">DRUKDEV</span> — Hecho desde cero con HTML5 Canvas & Pixel Art Procedural.
+        </div>
+        <div class="font-vt text-base">
+            <span>Estado del servidor: </span>
+            <span class="text-emerald-400">● ONLINE (Esperando Deploy Final)</span>
+        </div>
+    </footer>
+
+    <!-- Complete Procedural Pixel Art, Theme Engine, WebAudio Synth & Arcade Game Script -->
+    <script>
+        /**************************************************************
+         * 1. STATE & THEME CONFIGURATION
+         **************************************************************/
+        let currentTheme = 'fantasy'; // 'fantasy' | 'cyber'
+        let soundEnabled = true;
+        let crtEnabled = true;
+
+        // Pixel Art Sprite Matrices (8x8 or 12x12 grids encoded as strings)
+        // Legend:
+        // '.' = transparent
+        // '1' = Primary Armor / Suit
+        // '2' = Secondary Accent (Gold / Magenta)
+        // '3' = Glow / Visor / Eyes / Blade Energy
+        // '4' = Dark Outline / Shadow
+        const SPRITES = {
+            fantasyKnight: [
+                "....2222....",
+                "...111111...",
+                "..11444411..",
+                "..14333341..",
+                "..11444411..",
+                "...112211...",
+                "..21111112..",
+                ".2111221112.",
+                ".2.111111.2.",
+                "...11..11...",
+                "...11..11...",
+                "..44....44.."
+            ],
+            cyberRunner: [
+                "....3333....",
+                "...111111...",
+                "..11333311..",
+                "..13222231..",
+                "..11111111..",
+                "...221122...",
+                "..21133112..",
+                ".3.111111.3.",
+                "...112211...",
+                "...11..11...",
+                "..31....13..",
+                "..33....33.."
+            ],
+            fantasyBug: [
+                "....3..3....",
+                "...344443...",
+                "..41111114..",
+                ".4133113314.",
+                ".4111111114.",
+                "..41211214..",
+                "...44..44...",
+                "..4..44..4.."
+            ],
+            cyberBug: [
+                "..3......3..",
+                "...311113...",
+                "..11444411..",
+                ".1432442341.",
+                ".1111111111.",
+                "..2.1221.2..",
+                ".2..1..1..2.",
+                "2..2....2..2"
+            ],
+            commitGem: [
+                "....33....",
+                "...3223...",
+                "..321123..",
+                ".32133123.",
+                ".32133123.",
+                "..321123..",
+                "...3223...",
+                "....33...."
+            ]
+        };
+
+        const THEME_PALETTES = {
+            fantasy: {
+                bgSkyTop: '#08050b',
+                bgSkyBottom: '#1c0d1f',
+                groundColor: '#251329',
+                groundLine: '#ff3b30',
+                spriteColors: {
+                    '1': '#d8dee9', // Silver Steel
+                    '2': '#ffb703', // Royal Gold
+                    '3': '#ff3b30', // Crimson Ember
+                    '4': '#1a1423'  // Dark Obsidian
+                },
+                bugColors: {
+                    '1': '#7f1d1d',
+                    '2': '#ffb703',
+                    '3': '#ff3b30',
+                    '4': '#2b0909'
+                },
+                gemColors: {
+                    '1': '#ffffff',
+                    '2': '#ffb703',
+                    '3': '#fb8500'
+                },
+                particleColors: ['#ff3b30', '#ffb703', '#fb8500', '#fde047'],
+                slashColor: '#ffb703'
+            },
+            cyber: {
+                bgSkyTop: '#03030c',
+                bgSkyBottom: '#0f1035',
+                groundColor: '#0b0c24',
+                groundLine: '#00f5d4',
+                spriteColors: {
+                    '1': '#1e293b', // Cyber Slate
+                    '2': '#ff007f', // Neon Magenta
+                    '3': '#00f5d4', // Cyber Cyan
+                    '4': '#020617'
+                },
+                bugColors: {
+                    '1': '#3b0764',
+                    '2': '#00f5d4',
+                    '3': '#ff007f',
+                    '4': '#090d16'
+                },
+                gemColors: {
+                    '1': '#ffffff',
+                    '2': '#00f5d4',
+                    '3': '#ff007f'
+                },
+                particleColors: ['#00f5d4', '#ff007f', '#a855f7', '#38bdf8'],
+                slashColor: '#00f5d4'
+            }
+        };
+
+        /**************************************************************
+         * 2. RETRO 8-BIT WEB AUDIO SYNTHESIZER (NO EXTERNAL MP3s)
+         **************************************************************/
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'jump') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(520, now + 0.14);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+                    osc.start(now);
+                    osc.stop(now + 0.14);
+                } else if (type === 'attack') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(480, now);
+                    osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
+                    gain.gain.setValueAtTime(0.09, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'coin') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(587.33, now); // D5
+                    osc.frequency.setValueAtTime(880, now + 0.06); // A5
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'hit') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(260, now);
+                    osc.frequency.exponentialRampToValueAtTime(70, now + 0.15);
+                    gain.gain.setValueAtTime(0.11, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'gameover') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(120, now + 0.35);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(660, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                }
+            } catch (e) {
+                // Ignore audio context locks
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const label = document.getElementById('soundLabel');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high text-amber-400';
+                label.textContent = 'SFX ON';
+                playSound('coin');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-gray-400';
+                label.textContent = 'MUTE';
+            }
+        }
+
+        function toggleCRT() {
+            crtEnabled = !crtEnabled;
+            const overlay = document.getElementById('crtOverlay');
+            overlay.style.display = crtEnabled ? 'block' : 'none';
+            playSound('click');
+        }
+
+        /**************************************************************
+         * 3. HELPER: DRAW PIXEL MATRIX ON ANY CANVAS
+         **************************************************************/
+        function drawPixelSprite(ctx, matrix, x, y, scale, colorMap) {
+            for (let r = 0; r < matrix.length; r++) {
+                const row = matrix[r];
+                for (let c = 0; c < row.length; c++) {
+                    const ch = row[c];
+                    if (ch !== '.' && colorMap[ch]) {
+                        ctx.fillStyle = colorMap[ch];
+                        ctx.fillRect(
+                            Math.floor(x + c * scale),
+                            Math.floor(y + r * scale),
+                            Math.ceil(scale),
+                            Math.ceil(scale)
+                        );
+                    }
+                }
+            }
+        }
+
+        /**************************************************************
+         * 4. THEME SWITCHER LOGIC (DARK FANTASY VS CYBER NEON)
+         **************************************************************/
+        function setTheme(theme) {
+            currentTheme = theme;
+            playSound('coin');
+
+            const body = document.body;
+            const btnFantasy = document.getElementById('btnFantasy');
+            const btnCyber = document.getElementById('btnCyber');
+
+            if (theme === 'cyber') {
+                body.classList.add('theme-cyber');
+                btnCyber.className = 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-cyan-500 text-black shadow font-bold';
+                btnFantasy.className = 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white';
+
+                document.getElementById('brandSuffix').className = 'text-cyan-400';
+                document.getElementById('statusBadge').className = 'text-[10px] font-pixel px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 animate-pulse';
+                document.getElementById('themeSubtitle').textContent = 'Synthwave Grid & Arquitectura Full-Stack';
+                document.getElementById('heroTitle').textContent = 'INICIALIZANDO EL SISTEMA DRUK.DEV';
+                document.getElementById('progressTask').textContent = '⚡ CARGANDO NEON SHADERS & MINIJUEGOS...';
+                document.getElementById('gameTitle').textContent = 'CYBER BUG RUNNER 2099';
+                document.getElementById('attackBtnLabel').textContent = 'PULSO LÁSER (K / CLICK)';
+                document.getElementById('featIcon1').textContent = '🛰️';
+                document.getElementById('featIcon2').textContent = '🌆';
+                document.getElementById('featIcon3').textContent = '⚡';
+            } else {
+                body.classList.remove('theme-cyber');
+                btnFantasy.className = 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-red-600 text-white shadow';
+                btnCyber.className = 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white';
+
+                document.getElementById('brandSuffix').className = 'text-amber-400';
+                document.getElementById('statusBadge').className = 'text-[10px] font-pixel px-2 py-0.5 rounded bg-red-500/20 border border-red-500/50 text-red-300 animate-pulse';
+                document.getElementById('themeSubtitle').textContent = 'Grimorio Digital & Código Artesanal';
+                document.getElementById('heroTitle').textContent = 'FORJANDO EL PORTAFOLIO DE DRUKDEV';
+                document.getElementById('progressTask').textContent = '🔨 FORJANDO SHADERS & PROYECTOS...';
+                document.getElementById('gameTitle').textContent = "DRUK'S BUG SLASHER";
+                document.getElementById('attackBtnLabel').textContent = 'ESPADAZO (K / CLICK)';
+                document.getElementById('featIcon1').textContent = '🗡️';
+                document.getElementById('featIcon2').textContent = '👾';
+                document.getElementById('featIcon3').textContent = '🕹️';
+            }
+
+            renderStaticPreviews();
+            spawnDioramaBurst(dioramaCanvas.width / 2, dioramaCanvas.height / 2, 24);
+        }
+
+        function renderStaticPreviews() {
+            const palette = THEME_PALETTES[currentTheme];
+            const sprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
+
+            // Header small avatar
+            const logoCanvas = document.getElementById('logoSpriteCanvas');
+            const lctx = logoCanvas.getContext('2d');
+            lctx.clearRect(0, 0, logoCanvas.width, logoCanvas.height);
+            drawPixelSprite(lctx, sprite, 4, 4, 3, palette.spriteColors);
+
+            // Game overlay hero preview
+            const prevCanvas = document.getElementById('heroPreviewCanvas');
+            const pctx = prevCanvas.getContext('2d');
+            pctx.clearRect(0, 0, prevCanvas.width, prevCanvas.height);
+            drawPixelSprite(pctx, sprite, 8, 4, 4, palette.spriteColors);
+        }
+
+        /**************************************************************
+         * 5. INTERACTIVE HERO DIORAMA CANVAS (PROCEDURAL PIXEL SCENE)
+         **************************************************************/
+        const dioramaCanvas = document.getElementById('dioramaCanvas');
+        const dctx = dioramaCanvas.getContext('2d');
+        let dioramaParticles = [];
+        let dioramaTick = 0;
+
+        function resizeDiorama() {
+            const rect = dioramaCanvas.parentElement.getBoundingClientRect();
+            dioramaCanvas.width = Math.max(300, Math.floor(rect.width));
+            dioramaCanvas.height = Math.max(140, Math.floor(rect.height));
+        }
+
+        function spawnDioramaBurst(x, y, count = 16) {
+            const palette = THEME_PALETTES[currentTheme];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 0.8 + Math.random() * 3.2;
+                dioramaParticles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 0.8,
+                    size: Math.random() > 0.5 ? 4 : 3,
+                    life: 1,
+                    color: palette.particleColors[Math.floor(Math.random() * palette.particleColors.length)]
+                });
+            }
+        }
+
+        dioramaCanvas.parentElement.addEventListener('click', (e) => {
+            const rect = dioramaCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            spawnDioramaBurst(x, y, 22);
+            playSound('click');
+        });
+
+        function updateAndDrawDiorama() {
+            dioramaTick++;
+            const w = dioramaCanvas.width;
+            const h = dioramaCanvas.height;
+            const palette = THEME_PALETTES[currentTheme];
+
+            // Background Gradient
+            const grad = dctx.createLinearGradient(0, 0, 0, h);
+            grad.addColorStop(0, palette.bgSkyTop);
+            grad.addColorStop(1, palette.bgSkyBottom);
+            dctx.fillStyle = grad;
+            dctx.fillRect(0, 0, w, h);
+
+            if (currentTheme === 'fantasy') {
+                // Draw Pixel Blood Moon
+                dctx.fillStyle = 'rgba(255, 59, 48, 0.18)';
+                dctx.fillRect(w - 110, 14, 56, 56);
+                dctx.fillStyle = '#ff3b30';
+                dctx.fillRect(w - 102, 22, 40, 40);
+                dctx.fillStyle = '#ffb703';
+                dctx.fillRect(w - 94, 30, 24, 24);
+
+                // Distant Gothic Castle / Monoliths Silhouette
+                dctx.fillStyle = '#120817';
+                for (let x = 0; x < w; x += 24) {
+                    const towerH = 28 + ((x * 17) % 45);
+                    dctx.fillRect(x, h - 28 - towerH, 20, towerH);
+                }
+
+                // Campfire & Flickering Torches in Center
+                const fireX = Math.floor(w / 2);
+                const fireY = h - 32;
+                dctx.fillStyle = '#4a2c40';
+                dctx.fillRect(fireX - 14, fireY + 4, 28, 6);
+                const flameH = 10 + Math.floor(Math.sin(dioramaTick * 0.2) * 4);
+                dctx.fillStyle = '#ff3b30';
+                dctx.fillRect(fireX - 8, fireY - flameH, 16, flameH + 4);
+                dctx.fillStyle = '#ffb703';
+                dctx.fillRect(fireX - 4, fireY - flameH + 4, 8, flameH);
+
+                // Spawn gentle rising embers
+                if (dioramaTick % 4 === 0) {
+                    dioramaParticles.push({
+                        x: fireX + (Math.random() * 20 - 10),
+                        y: fireY - 6,
+                        vx: (Math.random() - 0.5) * 0.6,
+                        vy: -0.7 - Math.random() * 1.1,
+                        size: 3,
+                        life: 1,
+                        color: Math.random() > 0.4 ? '#ffb703' : '#ff3b30'
+                    });
+                }
+            } else {
+                // CYBER NEON SCENE: Retro Synth Sun & Perspective Grid
+                const sunX = Math.floor(w / 2);
+                const sunY = h - 42;
+                dctx.fillStyle = '#ff007f';
+                dctx.fillRect(sunX - 36, sunY - 36, 72, 42);
+                dctx.fillStyle = '#00f5d4';
+                dctx.fillRect(sunX - 28, sunY - 28, 56, 12);
+
+                // Skyline Buildings with Neon Windows
+                dctx.fillStyle = '#07091e';
+                for (let x = 10; x < w; x += 38) {
+                    const bH = 35 + ((x * 23) % 55);
+                    dctx.fillRect(x, h - 28 - bH, 30, bH);
+                    dctx.fillStyle = (x % 76 === 0) ? '#00f5d4' : '#ff007f';
+                    dctx.fillRect(x + 6, h - 22 - bH, 4, 4);
+                    dctx.fillRect(x + 16, h - 12 - bH, 4, 4);
+                    dctx.fillStyle = '#07091e';
+                }
+
+                // Ambient digital rain
+                if (dioramaTick % 3 === 0) {
+                    dioramaParticles.push({
+                        x: Math.random() * w,
+                        y: 0,
+                        vx: 0,
+                        vy: 1.5 + Math.random() * 2,
+                        size: 3,
+                        life: 1,
+                        color: Math.random() > 0.5 ? '#00f5d4' : '#ff007f'
+                    });
+                }
+            }
+
+            // Ground Platform
+            dctx.fillStyle = palette.groundColor;
+            dctx.fillRect(0, h - 28, w, 28);
+            dctx.fillStyle = palette.groundLine;
+            dctx.fillRect(0, h - 28, w, 3);
+
+            // Animated Hero Sprite standing in Diorama
+            const bobOffset = Math.sin(dioramaTick * 0.1) > 0 ? -3 : 0;
+            const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
+            drawPixelSprite(dctx, heroSprite, Math.floor(w * 0.22), h - 64 + bobOffset, 3, palette.spriteColors);
+
+            // Floating Gem / Artifact on the right
+            const gemBob = Math.floor(Math.sin(dioramaTick * 0.08) * 5);
+            drawPixelSprite(dctx, SPRITES.commitGem, Math.floor(w * 0.75), h - 62 + gemBob, 3, palette.gemColors);
+
+            // Update & Draw Diorama Particles
+            for (let i = dioramaParticles.length - 1; i >= 0; i--) {
+                const p = dioramaParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+                if (p.life <= 0) {
+                    dioramaParticles.splice(i, 1);
+                } else {
+                    dctx.fillStyle = p.color;
+                    dctx.globalAlpha = Math.max(0, p.life);
+                    dctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+                    dctx.globalAlpha = 1.0;
+                }
+            }
+        }
+
+        /**************************************************************
+         * 6. BACKGROUND AMBIENT PIXEL CANVAS
+         **************************************************************/
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgStars = [];
+
+        function initBgCanvas() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            bgStars = [];
+            for (let i = 0; i < 45; i++) {
+                bgStars.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    size: Math.random() > 0.7 ? 3 : 2,
+                    speedY: (Math.random() * 0.4) + 0.15,
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function updateAndDrawBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            const palette = THEME_PALETTES[currentTheme];
+
+            for (let i = 0; i < bgStars.length; i++) {
+                const s = bgStars[i];
+                s.y = (currentTheme === 'fantasy')
+                    ? s.y - s.speedY // rising embers
+                    : s.y + s.speedY * 1.6; // falling cyber data
+
+                if (s.y < 0) s.y = bgCanvas.height;
+                if (s.y > bgCanvas.height) s.y = 0;
+
+                const alpha = 0.25 + 0.35 * Math.sin(dioramaTick * 0.04 + s.phase);
+                bgCtx.fillStyle = palette.particleColors[i % palette.particleColors.length];
+                bgCtx.globalAlpha = alpha;
+                bgCtx.fillRect(Math.floor(s.x), Math.floor(s.y), s.size, s.size);
+            }
+            bgCtx.globalAlpha = 1;
+        }
+
+        /**************************************************************
+         * 7. PLAYABLE MINI-GAME: "DRUK'S BUG SLASHER"
+         **************************************************************/
+        const gameCanvas = document.getElementById('gameCanvas');
+        const gctx = gameCanvas.getContext('2d');
+
+        let gameRunning = false;
+        let score = 0;
+        let hiScore = parseInt(localStorage.getItem('drukdev_hiscore') || '0', 10);
+        document.getElementById('hiScoreDisplay').textContent = hiScore;
+
+        const GAME_W = 400;
+        const GAME_H = 300;
+        gameCanvas.width = GAME_W;
+        gameCanvas.height = GAME_H;
+        const GROUND_Y = 248;
+
+        let player = {
+            x: 48,
+            y: GROUND_Y - 36,
+            vy: 0,
+            w: 36,
+            h: 36,
+            grounded: true,
+            attackTimer: 0
+        };
+
+        let entities = []; // bugs and commit gems
+        let gameParticles = [];
+        let spawnTimer = 0;
+        let gameSpeed = 3.2;
+
+        function startGame() {
+            playSound('coin');
+            document.getElementById('gameOverlay').classList.add('hidden');
+            score = 0;
+            gameSpeed = 3.2;
+            entities = [];
+            gameParticles = [];
+            player.y = GROUND_Y - player.h;
+            player.vy = 0;
+            player.grounded = true;
+            player.attackTimer = 0;
+            gameRunning = true;
+            updateScoreUI();
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            playSound('gameover');
+            if (score > hiScore) {
+                hiScore = score;
+                localStorage.setItem('drukdev_hiscore', String(hiScore));
+            }
+            updateScoreUI();
+
+            const overlay = document.getElementById('gameOverlay');
+            overlay.classList.remove('hidden');
+            document.getElementById('overlayTitle').textContent = `¡BUG EN PRODUCCIÓN! (SCORE: ${score})`;
+            document.getElementById('overlayDesc').innerHTML = `Tu récord actual es <b class="text-amber-400">${hiScore} pts</b>. ¿Otra partida rápida mientras DrukDev termina el deploy?`;
+            document.getElementById('startBtnText').textContent = 'REINTENTAR / PLAY AGAIN';
+        }
+
+        function updateScoreUI() {
+            document.getElementById('scoreDisplay').textContent = score;
+            document.getElementById('hiScoreDisplay').textContent = hiScore;
+        }
+
+        function triggerJump(e) {
+            if (e) e.preventDefault();
+            if (!gameRunning) return;
+            if (player.grounded) {
+                player.vy = -9.6;
+                player.grounded = false;
+                playSound('jump');
+                spawnGameParticles(player.x + 12, player.y + 34, 6, '#ffffff');
+            }
+        }
+
+        function triggerAttack(e) {
+            if (e) e.preventDefault();
+            if (!gameRunning) return;
+            if (player.attackTimer <= 0) {
+                player.attackTimer = 14;
+                playSound('attack');
+
+                // Check if any bug is within slash range right now
+                const slashBox = {
+                    x: player.x + player.w - 4,
+                    y: player.y - 8,
+                    w: 48,
+                    h: player.h + 16
+                };
+
+                for (let i = entities.length - 1; i >= 0; i--) {
+                    const ent = entities[i];
+                    if (ent.type === 'bug' && rectIntersect(slashBox, ent)) {
+                        spawnGameParticles(ent.x + 12, ent.y + 12, 16, THEME_PALETTES[currentTheme].slashColor);
+                        entities.splice(i, 1);
+                        score += 15;
+                        playSound('hit');
+                        updateScoreUI();
+                    }
+                }
+            }
+        }
+
+        // Keyboard controls
+        window.addEventListener('keydown', (e) => {
+            if (['Space', 'ArrowUp', 'KeyW'].includes(e.code)) {
+                if (gameRunning) {
+                    e.preventDefault();
+                    triggerJump();
+                }
+            } else if (['KeyK', 'KeyJ', 'ArrowRight', 'Enter'].includes(e.code)) {
+                if (gameRunning) {
+                    e.preventDefault();
+                    triggerAttack();
+                }
+            }
+        });
+
+        // Click on Game Canvas to attack/jump
+        gameCanvas.addEventListener('mousedown', (e) => {
+            if (!gameRunning) return;
+            const rect = gameCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            if (clickX < rect.width / 2) {
+                triggerJump();
+            } else {
+                triggerAttack();
+            }
+        });
+
+        function rectIntersect(a, b) {
+            return (
+                a.x < b.x + b.w &&
+                a.x + a.w > b.x &&
+                a.y < b.y + b.h &&
+                a.y + a.h > b.y
+            );
+        }
+
+        function spawnGameParticles(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                gameParticles.push({
+                    x,
+                    y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    size: 4,
+                    life: 1,
+                    color
+                });
+            }
+        }
+
+        function updateAndDrawGame() {
+            const palette = THEME_PALETTES[currentTheme];
+
+            // Clear Sky
+            gctx.fillStyle = palette.bgSkyTop;
+            gctx.fillRect(0, 0, GAME_W, GAME_H);
+
+            // Retro Horizon Grid Lines
+            gctx.fillStyle = 'rgba(255,255,255,0.04)';
+            for (let y = 40; y < GROUND_Y; y += 35) {
+                gctx.fillRect(0, y, GAME_W, 1);
+            }
+
+            // Ground
+            gctx.fillStyle = palette.groundColor;
+            gctx.fillRect(0, GROUND_Y, GAME_W, GAME_H - GROUND_Y);
+            gctx.fillStyle = palette.groundLine;
+            gctx.fillRect(0, GROUND_Y, GAME_W, 4);
+
+            if (gameRunning) {
+                // Physics
+                player.y += player.vy;
+                player.vy += 0.52; // gravity
+
+                if (player.y >= GROUND_Y - player.h) {
+                    player.y = GROUND_Y - player.h;
+                    player.vy = 0;
+                    player.grounded = true;
+                }
+
+                if (player.attackTimer > 0) {
+                    player.attackTimer--;
+                }
+
+                // Increase speed gradually
+                gameSpeed = Math.min(7.2, 3.2 + score * 0.012);
+
+                // Spawn Bugs and Commit Gems
+                spawnTimer--;
+                if (spawnTimer <= 0) {
+                    const isGem = Math.random() < 0.35;
+                    entities.push({
+                        type: isGem ? 'gem' : 'bug',
+                        x: GAME_W + 20,
+                        y: isGem ? (GROUND_Y - 32 - (Math.random() > 0.5 ? 42 : 0)) : (GROUND_Y - 26),
+                        w: 26,
+                        h: 26
+                    });
+                    spawnTimer = Math.floor(45 + Math.random() * 45);
+                }
+
+                // Update Entities
+                const slashBox = {
+                    x: player.x + player.w - 4,
+                    y: player.y - 8,
+                    w: 48,
+                    h: player.h + 16
+                };
+
+                for (let i = entities.length - 1; i >= 0; i--) {
+                    const ent = entities[i];
+                    ent.x -= gameSpeed;
+
+                    // If player is actively slashing, destroy bugs in front
+                    if (player.attackTimer > 4 && ent.type === 'bug' && rectIntersect(slashBox, ent)) {
+                        spawnGameParticles(ent.x + 12, ent.y + 12, 14, palette.slashColor);
+                        entities.splice(i, 1);
+                        score += 15;
+                        playSound('hit');
+                        updateScoreUI();
+                        continue;
+                    }
+
+                    // Check collision with player body
+                    const playerHitbox = {
+                        x: player.x + 6,
+                        y: player.y + 4,
+                        w: player.w - 12,
+                        h: player.h - 6
+                    };
+
+                    if (rectIntersect(playerHitbox, ent)) {
+                        if (ent.type === 'gem') {
+                            score += 25;
+                            playSound('coin');
+                            spawnGameParticles(ent.x + 10, ent.y + 10, 12, '#fde047');
+                            entities.splice(i, 1);
+                            updateScoreUI();
+                            continue;
+                        } else {
+                            // Hit a Bug!
+                            spawnGameParticles(player.x + 16, player.y + 16, 24, '#ff3b30');
+                            gameOver();
+                            break;
+                        }
+                    }
+
+                    // Passed screen safely
+                    if (ent.x + ent.w < 0) {
+                        if (ent.type === 'bug') {
+                            score += 5;
+                            updateScoreUI();
+                        }
+                        entities.splice(i, 1);
+                    }
+                }
+            }
+
+            // Draw Player Sprite
+            const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
+            drawPixelSprite(gctx, heroSprite, player.x, player.y, 3, palette.spriteColors);
+
+            // Draw Attack Slash Wave
+            if (player.attackTimer > 0) {
+                gctx.fillStyle = palette.slashColor;
+                const offset = (14 - player.attackTimer) * 2;
+                gctx.fillRect(player.x + player.w + offset, player.y + 2, 10, 30);
+                gctx.fillRect(player.x + player.w + offset + 10, player.y + 8, 6, 18);
+            }
+
+            // Draw Entities
+            const bugSprite = currentTheme === 'fantasy' ? SPRITES.fantasyBug : SPRITES.cyberBug;
+            for (const ent of entities) {
+                if (ent.type === 'bug') {
+                    drawPixelSprite(gctx, bugSprite, ent.x, ent.y, 3, palette.bugColors);
+                } else {
+                    drawPixelSprite(gctx, SPRITES.commitGem, ent.x, ent.y, 3, palette.gemColors);
+                }
+            }
+
+            // Draw Game Particles
+            for (let i = gameParticles.length - 1; i >= 0; i--) {
+                const p = gameParticles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.05;
+                if (p.life <= 0) {
+                    gameParticles.splice(i, 1);
+                } else {
+                    gctx.fillStyle = p.color;
+                    gctx.globalAlpha = Math.max(0, p.life);
+                    gctx.fillRect(Math.floor(p.x), Math.floor(p.y), p.size, p.size);
+                    gctx.globalAlpha = 1;
+                }
+            }
+        }
+
+        /**************************************************************
+         * 8. CLIPBOARD EMAIL COPY & TOAST NOTIFICATION
+         **************************************************************/
+        function copyEmail() {
+            const email = 'contacto@druk.dev';
+            const tempInput = document.createElement('textarea');
+            tempInput.value = email;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            playSound('coin');
+            showToast('📜', '¡EMAIL COPIADO!', `${email} listo para pegar.`);
+        }
+
+        let toastTimeout = null;
+        function showToast(icon, title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = msg;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3200);
+        }
+
+        /**************************************************************
+         * 9. MAIN ANIMATION LOOP & WINDOW EVENTS
+         **************************************************************/
+        function mainLoop() {
+            updateAndDrawBg();
+            updateAndDrawDiorama();
+            updateAndDrawGame();
+            requestAnimationFrame(mainLoop);
+        }
+
+        window.addEventListener('resize', () => {
+            initBgCanvas();
+            resizeDiorama();
+        });
+
+        window.onload = function () {
+            initBgCanvas();
+            resizeDiorama();
+            renderStaticPreviews();
+            mainLoop();
+        };
+    </script>
+</body>
+</html>
