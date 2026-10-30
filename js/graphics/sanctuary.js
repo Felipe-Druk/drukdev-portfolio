@@ -2,12 +2,78 @@
  * INTERACTIVE PIXEL-ART SANCTUARY SCENE (MAIN STAGE CANVAS)
  **************************************************************/
 
+import { CONTACT_LINKS } from '../config/links.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound } from '../audio/soundEngine.js';
 import { SPRITES, drawPixelSprite } from './sprites.js';
 import { THEME_PALETTES } from '../config/themes.js';
 
 const PIXEL_UNIT = 4;
+
+const CONSTELLATION_BLUEPRINTS = [
+    {
+        id: 'github',
+        type: 'social',
+        rx: 0.16,
+        ry: 0.22,
+        angle: -0.18,
+        nodes: [
+            [-22, -16], [-38, 0], [-22, 16],
+            [-7, 20], [0, 0], [7, -20],
+            [22, -16], [38, 0], [22, 16]
+        ],
+        edges: [
+            [0, 1], [1, 2],
+            [3, 4], [4, 5],
+            [6, 7], [7, 8]
+        ]
+    },
+    {
+        id: 'youtube',
+        type: 'social',
+        rx: 0.34,
+        ry: 0.15,
+        angle: 0.14,
+        nodes: [
+            [-36, -20], [36, -20], [36, 20], [-36, 20],
+            [-10, -11], [-10, 11], [15, 0]
+        ],
+        edges: [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 4]
+        ]
+    },
+    {
+        id: 'linkedin',
+        type: 'social',
+        rx: 0.52,
+        ry: 0.17,
+        angle: -0.13,
+        nodes: [
+            [-22, -18], [-22, -4], [-22, 18],
+            [-6, 18], [-6, -4], [7, -9], [21, -3], [21, 18]
+        ],
+        edges: [
+            [0, 1], [1, 2],
+            [3, 4], [4, 5], [5, 6], [6, 7]
+        ]
+    },
+    {
+        id: 'mail',
+        type: 'email',
+        rx: 0.70,
+        ry: 0.23,
+        angle: 0.19,
+        nodes: [
+            [-36, -20], [36, -20], [36, 20], [-36, 20],
+            [0, 5]
+        ],
+        edges: [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [0, 4], [1, 4]
+        ]
+    }
+];
 
 let sanctuaryCanvas = null;
 let sanctuaryContext = null;
@@ -25,6 +91,7 @@ const sanctuaryState = {
     treeRustleTimer: 0,
     dungeonShakeTimer: 0,
     dungeonMessageTimer: 0,
+    mailCopiedTimer: 0,
     heroOffsetY: 0,
     heroVelocityY: 0,
     heroJumping: false
@@ -57,6 +124,85 @@ function isPointInRect(pointX, pointY, rect) {
     );
 }
 
+function drawPixelLine(x1, y1, x2, y2, color, stepSize = 2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.hypot(dx, dy);
+    const steps = Math.max(1, Math.ceil(distance / stepSize));
+    sanctuaryContext.fillStyle = color;
+    for (let step = 0; step <= steps; step++) {
+        const ratio = step / steps;
+        const px = Math.floor((x1 + dx * ratio) / stepSize) * stepSize;
+        const py = Math.floor((y1 + dy * ratio) / stepSize) * stepSize;
+        sanctuaryContext.fillRect(px, py, stepSize, stepSize);
+    }
+}
+
+function getConstellationTargetValue(blueprint) {
+    if (blueprint.type === 'social') {
+        const rawUrl = CONTACT_LINKS.socials?.[blueprint.id];
+        return typeof rawUrl === 'string' ? rawUrl.trim() : '';
+    }
+    if (blueprint.type === 'email') {
+        const rawEmail = CONTACT_LINKS.email;
+        return typeof rawEmail === 'string' ? rawEmail.trim() : '';
+    }
+    return '';
+}
+
+function rotateAndScaleNode([offsetX, offsetY], centerX, centerY, scale, rotationAngle) {
+    const cosAngle = Math.cos(rotationAngle);
+    const sinAngle = Math.sin(rotationAngle);
+    const rotatedX = offsetX * cosAngle - offsetY * sinAngle;
+    const rotatedY = offsetX * sinAngle + offsetY * cosAngle;
+
+    return {
+        x: Math.floor((centerX + rotatedX * scale) / 2) * 2,
+        y: Math.floor((centerY + rotatedY * scale) / 2) * 2
+    };
+}
+
+function buildConstellationZones(width, height, horizonY) {
+    const scale = Math.max(0.85, Math.min(1.35, Math.min(width / 1180, height / 720)));
+    const minSkyY = width < 640 ? 122 : 104;
+    const maxSkyY = Math.max(minSkyY + 24, horizonY - 250);
+
+    const activeConstellations = [];
+    CONSTELLATION_BLUEPRINTS.forEach((blueprint) => {
+        const targetValue = getConstellationTargetValue(blueprint);
+        if (!targetValue) return;
+
+        const centerX = Math.floor(width * blueprint.rx);
+        const centerY = Math.max(minSkyY, Math.min(maxSkyY, Math.floor(height * blueprint.ry)));
+        const halfWidth = Math.floor(56 * scale);
+        const topPadding = Math.floor(34 * scale);
+        const bottomPadding = Math.floor(48 * scale);
+        const rotationAngle = blueprint.angle || 0;
+
+        const nodes = blueprint.nodes.map((nodeCoords) => (
+            rotateAndScaleNode(nodeCoords, centerX, centerY, scale, rotationAngle)
+        ));
+
+        activeConstellations.push({
+            id: blueprint.id,
+            zoneKey: `constellation:${blueprint.id}`,
+            type: blueprint.type,
+            targetValue,
+            centerX,
+            centerY,
+            scale,
+            x: centerX - halfWidth,
+            y: centerY - topPadding,
+            w: halfWidth * 2,
+            h: topPadding + bottomPadding,
+            nodes,
+            edges: blueprint.edges
+        });
+    });
+
+    return activeConstellations;
+}
+
 function getLayoutZones(width, height) {
     const horizonY = Math.floor(height * 0.66);
     const treeX = Math.floor(width * 0.19);
@@ -73,14 +219,17 @@ function getLayoutZones(width, height) {
     const dungeonX = Math.floor(width * 0.76);
     const dungeonY = horizonY - 140;
 
-    const moonX = Math.floor(width * 0.84);
+    const moonX = Math.floor(width * (width < 640 ? 0.88 : 0.84));
     const moonY = Math.max(58, Math.floor(height * 0.11));
 
     const heroX = Math.floor(width * 0.36);
     const heroY = horizonY - 36 + sanctuaryState.heroOffsetY;
 
+    const constellations = buildConstellationZones(width, height, horizonY);
+
     return {
         horizonY,
+        constellations,
         tree: { x: treeX - 88, y: treeY - 36, w: 176, h: 196, centerX: treeX, baseY: horizonY },
         pond: { x: pondX, y: pondY, w: pondW, h: pondH },
         console: { x: consoleX - 32, y: consoleY - 16, w: 68, h: 58, baseX: consoleX, baseY: consoleY },
@@ -176,7 +325,56 @@ function spawnDungeonRuneSparks(dungeonZone) {
     }
 }
 
+function spawnConstellationStarfall(constellation) {
+    const starColors = ['#F3D5B5', '#D8E2EB', '#D4957A', '#B92B92', '#00FF41'];
+    constellation.nodes.forEach((node) => {
+        for (let index = 0; index < 4; index++) {
+            particles.push({
+                x: node.x + (Math.random() * 6 - 3),
+                y: node.y + (Math.random() * 6 - 3),
+                vx: (Math.random() - 0.5) * 2.2,
+                vy: 0.6 + Math.random() * 2.4,
+                isLeaf: false,
+                size: Math.random() > 0.4 ? 4 : 2,
+                life: 1.05,
+                color: starColors[Math.floor(Math.random() * starColors.length)]
+            });
+        }
+    });
+}
+
+function copyTextToClipboard(textValue) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(textValue).catch(() => {});
+        return;
+    }
+    const clipboardTextarea = document.createElement('textarea');
+    clipboardTextarea.value = textValue;
+    document.body.appendChild(clipboardTextarea);
+    clipboardTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(clipboardTextarea);
+}
+
+function activateConstellation(constellation) {
+    playSound('constellation');
+    spawnConstellationStarfall(constellation);
+
+    if (constellation.type === 'social') {
+        window.open(constellation.targetValue, '_blank', 'noopener,noreferrer');
+    } else if (constellation.type === 'email') {
+        copyTextToClipboard(constellation.targetValue);
+        sanctuaryState.mailCopiedTimer = 115;
+    }
+}
+
 function detectHoveredZone(pointX, pointY, zones) {
+    for (let index = 0; index < zones.constellations.length; index++) {
+        const constellation = zones.constellations[index];
+        if (isPointInRect(pointX, pointY, constellation)) {
+            return constellation.zoneKey;
+        }
+    }
     if (isPointInRect(pointX, pointY, zones.console)) return 'console';
     if (isPointInRect(pointX, pointY, zones.dungeon)) return 'dungeon';
     if (isPointInRect(pointX, pointY, zones.tree)) return 'tree';
@@ -189,6 +387,14 @@ function detectHoveredZone(pointX, pointY, zones) {
 function handleSanctuaryClick(clickX, clickY) {
     const zones = getLayoutZones(sanctuaryCanvas.width, sanctuaryCanvas.height);
     const hitZone = detectHoveredZone(clickX, clickY, zones);
+
+    if (hitZone && hitZone.startsWith('constellation:')) {
+        const clickedConstellation = zones.constellations.find((item) => item.zoneKey === hitZone);
+        if (clickedConstellation) {
+            activateConstellation(clickedConstellation);
+        }
+        return;
+    }
 
     if (hitZone === 'console') {
         playSound('terminal');
@@ -248,7 +454,17 @@ export function initSanctuary(onOpenTerminal) {
         pointerState.x = event.clientX - rect.left;
         pointerState.y = event.clientY - rect.top;
         const zones = getLayoutZones(sanctuaryCanvas.width, sanctuaryCanvas.height);
-        pointerState.hoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
+        const nextHoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
+
+        if (
+            nextHoveredZone !== pointerState.hoveredZone &&
+            nextHoveredZone &&
+            nextHoveredZone.startsWith('constellation:')
+        ) {
+            playSound('starHover');
+        }
+
+        pointerState.hoveredZone = nextHoveredZone;
         sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
     });
 
@@ -264,6 +480,7 @@ function updateSanctuaryState(zones) {
     if (sanctuaryState.treeRustleTimer > 0) sanctuaryState.treeRustleTimer--;
     if (sanctuaryState.dungeonShakeTimer > 0) sanctuaryState.dungeonShakeTimer--;
     if (sanctuaryState.dungeonMessageTimer > 0) sanctuaryState.dungeonMessageTimer--;
+    if (sanctuaryState.mailCopiedTimer > 0) sanctuaryState.mailCopiedTimer--;
 
     if (sanctuaryState.heroJumping) {
         sanctuaryState.heroOffsetY += sanctuaryState.heroVelocityY;
@@ -318,6 +535,97 @@ function drawNightSkyAndMoon(width, height, moonZone) {
     } else if (sanctuaryState.moonPhase === 3) {
         drawRect(mx - 20, my - 20, 22, 40, '#09090E');
     }
+}
+
+function drawConstellationEdges(constellation, isHovered) {
+    constellation.edges.forEach(([fromNodeIndex, toNodeIndex]) => {
+        const fromNode = constellation.nodes[fromNodeIndex];
+        const toNode = constellation.nodes[toNodeIndex];
+        if (!fromNode || !toNode) return;
+
+        if (isHovered) {
+            sanctuaryContext.globalAlpha = 0.26;
+            drawPixelLine(fromNode.x, fromNode.y, toNode.x, toNode.y, '#B92B92', 4);
+            sanctuaryContext.globalAlpha = 1.0;
+            drawPixelLine(fromNode.x, fromNode.y, toNode.x, toNode.y, '#B92B92', 2);
+        } else {
+            sanctuaryContext.globalAlpha = 0.52;
+            drawPixelLine(fromNode.x, fromNode.y, toNode.x, toNode.y, '#7A1F73', 2);
+            sanctuaryContext.globalAlpha = 1.0;
+        }
+    });
+}
+
+function drawConstellationStars(constellation, constellationIndex, isHovered) {
+    constellation.nodes.forEach((node, nodeIndex) => {
+        if (isHovered) {
+            drawRect(node.x - 5, node.y - 1, 10, 2, '#F3D5B5');
+            drawRect(node.x - 1, node.y - 5, 2, 10, '#F3D5B5');
+            drawRect(node.x - 2, node.y - 2, 4, 4, '#F3D5B5');
+            drawRect(node.x - 1, node.y - 1, 2, 2, '#D8E2EB');
+            return;
+        }
+
+        const isBrightPhase = Math.sin(sanctuaryTick * 0.06 + nodeIndex * 1.7 + constellationIndex * 1.3) > 0;
+        const starColor = isBrightPhase ? '#D8E2EB' : '#D4957A';
+        const starSize = (nodeIndex % 2 === 0 || isBrightPhase) ? 4 : 2;
+        drawRect(
+            node.x - starSize / 2,
+            node.y - starSize / 2,
+            starSize,
+            starSize,
+            starColor
+        );
+    });
+}
+
+function drawConstellationLabel(constellation, translationEntry, isHovered) {
+    if (!translationEntry) return;
+
+    const labelText = isHovered ? translationEntry.hover : translationEntry.label;
+    const labelY = constellation.centerY + Math.floor(38 * constellation.scale);
+    sanctuaryContext.font = '8px "Press Start 2P", monospace';
+    sanctuaryContext.textAlign = 'center';
+
+    if (isHovered) {
+        const labelWidth = Math.ceil(sanctuaryContext.measureText(labelText).width + 12);
+        drawRect(
+            constellation.centerX - labelWidth / 2,
+            labelY - 10,
+            labelWidth,
+            14,
+            'rgba(13, 13, 15, 0.85)'
+        );
+        sanctuaryContext.fillStyle = constellation.type === 'email' ? '#00FF41' : '#D8E2EB';
+        sanctuaryContext.fillText(labelText, constellation.centerX, labelY);
+    } else {
+        sanctuaryContext.fillStyle = '#8E8582';
+        sanctuaryContext.fillText(labelText, constellation.centerX, labelY);
+    }
+
+    if (constellation.id === 'mail' && sanctuaryState.mailCopiedTimer > 0 && translationEntry.copied) {
+        const animationProgress = 1 - sanctuaryState.mailCopiedTimer / 115;
+        const floatRiseOffset = Math.floor(animationProgress * 18);
+        drawFloatingPixelLabel(
+            constellation.centerX,
+            constellation.centerY - Math.floor(34 * constellation.scale) - floatRiseOffset,
+            translationEntry.copied,
+            '#00FF41'
+        );
+    }
+}
+
+function drawSkyConstellations(constellations, hoveredZone) {
+    const activeLangConstellations = TRANSLATIONS[getCurrentLanguage()].sanctuary.constellations;
+
+    constellations.forEach((constellation, constellationIndex) => {
+        const isHovered = hoveredZone === constellation.zoneKey;
+        const translationEntry = activeLangConstellations[constellation.id];
+
+        drawConstellationEdges(constellation, isHovered);
+        drawConstellationStars(constellation, constellationIndex, isHovered);
+        drawConstellationLabel(constellation, translationEntry, isHovered);
+    });
 }
 
 function drawSanctuaryMeadowAndLagoon(width, height, zones) {
@@ -590,6 +898,7 @@ export function updateAndDrawSanctuary() {
     updateSanctuaryState(zones);
 
     drawNightSkyAndMoon(width, height, zones.moon);
+    drawSkyConstellations(zones.constellations, pointerState.hoveredZone);
     drawSanctuaryMeadowAndLagoon(width, height, zones);
     drawAncientTree(zones.tree, pointerState.hoveredZone === 'tree');
     drawSealedDungeonPortal(zones.dungeon, pointerState.hoveredZone === 'dungeon');

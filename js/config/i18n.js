@@ -39,13 +39,32 @@ export const TRANSLATIONS = {
             subtitle: 'Santuario Pixel-Art & Consola Interactiva'
         },
         sanctuary: {
-            hint: '✨ Interactúa con el Santuario: Árbol Antiguo, Laguna, Portal Dungeon o la Consola DrukSystem en el pasto',
+            hint: '✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Portal Dungeon o Consola DrukSystem',
             treeHover: '[ÁRBOL ANTIGUO]',
             pondHover: '[LAGUNA DE NENÚFARES]',
             dungeonSign: 'COMING SOON',
             dungeonHover: '[ENTRADA A LA DUNGEON]',
             dungeonSealMsg: 'Sellado por magia antigua... en construcción',
-            consoleHover: '[ABRIR DRUKSYSTEM OS]'
+            consoleHover: '[ABRIR DRUKSYSTEM OS]',
+            constellations: {
+                github: {
+                    label: '[GITHUB]',
+                    hover: '[ABRIR GITHUB]'
+                },
+                youtube: {
+                    label: '[YOUTUBE]',
+                    hover: '[ABRIR YOUTUBE]'
+                },
+                linkedin: {
+                    label: '[LINKEDIN]',
+                    hover: '[ABRIR LINKEDIN]'
+                },
+                mail: {
+                    label: '[MAIL / COPY]',
+                    hover: '[COPIAR EMAIL]',
+                    copied: '¡CORREO COPIADO!'
+                }
+            }
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO',
@@ -162,13 +181,32 @@ export const TRANSLATIONS = {
             subtitle: 'Pixel-Art Sanctuary & Interactive Console'
         },
         sanctuary: {
-            hint: '✨ Interact with the Sanctuary: Ancient Tree, Lagoon, Dungeon Gate, or the DrukSystem Console on the grass',
+            hint: '✨ Interact with the Sanctuary: Constellations, Ancient Tree, Lagoon, Dungeon Gate, or DrukSystem Console',
             treeHover: '[ANCIENT TREE]',
             pondHover: '[LILYPAD LAGOON]',
             dungeonSign: 'COMING SOON',
             dungeonHover: '[DUNGEON ENTRANCE]',
             dungeonSealMsg: 'Sealed by ancient magic... under construction',
-            consoleHover: '[OPEN DRUKSYSTEM OS]'
+            consoleHover: '[OPEN DRUKSYSTEM OS]',
+            constellations: {
+                github: {
+                    label: '[GITHUB]',
+                    hover: '[OPEN GITHUB]'
+                },
+                youtube: {
+                    label: '[YOUTUBE]',
+                    hover: '[OPEN YOUTUBE]'
+                },
+                linkedin: {
+                    label: '[LINKEDIN]',
+                    hover: '[OPEN LINKEDIN]'
+                },
+                mail: {
+                    label: '[MAIL / COPY]',
+                    hover: '[COPY EMAIL]',
+                    copied: 'EMAIL COPIED!'
+                }
+            }
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // PHOSPHOR MONITOR',
