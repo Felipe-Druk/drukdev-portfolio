@@ -4,9 +4,12 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound, floraSpell } from '../audio/soundEngine.js';
-import { SPRITES, drawPixelSprite } from './sprites.js';
-import { THEME_PALETTES } from '../config/themes.js';
-import { drawFloatingPixelLabel, copyTextToClipboard } from './sanctuary/canvasUtils.js';
+import {
+    drawFloatingPixelLabel,
+    copyTextToClipboard,
+    drawGreenMage,
+    drawDragonKnightGuardian
+} from './sprites/index.js';
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
 import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
 import {
@@ -29,8 +32,7 @@ import {
     drawSanctuaryMeadowAndLagoon,
     drawAncientTree,
     drawSealedDungeonPortal,
-    drawDrukSystemRelicConsole,
-    drawGreenMage
+    drawDrukSystemRelicConsole
 } from './sanctuary/environmentRenderer.js';
 
 let sanctuaryCanvas = null;
@@ -287,13 +289,11 @@ export function updateAndDrawSanctuary() {
     }
 
     const idleBob = sanctuaryState.heroJumping ? 0 : (Math.sin(sanctuaryTick * 0.08) > 0 ? -3 : 0);
-    drawPixelSprite(
+    drawDragonKnightGuardian(
         sanctuaryContext,
-        SPRITES.fantasyKnight,
         zones.hero.spriteX,
         zones.hero.spriteY + idleBob,
-        3,
-        THEME_PALETTES.fantasy.spriteColors
+        3
     );
 
     updateAndDrawParticles(sanctuaryContext, width, height, sanctuaryTick);

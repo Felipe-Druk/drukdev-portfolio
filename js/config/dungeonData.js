@@ -1,5 +1,5 @@
 /**************************************************************
- * DUNGEON DATA SOURCE — RPG CLASSES, PROJECTS, EXPERIENCE & SEALS
+ * DUNGEON DATA SOURCE — PURE DOMAIN DATA (CLASSES, RELICS & SEALS)
  * ------------------------------------------------------------
  * Edita este archivo para actualizar tus proyectos, experiencia,
  * materias de FIUBA y certificados de Boot.dev.
@@ -9,68 +9,10 @@
 
 export const OMNISCIENT_CLASS_ID = 'all';
 
-export const CLASS_SPRITES = {
-    backend: [
-        '....3333....',
-        '..33111133..',
-        '.3114444113.',
-        '.3143333413.',
-        '314322223413',
-        '314321123413',
-        '314321123413',
-        '314322223413',
-        '.3143333413.',
-        '.3114444113.',
-        '..33111133..',
-        '....3333....'
-    ],
-    algorithms: [
-        '..33333333..',
-        '.3222222223.',
-        '.3211111123.',
-        '.3213333123.',
-        '.3211111123.',
-        '.3213331123.',
-        '.3211111123.',
-        '.3213333123.',
-        '.3222222223.',
-        '..33333333..',
-        '....3113....',
-        '....3..3....'
-    ],
-    gamedev: [
-        '.........33.',
-        '........313.',
-        '.......313..',
-        '......313...',
-        '.....313....',
-        '..3.313.....',
-        '..3313......',
-        '...333......',
-        '..23.33.....',
-        '.22...3.....',
-        '22..........',
-        '2...........'
-    ],
-    fullstack: [
-        '..33333333..',
-        '.3111111113.',
-        '312222222213',
-        '312333333213',
-        '312311113213',
-        '312313313213',
-        '.3123113213.',
-        '.3123333213.',
-        '..31222213..',
-        '...311113...',
-        '....3113....',
-        '.....33.....'
-    ]
-};
-
 export const DUNGEON_CLASSES = [
     {
         id: 'backend',
+        emblemId: 'backend',
         code: 'CLS-01',
         name: {
             es: 'TECHNOMANCER',
@@ -104,6 +46,7 @@ export const DUNGEON_CLASSES = [
     },
     {
         id: 'algorithms',
+        emblemId: 'algorithms',
         code: 'CLS-02',
         name: {
             es: 'LOREKEEPER',
@@ -135,6 +78,7 @@ export const DUNGEON_CLASSES = [
     },
     {
         id: 'gamedev',
+        emblemId: 'gamedev',
         code: 'CLS-03',
         name: {
             es: 'WORLDBUILDER',
@@ -165,6 +109,7 @@ export const DUNGEON_CLASSES = [
     },
     {
         id: 'fullstack',
+        emblemId: 'fullstack',
         code: 'CLS-04',
         name: {
             es: 'VANGUARD',
@@ -384,8 +329,6 @@ export const DUNGEON_EDUCATION = {
     ]
 };
 
-// Edita o agrega aquí nuevos certificados de Boot.dev u otras plataformas.
-// Si defines `url: 'https://...'`, el sello mostrará un enlace de verificación clicable.
 export const DUNGEON_CERTIFICATIONS = [
     {
         id: 'bootdev-dsa-python',

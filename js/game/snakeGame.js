@@ -4,6 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound } from '../audio/soundEngine.js';
+import { drawSnakeFoodNode, drawSnakeSegment } from '../graphics/sprites/index.js';
 
 const SNAKE_HISCORE_KEY = 'druk_snake_hiscore';
 const GRID_COLS = 24;
@@ -151,25 +152,11 @@ export function drawSnakeFrame() {
     }
     snakeContext.globalAlpha = 1.0;
 
-    // Draw Food (blinking phosphor data node)
-    snakeContext.fillStyle = colors.fg;
-    snakeContext.fillRect(
-        foodPosition.x * CELL_SIZE + 2,
-        foodPosition.y * CELL_SIZE + 2,
-        CELL_SIZE - 4,
-        CELL_SIZE - 4
-    );
+    // Draw Food & Snake Segments procedurally
+    drawSnakeFoodNode(snakeContext, foodPosition.x, foodPosition.y, CELL_SIZE, colors);
 
-    // Draw Snake Segments
     snakeSegments.forEach((segment, index) => {
-        snakeContext.fillStyle = index === 0 ? colors.fg : colors.dim;
-        const inset = index === 0 ? 1 : 2;
-        snakeContext.fillRect(
-            segment.x * CELL_SIZE + inset,
-            segment.y * CELL_SIZE + inset,
-            CELL_SIZE - inset * 2,
-            CELL_SIZE - inset * 2
-        );
+        drawSnakeSegment(snakeContext, segment.x, segment.y, CELL_SIZE, index === 0, colors);
     });
 
     // Outer phosphor border

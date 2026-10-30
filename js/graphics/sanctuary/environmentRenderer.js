@@ -3,13 +3,12 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
-import { drawRect, drawFloatingPixelLabel } from './canvasUtils.js';
+import { drawRect, drawFloatingPixelLabel } from '../sprites/index.js';
 import { updateAndDrawPondRipples } from './particles.js';
 import {
     getActiveBiomePalette,
     shadeHexColorByDepth,
-    drawProceduralGrass,
-    drawGreenMage
+    drawProceduralGrass
 } from './floraSystem.js';
 
 export function drawNightSkyAndMoon(context, width, height, moonZone, moonPhase) {
@@ -248,5 +247,3 @@ export function drawDrukSystemRelicConsole(context, consoleZone, isHovered, sanc
         drawFloatingPixelLabel(context, centerX, centerY - 22 + floatOffset, '▼ DRUKSYSTEM OS', '#00FF41');
     }
 }
-
-export { drawGreenMage };

@@ -4,7 +4,7 @@
 
 import { CONTACT_LINKS, getLocalizedCvPath } from '../../config/links.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
-import { drawRect, drawPixelLine, drawFloatingPixelLabel } from './canvasUtils.js';
+import { drawRect, drawPixelLine, drawFloatingPixelLabel } from '../sprites/index.js';
 
 export const CONSTELLATION_ZONE_PREFIX = 'constellation:';
 

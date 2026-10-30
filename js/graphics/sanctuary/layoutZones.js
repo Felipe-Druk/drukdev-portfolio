@@ -2,7 +2,7 @@
  * SANCTUARY RESPONSIVE LAYOUT ZONES & HIT DETECTION
  **************************************************************/
 
-import { isPointInRect } from './canvasUtils.js';
+import { isPointInRect } from '../sprites/index.js';
 import { buildConstellationZones } from './constellations.js';
 
 export function getLayoutZones(width, height, heroOffsetY = 0) {

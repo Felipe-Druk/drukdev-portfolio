@@ -4,7 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound } from '../audio/soundEngine.js';
-import { drawPixelSprite } from '../graphics/sprites.js';
+import { drawFlyingDragon } from '../graphics/sprites/index.js';
 
 const FLAPPY_HISCORE_KEY = 'druk_flappy_hiscore';
 const CANVAS_WIDTH = 416;
@@ -16,50 +16,6 @@ const BASE_PILLAR_GAP = 94;
 const MIN_PILLAR_GAP = 72;
 const PILLAR_WIDTH = 44;
 const PILLAR_SPAWN_INTERVAL = 112;
-
-// 16x14 Pixel-Art Dragon Matrices
-// '1': #B92B92 (Magenta Scales)
-// '2': #7A1F73 (Deep Purple Wing/Scales)
-// '3': #D4957A (Warm Bronze Chest)
-// '4': #F3D5B5 (Luminous Eye & Horns)
-// '5': #231C1A (Dark Charcoal Outline)
-const DRAGON_COLOR_MAP = {
-    '1': '#B92B92',
-    '2': '#7A1F73',
-    '3': '#D4957A',
-    '4': '#F3D5B5',
-    '5': '#231C1A'
-};
-
-const DRAGON_WINGS_UP = [
-    '....222.........',
-    '...21112..4..4..',
-    '..2112112.2424..',
-    '..212.211111112.',
-    '.......211544112',
-    '......2111111133',
-    '..22..211221333.',
-    '.2112211111333..',
-    '2111111113333...',
-    '22..22113333....',
-    '......221122....',
-    '.......22..22...'
-];
-
-const DRAGON_WINGS_DOWN = [
-    '..........4..4..',
-    '..........2424..',
-    '.......21111112.',
-    '......2111544112',
-    '.....21111111133',
-    '..22.2111221333.',
-    '.2112211111333..',
-    '2111121113333...',
-    '.22111213333....',
-    '...211121122....',
-    '....211222.22...',
-    '.....22.........'
-];
 
 let flappyCanvas = null;
 let flappyContext = null;
@@ -344,21 +300,14 @@ export function drawFlappyFrame() {
     }
 
     // 4. Draw DrukDev Dragon Sprite (with wing state & velocity tilt)
-    const activeMatrix = dragon.flapTimer > 0 ? DRAGON_WINGS_DOWN : DRAGON_WINGS_UP;
     const tiltAngle = Math.max(-0.32, Math.min(0.42, dragon.vy * 0.06));
-
-    flappyContext.save();
-    flappyContext.translate(Math.floor(dragon.x + dragon.w / 2), Math.floor(dragon.y + dragon.h / 2));
-    flappyContext.rotate(tiltAngle);
-    drawPixelSprite(
+    drawFlyingDragon(
         flappyContext,
-        activeMatrix,
-        -Math.floor(dragon.w / 2),
-        -Math.floor(dragon.h / 2),
-        2.4,
-        DRAGON_COLOR_MAP
+        dragon.x + dragon.w / 2,
+        dragon.y + dragon.h / 2,
+        dragon.flapTimer > 0,
+        tiltAngle
     );
-    flappyContext.restore();
 
     // 5. Outer CRT Frame Border
     flappyContext.strokeStyle = colors.dim;

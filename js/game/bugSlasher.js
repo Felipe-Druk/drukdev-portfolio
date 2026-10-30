@@ -5,7 +5,12 @@
 import { THEME_PALETTES, HISCORE_STORAGE_KEY, getCurrentTheme } from '../config/themes.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { playSound } from '../audio/soundEngine.js';
-import { SPRITES, drawPixelSprite } from '../graphics/sprites.js';
+import {
+    drawSlasherHero,
+    drawSlasherSwordWave,
+    drawBugEnemy,
+    drawCommitGem
+} from '../graphics/sprites/index.js';
 
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 300;
@@ -314,25 +319,23 @@ function drawGameScene(currentTheme, palette) {
     gameContext.fillStyle = palette.groundLine;
     gameContext.fillRect(0, GROUND_Y, GAME_WIDTH, 4);
 
-    // Player Sprite
-    const heroSprite = currentTheme === 'fantasy' ? SPRITES.fantasyKnight : SPRITES.cyberRunner;
-    drawPixelSprite(gameContext, heroSprite, player.x, player.y, 3, palette.spriteColors);
-
-    // Attack Slash Wave
-    if (player.attackTimer > 0) {
-        gameContext.fillStyle = palette.slashColor;
-        const slashOffset = (14 - player.attackTimer) * 2;
-        gameContext.fillRect(player.x + player.w + slashOffset, player.y + 2, 10, 30);
-        gameContext.fillRect(player.x + player.w + slashOffset + 10, player.y + 8, 6, 18);
-    }
+    // Player Sprite & Attack Slash Wave
+    drawSlasherHero(gameContext, player.x, player.y);
+    drawSlasherSwordWave(
+        gameContext,
+        player.x,
+        player.y,
+        player.w,
+        player.attackTimer,
+        palette.slashColor
+    );
 
     // Entities (Bugs & Commit Gems)
-    const bugSprite = currentTheme === 'fantasy' ? SPRITES.fantasyBug : SPRITES.cyberBug;
     for (const entity of entities) {
         if (entity.type === 'bug') {
-            drawPixelSprite(gameContext, bugSprite, entity.x, entity.y, 3, palette.bugColors);
+            drawBugEnemy(gameContext, entity.x, entity.y, palette);
         } else {
-            drawPixelSprite(gameContext, SPRITES.commitGem, entity.x, entity.y, 3, palette.gemColors);
+            drawCommitGem(gameContext, entity.x, entity.y, palette);
         }
     }
 }

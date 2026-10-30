@@ -1,8 +1,13 @@
 /**************************************************************
- * SANCTUARY CANVAS PRIMITIVES & GEOMETRY UTILITIES
+ * PIXEL-ART CANVAS PRIMITIVES, GEOMETRY & CLIPBOARD UTILITIES
  **************************************************************/
 
 export const PIXEL_UNIT = 4;
+
+const LABEL_PADDING_X = 18;
+const LABEL_BOX_HEIGHT = 22;
+const LABEL_BORDER_OUTSET = 2;
+const LABEL_TEXT_BASELINE_OFFSET = 15;
 
 export function snapToPixel(value) {
     return Math.floor(value / PIXEL_UNIT) * PIXEL_UNIT;
@@ -45,20 +50,26 @@ export function drawPixelLine(context, startX, startY, endX, endY, color, stepSi
 export function drawFloatingPixelLabel(context, centerX, topY, text, borderColor) {
     context.font = '11px "IBM Plex Mono", monospace';
     const textWidth = context.measureText(text).width;
-    const boxWidth = Math.ceil(textWidth + 18);
-    const boxHeight = 22;
+    const boxWidth = Math.ceil(textWidth + LABEL_PADDING_X);
     const boxX = Math.floor(centerX - boxWidth / 2);
-    const boxY = Math.floor(topY - boxHeight / 2);
+    const boxY = Math.floor(topY - LABEL_BOX_HEIGHT / 2);
 
-    drawRect(context, boxX - 2, boxY - 2, boxWidth + 4, boxHeight + 4, '#0D0D0F');
-    drawRect(context, boxX, boxY, boxWidth, boxHeight, '#141116');
+    drawRect(
+        context,
+        boxX - LABEL_BORDER_OUTSET,
+        boxY - LABEL_BORDER_OUTSET,
+        boxWidth + LABEL_BORDER_OUTSET * 2,
+        LABEL_BOX_HEIGHT + LABEL_BORDER_OUTSET * 2,
+        '#0D0D0F'
+    );
+    drawRect(context, boxX, boxY, boxWidth, LABEL_BOX_HEIGHT, '#141116');
     context.strokeStyle = borderColor;
     context.lineWidth = 2;
-    context.strokeRect(boxX, boxY, boxWidth, boxHeight);
+    context.strokeRect(boxX, boxY, boxWidth, LABEL_BOX_HEIGHT);
 
     context.fillStyle = borderColor;
     context.textAlign = 'center';
-    context.fillText(text, centerX, boxY + 15);
+    context.fillText(text, centerX, boxY + LABEL_TEXT_BASELINE_OFFSET);
 }
 
 function fallbackCopyTextToClipboard(textValue) {

@@ -10,13 +10,15 @@ import {
     getTranslationByKey
 } from './config/i18n.js';
 import { playSound, toggleSound, isSoundEnabled } from './audio/soundEngine.js';
-import { renderStaticPreviews } from './graphics/sprites.js';
+import {
+    renderStaticPreviews,
+    copyTextToClipboard
+} from './graphics/sprites/index.js';
 import {
     initSanctuary,
     resizeSanctuary,
     updateAndDrawSanctuary
 } from './graphics/sanctuary.js';
-import { copyTextToClipboard } from './graphics/sanctuary/canvasUtils.js';
 import {
     initDrukSystem,
     openDrukSystem,

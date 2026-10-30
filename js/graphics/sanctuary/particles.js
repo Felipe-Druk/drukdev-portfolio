@@ -2,7 +2,7 @@
  * SANCTUARY PARTICLES, AMBIENT FIREFLIES & WATER RIPPLES
  **************************************************************/
 
-import { snapToPixel, drawRect } from './canvasUtils.js';
+import { snapToPixel, drawRect } from '../sprites/index.js';
 import { getActiveBiomePalette } from './floraSystem.js';
 
 let particles = [];
