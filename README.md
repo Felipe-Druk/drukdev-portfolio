@@ -27,9 +27,12 @@ portfolio/
     ├── audio/
     │   └── soundEngine.js              # Sintetizador 8-bit procedural (Web Audio API) sin archivos de audio externos
     ├── config/
+    │   ├── dungeonData.js              # Fuente de datos RPG: las 4 clases, proyectos, experiencia, FIUBA y Boot.dev
     │   ├── i18n.js                     # Diccionarios ES / EN y persistencia de idioma en localStorage
     │   ├── links.js                    # Fuente única de verdad para correo electrónico, redes sociales y rutas de CV por idioma
     │   └── themes.js                   # Paletas cromáticas pixel-art para sprites y escenarios
+    ├── dungeon/
+    │   └── dungeonUI.js                # Controlador e interfaz de la Dungeon Interactiva: Selector de Clase (Mouse/Teclado) y Cámara/CV
     ├── graphics/
     │   ├── sprites.js                  # Matrices de sprites pixel-art (caballero, enemigos, gemas) y helper de pintado en Canvas
     │   ├── diorama.js                  # Módulo secundario de diorama / escena alternativa
@@ -62,24 +65,27 @@ portfolio/
 ## 🔗 Conexión entre Módulos Principales
 
 1. **Punto de Entrada (`js/main.js`):**
-   - Inicializa el escenario del Santuario (`initSanctuary`), la terminal (`initDrukSystem`), el cartucho runner (`initGame`), las vistas previas de sprites (`renderStaticPreviews`) y el idioma activo (`setLanguage`).
+   - Inicializa el escenario del Santuario (`initSanctuary`), la terminal (`initDrukSystem`), la Dungeon Interactiva (`initDungeonUI`), el cartucho runner (`initGame`), las vistas previas de sprites (`renderStaticPreviews`) y el idioma activo (`setLanguage`).
    - Ejecuta el bucle principal `requestAnimationFrame` (`mainLoop`) que invoca en cada frame a `updateAndDrawSanctuary()` y `updateAndDrawGame()`.
 2. **Escenario del Santuario (`js/graphics/sanctuary.js` + `js/graphics/sanctuary/*`):**
    - `sanctuary.js` actúa como controlador de estado e input del canvas `#sanctuaryCanvas` y delega responsabilidades en `js/graphics/sanctuary/`:
      - `layoutZones.js` calcula las coordenadas relativas al viewport para que ningún elemento colisione en distintas resoluciones.
-     - `environmentRenderer.js` dibuja el cielo nocturno, la luna de fases interactivas, la pradera, la laguna con nenúfares, el Árbol Antiguo, la entrada sellada a la Dungeon y la consola reliquia `DrukSystem`, sincronizando su paleta vegetal con el bioma activo.
+     - `environmentRenderer.js` dibuja el cielo nocturno, la luna de fases interactivas, la pradera, la laguna con nenúfares, el Árbol Antiguo, el Portal de la Dungeon (`DUNGEON // ENTER`) y la consola reliquia `DrukSystem`, sincronizando su paleta vegetal con el bioma activo.
      - `floraSystem.js` gestiona la vegetación procedural del pasto (`seed`, `density`, `clumping` y biomas `emerald`, `druk`, `autumn`, `matrix` persistidos en `localStorage` bajo `druk_flora_config`), la física de viento/repulsión del cursor, el renderizado del **Mago Verde** y el **Grimorio Botánico (`#floraPanel`)**.
      - `constellations.js` lee `CONTACT_LINKS` (`getLocalizedCvPath`) desde `js/config/links.js` y `TRANSLATIONS` desde `js/config/i18n.js` para trazar en el cielo las 5 constelaciones interactivas (**GitHub**, **YouTube**, **LinkedIn**, **Mail** y **CV**), abriendo enlaces/PDFs o copiando el email con `canvasUtils.js`.
-     - `particles.js` actualiza y dibuja luciérnagas ambientales, ondas en el agua (`updateAndDrawPondRipples`), hojas, chispas del sello y lluvia estelar de las constelaciones.
-   - Al hacer clic sobre la consola del pasto (o el botón del HUD), invoca el callback `openDrukSystem` hacia `js/terminal/drukSystem.js`.
-3. **Artefacto `DrukSystem OS` (`js/terminal/drukSystem.js` + `js/terminal/terminalDom.js` + `js/terminal/commands/*`):**
-   - `drukSystem.js` orquesta la apertura/cierre del modal (`#drukSystemModal`), el historial de comandos por teclado (`ArrowUp`/`ArrowDown`) y los chips rápidos (`help`, `ls`, `cv`, `contacto`, `play snake`, `play flappy`, `play slasher`, `color`, `font`, `clear`, `exit`).
+     - `particles.js` actualiza y dibuja luciérnagas ambientales, ondas en el agua (`updateAndDrawPondRipples`), hojas, chispas del portal y lluvia estelar de las constelaciones.
+   - Al hacer clic sobre la consola del pasto abre `DrukSystem OS` (`openDrukSystem`), y al hacer clic sobre el Portal de la derecha abre la Dungeon Interactiva (`openDungeonModal`).
+3. **La Dungeon Interactiva (`js/dungeon/dungeonUI.js` + `js/config/dungeonData.js`):**
+   - `dungeonData.js` centraliza las 4 clases RPG (**Technomancer / Backend**, **Lorekeeper / Algorithms & Data**, **Worldbuilder / Game Dev** y **Vanguard / Full-Stack**), los proyectos destacados (`DUNGEON_PROJECTS`), la experiencia docente y laboral (`DUNGEON_EXPERIENCE`), las materias clave de **Ingeniería Informática en FIUBA** (`DUNGEON_EDUCATION`) y las certificaciones de **Boot.dev** (`DUNGEON_CERTIFICATIONS`).
+   - `dungeonUI.js` controla `#dungeonModal` con soporte híbrido de **Mouse y Teclado** (`ArrowLeft`/`ArrowRight` + `Enter` + `Escape`), permitiendo elegir cualquiera de las 4 clases o activar el **Modo Omnisciente (Recruiter Mode)** para inspeccionar todo el CV sin filtros y descargar el PDF en el idioma activo.
+4. **Artefacto `DrukSystem OS` (`js/terminal/drukSystem.js` + `js/terminal/terminalDom.js` + `js/terminal/commands/*`):**
+   - `drukSystem.js` orquesta la apertura/cierre del modal (`#drukSystemModal`), el historial de comandos por teclado (`ArrowUp`/`ArrowDown`) y los chips rápidos (`help`, `ls`, `dungeon`, `cv`, `contacto`, `play snake`, `play flappy`, `play slasher`, `color`, `font`, `clear`, `exit`).
    - `terminalDom.js` encapsula la manipulación del DOM de la pantalla CRT y la conmutación entre la vista CLI y las vistas de los minijuegos.
    - `commands/index.js` implementa un registro declarativo de comandos que delega la ejecución en módulos independientes de responsabilidad única (`systemCommands.js`, `cvCommand.js`, `contactCommand.js`, `appearanceCommands.js` y `playCommand.js`).
-4. **Minijuegos (`js/game/snakeGame.js`, `js/game/flappyDragon.js`, `js/game/bugSlasher.js`):**
-   - `playCommand.js` y `terminalDom.js` alternan entre la vista CLI y los contenedores CRT de cada cartucho (`play snake`, `play flappy`, `play slasher`), deteniendo el juego activo al cambiar de vista o cerrar el monitor.
+5. **Minijuegos (`js/game/snakeGame.js`, `js/game/flappyDragon.js`, `js/game/bugSlasher.js`):**
+   - `playCommand.js` y `terminalDom.js` alterna entre la vista CLI y los contenedores CRT de cada cartucho (`play snake`, `play flappy`, `play slasher`), deteniendo el juego activo al cambiar de vista o cerrar el monitor.
    - Todos los juegos consumen `js/graphics/sprites.js`, `js/audio/soundEngine.js` y `js/config/i18n.js`.
-5. **Audio (`js/audio/soundEngine.js`), Internacionalización (`js/config/i18n.js`) y Enlaces (`js/config/links.js`):**
-   - `soundEngine.js` sintetiza efectos 8-bit (`jump`, `flap`, `attack`, `coin`, `hit`, `gameover`, `click`, `tree`, `water`, `seal`, `terminal`, `starHover`, `constellation`) consumidos por el Santuario, la terminal y los tres minijuegos.
-   - `i18n.js` centraliza todos los textos del DOM (`data-i18n*`), etiquetas flotantes del canvas y mensajes de la CLI.
-   - `links.js` alimenta tanto las constelaciones del cielo del Santuario como los comandos `contacto` y `cv` de `DrukSystem OS` (ocultando automáticamente cualquier red o CV cuya ruta esté vacía).
+6. **Audio (`js/audio/soundEngine.js`), Internacionalización (`js/config/i18n.js`) y Enlaces (`js/config/links.js`):**
+   - `soundEngine.js` sintetiza efectos 8-bit (`jump`, `flap`, `attack`, `coin`, `hit`, `gameover`, `click`, `tree`, `water`, `seal`, `terminal`, `starHover`, `constellation`) consumidos por el Santuario, la Dungeon, la terminal y los tres minijuegos.
+   - `i18n.js` centraliza todos los textos del DOM (`data-i18n*`), etiquetas flotantes del canvas, vistas de la Dungeon y mensajes de la CLI.
+   - `links.js` alimenta tanto las constelaciones del cielo del Santuario como el botón de descarga de la Dungeon y los comandos `contacto` y `cv` de `DrukSystem OS` (ocultando automáticamente cualquier red o CV cuya ruta esté vacía).

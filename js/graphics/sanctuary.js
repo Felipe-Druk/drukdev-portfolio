@@ -37,6 +37,7 @@ let sanctuaryCanvas = null;
 let sanctuaryContext = null;
 let sanctuaryTick = 0;
 let openTerminalCallback = null;
+let openDungeonCallback = null;
 
 const pointerState = {
     x: -1,
@@ -116,10 +117,13 @@ const ZONE_CLICK_HANDLERS = {
         spawnPondRipple(clickX, clickY, zones.pond);
     },
     dungeon: (zones) => {
-        sanctuaryState.dungeonShakeTimer = 24;
-        sanctuaryState.dungeonMessageTimer = 150;
-        playSound('seal');
+        sanctuaryState.dungeonShakeTimer = 16;
+        sanctuaryState.dungeonMessageTimer = 60;
+        playSound('constellation');
         spawnDungeonRuneSparks(zones.dungeon);
+        if (typeof openDungeonCallback === 'function') {
+            openDungeonCallback();
+        }
     },
     hero: () => {
         if (!sanctuaryState.heroJumping) {
@@ -157,8 +161,9 @@ function handleSanctuaryClick(clickX, clickY) {
     }
 }
 
-export function initSanctuary(onOpenTerminal) {
+export function initSanctuary(onOpenTerminal, onOpenDungeon) {
     openTerminalCallback = onOpenTerminal;
+    openDungeonCallback = onOpenDungeon;
     sanctuaryCanvas = document.getElementById('sanctuaryCanvas');
     if (!sanctuaryCanvas) return;
     sanctuaryContext = sanctuaryCanvas.getContext('2d');

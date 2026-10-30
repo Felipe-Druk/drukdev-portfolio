@@ -185,26 +185,25 @@ export function drawSealedDungeonPortal(
     drawRect(context, centerX - 4, baseY - 48, 8, 8, '#D4957A');
     context.globalAlpha = 1.0;
 
-    // Carved Signboard at top of portal ("COMING SOON")
-    drawRect(context, centerX - 62, baseY - 144, 124, 24, '#0D0D0F');
-    drawRect(context, centerX - 60, baseY - 142, 120, 20, '#231C1A');
-    context.strokeStyle = '#56616E';
+    // Carved Signboard at top of portal ("DUNGEON // ENTER")
+    drawRect(context, centerX - 76, baseY - 144, 152, 24, '#0D0D0F');
+    drawRect(context, centerX - 74, baseY - 142, 148, 20, '#231C1A');
+    context.strokeStyle = isHovered ? '#B92B92' : '#56616E';
     context.lineWidth = 2;
-    context.strokeRect(centerX - 60, baseY - 142, 120, 20);
+    context.strokeRect(centerX - 74, baseY - 142, 148, 20);
 
     const signText = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonSign;
-    context.font = '9px "Press Start 2P", monospace';
-    context.fillStyle = '#D4957A';
+    context.font = '8px "Press Start 2P", monospace';
+    context.fillStyle = isHovered ? '#D8E2EB' : '#D4957A';
     context.textAlign = 'center';
-    context.fillText(signText, centerX, baseY - 128);
+    context.fillText(signText, centerX, baseY - 129);
 
-    // Floating RPG message when clicked
     if (dungeonMessageTimer > 0) {
         const sealMsg = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonSealMsg;
-        drawFloatingPixelLabel(context, centerX, baseY - 164, `🔒 ${sealMsg}`, '#B92B92');
+        drawFloatingPixelLabel(context, centerX, baseY - 164, `⚔️ ${sealMsg}`, '#B92B92');
     } else if (isHovered) {
         const hoverLabel = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonHover;
-        drawFloatingPixelLabel(context, centerX, baseY - 160, hoverLabel, '#D8E2EB');
+        drawFloatingPixelLabel(context, centerX, baseY - 160, hoverLabel, '#D4957A');
     }
 }
 

@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { playSound } from '../../audio/soundEngine.js';
+import { openDungeonModal } from '../../dungeon/dungeonUI.js';
 import {
     getActiveTerminalTexts,
     appendLine,
@@ -29,4 +30,13 @@ export function runLsCommand() {
 export function runClearCommand() {
     playSound('click');
     renderBootBanner();
+}
+
+export function runDungeonCommand(_, context) {
+    playSound('constellation');
+    appendLine(getActiveTerminalTexts().dungeonOpening, 'font-bold mt-1');
+    if (context && typeof context.closeTerminal === 'function') {
+        context.closeTerminal();
+    }
+    openDungeonModal('select');
 }

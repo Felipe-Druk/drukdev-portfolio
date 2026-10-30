@@ -25,6 +25,12 @@ import {
     renderBootBanner
 } from './terminal/drukSystem.js';
 import {
+    initDungeonUI,
+    openDungeonModal,
+    closeDungeonModal,
+    refreshDungeonLanguage
+} from './dungeon/dungeonUI.js';
+import {
     initGame,
     refreshGameOverlayLanguage,
     updateAndDrawGame
@@ -84,6 +90,7 @@ export function setLanguage(language) {
 
     updateSoundButtonLabel(activeLanguage);
     refreshGameOverlayLanguage();
+    refreshDungeonLanguage();
     renderBootBanner();
 
     const langEsOption = document.getElementById('langEsOption');
@@ -154,8 +161,9 @@ function mainLoop() {
 }
 
 function initApp() {
-    initSanctuary(openDrukSystem);
+    initSanctuary(openDrukSystem, () => openDungeonModal('select'));
     initDrukSystem(copyEmail);
+    initDungeonUI();
     initGame();
     renderStaticPreviews();
     setLanguage(getCurrentLanguage());
@@ -170,6 +178,8 @@ Object.assign(window, {
     copyEmail,
     openDrukSystem,
     closeDrukSystem,
+    openDungeonModal,
+    closeDungeonModal,
     executeTerminalCommand
 });
 

@@ -4,7 +4,12 @@
 
 import { playSound } from '../../audio/soundEngine.js';
 import { getActiveTerminalTexts, appendLine } from '../terminalDom.js';
-import { runHelpCommand, runLsCommand, runClearCommand } from './systemCommands.js';
+import {
+    runHelpCommand,
+    runLsCommand,
+    runClearCommand,
+    runDungeonCommand
+} from './systemCommands.js';
 import { runCvCommand } from './cvCommand.js';
 import { runContactCommand } from './contactCommand.js';
 import { runColorCommand, runFontCommand } from './appearanceCommands.js';
@@ -15,6 +20,7 @@ const COMMAND_HANDLERS = {
     '?': runHelpCommand,
     ls: runLsCommand,
     dir: runLsCommand,
+    dungeon: runDungeonCommand,
     cv: runCvCommand,
     resume: runCvCommand,
     contacto: runContactCommand,

@@ -242,7 +242,7 @@
                             spellcheck="false"
                             class="term-input flex-1 text-xs sm:text-sm"
                             data-i18n-placeholder="terminal.inputPlaceholder"
-                            placeholder="Escribe un comando (help, ls, cv, contacto, play snake, play flappy, color, font)..."
+                            placeholder="Escribe un comando (help, ls, dungeon, cv, contacto, play snake, play flappy, color, font)..."
                         >
                     </form>
                 </div>
@@ -346,6 +346,7 @@
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button type="button" data-term-cmd="help" class="term-cmd-chip" data-i18n="terminal.btnHelp">[help]</button>
                     <button type="button" data-term-cmd="ls" class="term-cmd-chip" data-i18n="terminal.btnLs">[ls]</button>
+                    <button type="button" data-term-cmd="dungeon" class="term-cmd-chip" data-i18n="terminal.btnDungeon">[dungeon]</button>
                     <button type="button" data-term-cmd="cv" class="term-cmd-chip" data-i18n="terminal.btnCv">[cv]</button>
                     <button type="button" data-term-cmd="contacto" class="term-cmd-chip" data-i18n="terminal.btnContact">[contacto]</button>
                     <button type="button" data-term-cmd="play snake" class="term-cmd-chip" data-i18n="terminal.btnSnake">[play snake]</button>
@@ -355,6 +356,175 @@
                     <button type="button" data-term-cmd="font" class="term-cmd-chip" data-i18n="terminal.btnFont">[font]</button>
                 </div>
                 <button type="button" data-term-cmd="clear" class="term-cmd-chip">[clear]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         INTERACTIVE DUNGEON ARCHIVE: RPG CLASS SELECTOR & CV CHAMBER
+         =================================================================== -->
+    <div
+        id="dungeonModal"
+        class="hidden fixed inset-0 z-40 bg-[#0D0D0F]/95 flex items-center justify-center p-2 sm:p-5"
+    >
+        <div class="dungeon-modal-frame w-full max-w-6xl h-[92vh] flex flex-col p-3 sm:p-5">
+
+            <!-- Dungeon Beveled Steel Header -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b-2 border-[#56616E] shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 inline-block bg-[#B92B92] border border-[#D4957A]"></span>
+                    <span class="font-gothic-pixel text-[10px] sm:text-xs text-bronze tracking-wider" data-i18n="dungeon.headerTitle">
+                        ⚔️ LA DUNGEON DE DRUKDEV // ARCHIVO DE CLASES Y RELIQUIAS
+                    </span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a
+                        id="dungeonDownloadCvBtn"
+                        href="./assets/docs/CV-Felipe-Druk-ES.pdf"
+                        download="CV-Felipe-Druk-ES.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="pixel-btn px-2.5 py-1 text-[9px] font-gothic-pixel"
+                        data-i18n="dungeon.downloadCvBtn"
+                    >
+                        [DESCARGAR CV PDF]
+                    </a>
+                    <button
+                        id="dungeonCloseBtn"
+                        type="button"
+                        class="dungeon-tab-btn px-2.5 py-1 text-[9px] font-gothic-pixel"
+                        data-i18n="dungeon.closeBtn"
+                    >
+                        [X / SALIR AL SANTUARIO]
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Inner Content Area -->
+            <div id="dungeonScrollContainer" class="dungeon-scroll-area flex-1 overflow-y-auto pr-1">
+
+                <!-- VIEW 1: RPG CLASS SELECT SCREEN -->
+                <section id="dungeonSelectView" class="flex flex-col justify-between min-h-full space-y-4 py-1">
+                    <div class="text-center max-w-2xl mx-auto">
+                        <h2 class="font-gothic-pixel text-xs sm:text-sm text-bronze mb-1.5" data-i18n="dungeon.selectTitle">
+                            ELIGE TU CLASE DE INSPECCIÓN
+                        </h2>
+                        <p class="text-xs text-steel" data-i18n="dungeon.selectSubtitle">
+                            Filtra mi experiencia, proyectos y formación según el perfil que buscas, o desbloquea el archivo completo.
+                        </p>
+                    </div>
+
+                    <!-- 4 RPG Class Cards Grid -->
+                    <div id="dungeonClassGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5"></div>
+
+                    <!-- Master Omniscient Recruiter Button -->
+                    <div class="pt-1">
+                        <button
+                            id="dungeonOmniscientBtn"
+                            type="button"
+                            class="dungeon-omniscient-btn w-full py-3 px-4 font-gothic-pixel text-[10px] sm:text-xs tracking-wide text-center"
+                            data-i18n="dungeon.omniscientBtn"
+                        >
+                            [*] MODO OMNISCIENTE // VER TODO EL CV SIN FILTROS (RECRUITER MODE)
+                        </button>
+                        <p class="text-[11px] text-center text-steel/80 mt-2" data-i18n="dungeon.selectHint">
+                            🖱️ Haz clic en una carta o usa [◀ / ▶] + [ENTER] • [ESC] Salir al Santuario
+                        </p>
+                    </div>
+                </section>
+
+                <!-- VIEW 2: CLASS CHAMBER & OMNISCIENT GRIMOIRE VIEW -->
+                <section id="dungeonChamberView" class="hidden space-y-4 pb-2">
+
+                    <!-- Top Quick-Filter Class Tabs Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-[#0D0D0F] p-2.5 border-2 border-[#56616E]">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <button
+                                id="dungeonBackToSelectBtn"
+                                type="button"
+                                class="dungeon-tab-btn px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.backToClassesBtn"
+                            >
+                                [◀ CLASES]
+                            </button>
+                            <button
+                                type="button"
+                                data-dungeon-tab="all"
+                                class="dungeon-tab-btn active px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.tabAll"
+                            >
+                                [*] TODAS / OMNISCIENTE
+                            </button>
+                            <button
+                                type="button"
+                                data-dungeon-tab="backend"
+                                class="dungeon-tab-btn px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.tabBackend"
+                            >
+                                [BACKEND]
+                            </button>
+                            <button
+                                type="button"
+                                data-dungeon-tab="algorithms"
+                                class="dungeon-tab-btn px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.tabAlgorithms"
+                            >
+                                [ALGORITHMS & DATA]
+                            </button>
+                            <button
+                                type="button"
+                                data-dungeon-tab="gamedev"
+                                class="dungeon-tab-btn px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.tabGamedev"
+                            >
+                                [GAME DEV]
+                            </button>
+                            <button
+                                type="button"
+                                data-dungeon-tab="fullstack"
+                                class="dungeon-tab-btn px-2.5 py-1.5 font-gothic-pixel text-[9px]"
+                                data-i18n="dungeon.tabFullstack"
+                            >
+                                [FULL-STACK]
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Class / Omniscient Mode Banner -->
+                    <div id="dungeonChamberBanner" class="dungeon-section-box p-3.5"></div>
+
+                    <!-- 1. Equipped Weapons (Tech Stack) -->
+                    <div class="dungeon-section-box p-3.5">
+                        <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionWeapons">
+                            ⚔️ ARMAS EQUIPADAS // STACK TÉCNICO
+                        </h3>
+                        <div id="dungeonWeaponsList" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- 2. Forged Relics (Featured Projects) -->
+                    <div class="dungeon-section-box p-3.5">
+                        <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionRelics">
+                            🏺 RELIQUIAS FORJADAS // PROYECTOS DESTACADOS
+                        </h3>
+                        <div id="dungeonProjectsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- 3. Guild Chronicles (Work & Teaching Experience) -->
+                    <div class="dungeon-section-box p-3.5">
+                        <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionChronicles">
+                            📜 CRÓNICAS DEL GREMIO // EXPERIENCIA LABORAL Y DOCENTE
+                        </h3>
+                        <div id="dungeonExperienceList" class="space-y-3"></div>
+                    </div>
+
+                    <!-- 4. Arcane Seals (FIUBA Engineering & Boot.dev Certifications) -->
+                    <div class="dungeon-section-box p-3.5">
+                        <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionSeals">
+                            🔮 SELLOS ARCANOS // INGENIERÍA FIUBA & CERTIFICACIONES BOOT.DEV
+                        </h3>
+                        <div id="dungeonSealsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
