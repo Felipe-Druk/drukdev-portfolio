@@ -230,14 +230,60 @@ function drawFantasyMoonWithPhase(width) {
     }
 }
 
-function drawFantasyCastles(width, height) {
-    for (let towerX = 0; towerX < width; towerX += 24) {
-        const towerHeight = 28 + ((towerX * 17) % 45);
-        fillCanvasRect(towerX, height - 28 - towerHeight, 20, towerHeight, '#0D0D0F');
-        fillCanvasRect(towerX + 2, height - 28 - towerHeight + 2, 16, towerHeight - 2, '#231C1A');
-        if (towerX % 48 === 0) {
-            fillCanvasRect(towerX + 8, height - 20 - towerHeight, 4, 6, '#D4957A');
-        }
+function drawPixelPineTree(centerX, groundY, canopyHeight, color) {
+    const tierHeight = Math.floor(canopyHeight / 3);
+    // Trunk
+    fillCanvasRect(centerX - 2, groundY - 6, 4, 6, '#0D0D0F');
+    // Bottom tier
+    fillCanvasRect(centerX - 10, groundY - 6 - tierHeight, 20, tierHeight, color);
+    // Middle tier
+    fillCanvasRect(centerX - 7, groundY - 6 - tierHeight * 2, 14, tierHeight, color);
+    // Top tier & peak
+    fillCanvasRect(centerX - 4, groundY - 6 - tierHeight * 3, 8, tierHeight, color);
+    fillCanvasRect(centerX - 2, groundY - 10 - tierHeight * 3, 4, 4, color);
+}
+
+function drawDistantCastle(castleX, groundY) {
+    const castleColor = '#140E13';
+    const battlementColor = '#0D0D0F';
+
+    // Main central keep & flanking walls
+    fillCanvasRect(castleX - 28, groundY - 34, 56, 34, castleColor);
+    fillCanvasRect(castleX - 14, groundY - 54, 28, 54, battlementColor);
+
+    // Side towers with pointed roofs
+    fillCanvasRect(castleX - 34, groundY - 44, 12, 44, battlementColor);
+    fillCanvasRect(castleX - 31, groundY - 50, 6, 6, battlementColor);
+    fillCanvasRect(castleX + 22, groundY - 44, 12, 44, battlementColor);
+    fillCanvasRect(castleX + 25, groundY - 50, 6, 6, battlementColor);
+
+    // Central keep battlements (merlons)
+    for (let offset = -14; offset <= 10; offset += 8) {
+        fillCanvasRect(castleX + offset, groundY - 59, 4, 5, battlementColor);
+    }
+
+    // Warm lit castle window
+    fillCanvasRect(castleX - 2, groundY - 44, 4, 8, '#D4957A');
+}
+
+function drawFantasyForestAndCastle(width, height) {
+    const groundY = height - 28;
+
+    // 1. Distant Castle on the right-center horizon
+    drawDistantCastle(Math.floor(width * 0.62), groundY);
+
+    // 2. Back layer of dark pine trees
+    for (let treeX = 14; treeX < width; treeX += 32) {
+        if (Math.abs(treeX - width * 0.62) < 42 || Math.abs(treeX - width * 0.5) < 26) continue;
+        const canopyHeight = 24 + ((treeX * 13) % 15);
+        drawPixelPineTree(treeX, groundY, canopyHeight, '#191118');
+    }
+
+    // 3. Front layer of silhouettes pine trees
+    for (let treeX = 28; treeX < width; treeX += 44) {
+        if (Math.abs(treeX - width * 0.62) < 36 || Math.abs(treeX - width * 0.5) < 32) continue;
+        const canopyHeight = 18 + ((treeX * 19) % 15);
+        drawPixelPineTree(treeX, groundY, canopyHeight, '#0D0D0F');
     }
 }
 
@@ -275,7 +321,7 @@ function drawFantasyCampfire(width, height) {
 
 function drawFantasyDioramaScene(width, height) {
     drawFantasyMoonWithPhase(width);
-    drawFantasyCastles(width, height);
+    drawFantasyForestAndCastle(width, height);
     drawFantasyCampfire(width, height);
 }
 

@@ -1,5 +1,5 @@
 /**************************************************************
- * THEME PALETTES, UI TEXTS & GLOBAL CONSTANTS
+ * THEME PALETTES, UI STYLES & GLOBAL CONSTANTS
  **************************************************************/
 
 export const DEFAULT_THEME = 'fantasy';
@@ -86,11 +86,6 @@ export const THEME_UI = {
         btnCyberClass: 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white',
         brandSuffixClass: 'text-bronze',
         statusBadgeClass: 'text-[10px] font-pixel px-2 py-0.5 rounded bg-[#7A1F73]/40 border border-[#B92B92] text-[#D4957A] animate-pulse',
-        themeSubtitle: 'Grimorio Digital & Código Artesanal',
-        heroTitle: 'FORJANDO EL PORTAFOLIO DE DRUKDEV',
-        progressTask: '🐉 FORJANDO SHADERS & PROYECTOS...',
-        gameTitle: "DRUK'S BUG SLASHER",
-        attackBtnLabel: 'ESPADAZO (K / CLICK)',
         featIcons: ['🐉', '👾', '🕹️']
     },
     cyber: {
@@ -99,11 +94,6 @@ export const THEME_UI = {
         btnCyberClass: 'px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-cyan-500 text-black shadow font-bold',
         brandSuffixClass: 'text-cyan-400',
         statusBadgeClass: 'text-[10px] font-pixel px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 animate-pulse',
-        themeSubtitle: 'Synthwave Grid & Arquitectura Full-Stack',
-        heroTitle: 'INICIALIZANDO EL SISTEMA DRUK.DEV',
-        progressTask: '⚡ CARGANDO NEON SHADERS & MINIJUEGOS...',
-        gameTitle: 'CYBER BUG RUNNER 2099',
-        attackBtnLabel: 'PULSO LÁSER (K / CLICK)',
         featIcons: ['🛰️', '🌆', '⚡']
     }
 };

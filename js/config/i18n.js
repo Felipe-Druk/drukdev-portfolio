@@ -165,5 +165,9 @@ export const TRANSLATIONS = {
 
 export function getTranslationByKey(dotPath, language = currentLanguage) {
     const dictionary = TRANSLATIONS[language] || TRANSLATIONS.es;
-    return dotPath.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), dictionary);
+    return dotPath
+        .split('.')
+        .reduce((currentNode, keySegment) => (
+            currentNode && currentNode[keySegment] !== undefined ? currentNode[keySegment] : null
+        ), dictionary);
 }

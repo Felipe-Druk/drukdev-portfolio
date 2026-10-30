@@ -47,6 +47,10 @@ function setElementClass(elementId, classNameValue) {
     }
 }
 
+function getNormalizedContactEmail() {
+    return typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
+}
+
 function applyThemeTexts(theme = getCurrentTheme(), language = getCurrentLanguage()) {
     const themeTexts = TRANSLATIONS[language]?.themes?.[theme];
     if (!themeTexts) return;
@@ -59,7 +63,7 @@ function applyThemeTexts(theme = getCurrentTheme(), language = getCurrentLanguag
 }
 
 function updateEmailButtonLabel(language = getCurrentLanguage()) {
-    const emailAddress = typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
+    const emailAddress = getNormalizedContactEmail();
     if (!emailAddress) return;
     const copyLabel = TRANSLATIONS[language].hero.copyEmailBtn;
     setElementText('emailBtnText', `${copyLabel} (${emailAddress})`);
@@ -70,44 +74,35 @@ function updateSoundButtonLabel(language = getCurrentLanguage()) {
     setElementText('soundLabel', isSoundEnabled() ? navTexts.sfxOn : navTexts.sfxMute);
 }
 
+function applyTranslationsByAttribute(attributeName, activeLanguage, applyValueCallback) {
+    document.querySelectorAll(`[${attributeName}]`).forEach((element) => {
+        const translationKey = element.getAttribute(attributeName);
+        const translatedValue = getTranslationByKey(translationKey, activeLanguage);
+        if (typeof translatedValue === 'string') {
+            applyValueCallback(element, translatedValue);
+        }
+    });
+}
+
 export function setLanguage(language) {
     const activeLanguage = setCurrentLanguage(language);
     document.documentElement.lang = activeLanguage;
 
-    // 1. Update all [data-i18n] text elements
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-        const key = element.getAttribute('data-i18n');
-        const translatedValue = getTranslationByKey(key, activeLanguage);
-        if (typeof translatedValue === 'string') {
-            element.textContent = translatedValue;
-        }
+    applyTranslationsByAttribute('data-i18n', activeLanguage, (element, value) => {
+        element.textContent = value;
+    });
+    applyTranslationsByAttribute('data-i18n-html', activeLanguage, (element, value) => {
+        element.innerHTML = value;
+    });
+    applyTranslationsByAttribute('data-i18n-title', activeLanguage, (element, value) => {
+        element.setAttribute('title', value);
     });
 
-    // 2. Update all [data-i18n-html] rich-text elements
-    document.querySelectorAll('[data-i18n-html]').forEach((element) => {
-        const key = element.getAttribute('data-i18n-html');
-        const translatedHtml = getTranslationByKey(key, activeLanguage);
-        if (typeof translatedHtml === 'string') {
-            element.innerHTML = translatedHtml;
-        }
-    });
-
-    // 3. Update all [data-i18n-title] tooltip attributes
-    document.querySelectorAll('[data-i18n-title]').forEach((element) => {
-        const key = element.getAttribute('data-i18n-title');
-        const translatedTitle = getTranslationByKey(key, activeLanguage);
-        if (typeof translatedTitle === 'string') {
-            element.setAttribute('title', translatedTitle);
-        }
-    });
-
-    // 4. Update dynamic theme-dependent texts, game overlay, and control labels
     applyThemeTexts(getCurrentTheme(), activeLanguage);
     updateEmailButtonLabel(activeLanguage);
     updateSoundButtonLabel(activeLanguage);
     refreshGameOverlayLanguage();
 
-    // 5. Update #lang-toggle visual state (ES | EN)
     const langEsOption = document.getElementById('langEsOption');
     const langEnOption = document.getElementById('langEnOption');
     if (langEsOption) langEsOption.classList.toggle('active', activeLanguage === 'es');
@@ -144,14 +139,11 @@ export function setTheme(theme) {
 
 export function handleToggleSound() {
     const enabled = toggleSound();
-    const navTexts = TRANSLATIONS[getCurrentLanguage()].nav;
-    if (enabled) {
-        setElementClass('soundIcon', 'fa-solid fa-volume-high text-bronze');
-        setElementText('soundLabel', navTexts.sfxOn);
-    } else {
-        setElementClass('soundIcon', 'fa-solid fa-volume-xmark text-gray-400');
-        setElementText('soundLabel', navTexts.sfxMute);
-    }
+    setElementClass(
+        'soundIcon',
+        enabled ? 'fa-solid fa-volume-high text-bronze' : 'fa-solid fa-volume-xmark text-gray-400'
+    );
+    updateSoundButtonLabel();
 }
 
 export function toggleCRT() {
@@ -188,7 +180,7 @@ function fallbackCopyTextToClipboard(text) {
 }
 
 export function copyEmail() {
-    const emailAddress = CONTACT_LINKS.email;
+    const emailAddress = getNormalizedContactEmail();
     if (!emailAddress) return;
 
     if (navigator.clipboard && window.isSecureContext) {
@@ -237,7 +229,7 @@ export function initContactLinks() {
 
     const copyEmailBtn = document.getElementById('copy-email-btn') || document.querySelector('[data-contact="email"]');
     if (copyEmailBtn) {
-        const emailAddress = typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
+        const emailAddress = getNormalizedContactEmail();
         if (emailAddress !== '') {
             updateEmailButtonLabel();
             copyEmailBtn.addEventListener('click', copyEmail);
