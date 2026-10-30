@@ -1,8 +1,7 @@
 /**************************************************************
- * MAIN APPLICATION ENTRY POINT
+ * MAIN APPLICATION ENTRY POINT — SANCTUARY & DRUKSYSTEM OS
  **************************************************************/
 
-import { THEME_UI, getCurrentTheme, setCurrentTheme } from './config/themes.js';
 import { CONTACT_LINKS } from './config/links.js';
 import {
     TRANSLATIONS,
@@ -13,25 +12,24 @@ import {
 import { playSound, toggleSound, isSoundEnabled } from './audio/soundEngine.js';
 import { renderStaticPreviews } from './graphics/sprites.js';
 import {
-    initDiorama,
-    resizeDiorama,
-    spawnCenterDioramaBurst,
-    updateAndDrawDiorama,
-    initBgCanvas,
-    updateAndDrawBg
-} from './graphics/diorama.js';
+    initSanctuary,
+    resizeSanctuary,
+    updateAndDrawSanctuary
+} from './graphics/sanctuary.js';
+import {
+    initDrukSystem,
+    openDrukSystem,
+    closeDrukSystem,
+    executeTerminalCommand,
+    renderBootBanner
+} from './terminal/drukSystem.js';
 import {
     initGame,
-    startGame,
-    triggerJump,
-    triggerAttack,
     refreshGameOverlayLanguage,
     updateAndDrawGame
 } from './game/bugSlasher.js';
 
-let crtEnabled = true;
 let toastTimeout = null;
-let emailBtnResetTimeout = null;
 
 function setElementText(elementId, textValue) {
     const element = document.getElementById(elementId);
@@ -49,24 +47,6 @@ function setElementClass(elementId, classNameValue) {
 
 function getNormalizedContactEmail() {
     return typeof CONTACT_LINKS.email === 'string' ? CONTACT_LINKS.email.trim() : '';
-}
-
-function applyThemeTexts(theme = getCurrentTheme(), language = getCurrentLanguage()) {
-    const themeTexts = TRANSLATIONS[language]?.themes?.[theme];
-    if (!themeTexts) return;
-
-    setElementText('themeSubtitle', themeTexts.themeSubtitle);
-    setElementText('heroTitle', themeTexts.heroTitle);
-    setElementText('progressTask', themeTexts.progressTask);
-    setElementText('gameTitle', themeTexts.gameTitle);
-    setElementText('attackBtnLabel', themeTexts.attackBtnLabel);
-}
-
-function updateEmailButtonLabel(language = getCurrentLanguage()) {
-    const emailAddress = getNormalizedContactEmail();
-    if (!emailAddress) return;
-    const copyLabel = TRANSLATIONS[language].hero.copyEmailBtn;
-    setElementText('emailBtnText', `${copyLabel} (${emailAddress})`);
 }
 
 function updateSoundButtonLabel(language = getCurrentLanguage()) {
@@ -97,11 +77,13 @@ export function setLanguage(language) {
     applyTranslationsByAttribute('data-i18n-title', activeLanguage, (element, value) => {
         element.setAttribute('title', value);
     });
+    applyTranslationsByAttribute('data-i18n-placeholder', activeLanguage, (element, value) => {
+        element.setAttribute('placeholder', value);
+    });
 
-    applyThemeTexts(getCurrentTheme(), activeLanguage);
-    updateEmailButtonLabel(activeLanguage);
     updateSoundButtonLabel(activeLanguage);
     refreshGameOverlayLanguage();
+    renderBootBanner();
 
     const langEsOption = document.getElementById('langEsOption');
     const langEnOption = document.getElementById('langEnOption');
@@ -115,28 +97,6 @@ export function toggleLanguage() {
     setLanguage(nextLanguage);
 }
 
-export function setTheme(theme) {
-    const activeTheme = setCurrentTheme(theme);
-    const uiConfig = THEME_UI[activeTheme];
-    if (!uiConfig) return;
-
-    playSound('coin');
-    document.body.classList.toggle('theme-cyber', uiConfig.isCyber);
-
-    setElementClass('btnFantasy', uiConfig.btnFantasyClass);
-    setElementClass('btnCyber', uiConfig.btnCyberClass);
-    setElementClass('brandSuffix', uiConfig.brandSuffixClass);
-    setElementClass('statusBadge', uiConfig.statusBadgeClass);
-
-    setElementText('featIcon1', uiConfig.featIcons[0]);
-    setElementText('featIcon2', uiConfig.featIcons[1]);
-    setElementText('featIcon3', uiConfig.featIcons[2]);
-
-    applyThemeTexts(activeTheme, getCurrentLanguage());
-    renderStaticPreviews(activeTheme);
-    spawnCenterDioramaBurst(24);
-}
-
 export function handleToggleSound() {
     const enabled = toggleSound();
     setElementClass(
@@ -144,15 +104,6 @@ export function handleToggleSound() {
         enabled ? 'fa-solid fa-volume-high text-bronze' : 'fa-solid fa-volume-xmark text-gray-400'
     );
     updateSoundButtonLabel();
-}
-
-export function toggleCRT() {
-    crtEnabled = !crtEnabled;
-    const crtOverlayElement = document.getElementById('crtOverlay');
-    if (crtOverlayElement) {
-        crtOverlayElement.style.display = crtEnabled ? 'block' : 'none';
-    }
-    playSound('click');
 }
 
 export function showToast(icon, title, message) {
@@ -194,105 +145,46 @@ export function copyEmail() {
     const activeLangTexts = TRANSLATIONS[getCurrentLanguage()];
     playSound('coin');
     showToast('📜', activeLangTexts.toast.copiedTitle, activeLangTexts.toast.copiedMsg(emailAddress));
-
-    setElementText('emailBtnText', `${activeLangTexts.hero.copiedEmailBtn} (${emailAddress})`);
-    clearTimeout(emailBtnResetTimeout);
-    emailBtnResetTimeout = setTimeout(() => {
-        updateEmailButtonLabel();
-    }, 2200);
-}
-
-function configureExternalLinkElement(linkElement, rawUrl) {
-    const normalizedUrl = typeof rawUrl === 'string' ? rawUrl.trim() : '';
-    if (normalizedUrl !== '') {
-        linkElement.setAttribute('href', normalizedUrl);
-        linkElement.setAttribute('target', '_blank');
-        linkElement.setAttribute('rel', 'noopener noreferrer');
-        linkElement.style.display = '';
-    } else {
-        linkElement.style.display = 'none';
-    }
-}
-
-export function initContactLinks() {
-    const socialElements = document.querySelectorAll('[data-social]');
-    socialElements.forEach((socialElement) => {
-        const networkKey = socialElement.getAttribute('data-social');
-        const socialUrl = CONTACT_LINKS.socials?.[networkKey];
-        configureExternalLinkElement(socialElement, socialUrl);
-    });
-
-    const cvElements = document.querySelectorAll('[data-contact="cv"]');
-    cvElements.forEach((cvElement) => {
-        configureExternalLinkElement(cvElement, CONTACT_LINKS.cv);
-    });
-
-    const copyEmailBtn = document.getElementById('copy-email-btn') || document.querySelector('[data-contact="email"]');
-    if (copyEmailBtn) {
-        const emailAddress = getNormalizedContactEmail();
-        if (emailAddress !== '') {
-            updateEmailButtonLabel();
-            copyEmailBtn.addEventListener('click', copyEmail);
-        } else {
-            copyEmailBtn.style.display = 'none';
-        }
-    }
 }
 
 function bindUIEvents() {
-    const btnFantasy = document.getElementById('btnFantasy');
-    const btnCyber = document.getElementById('btnCyber');
+    const btnOpenTerminal = document.getElementById('btnOpenTerminal');
     const langToggleBtn = document.getElementById('lang-toggle');
     const btnSound = document.getElementById('btnSound');
-    const btnCrt = document.getElementById('btnCrt');
-    const sfxLinks = document.querySelectorAll('[data-sfx="click"]');
 
-    if (btnFantasy) btnFantasy.addEventListener('click', () => setTheme('fantasy'));
-    if (btnCyber) btnCyber.addEventListener('click', () => setTheme('cyber'));
+    if (btnOpenTerminal) btnOpenTerminal.addEventListener('click', openDrukSystem);
     if (langToggleBtn) langToggleBtn.addEventListener('click', toggleLanguage);
     if (btnSound) btnSound.addEventListener('click', handleToggleSound);
-    if (btnCrt) btnCrt.addEventListener('click', toggleCRT);
-
-    sfxLinks.forEach((linkElement) => {
-        linkElement.addEventListener('click', () => playSound('click'));
-    });
 
     window.addEventListener('resize', () => {
-        initBgCanvas();
-        resizeDiorama();
+        resizeSanctuary();
     });
 }
 
 function mainLoop() {
-    updateAndDrawBg();
-    updateAndDrawDiorama();
+    updateAndDrawSanctuary();
     updateAndDrawGame();
     requestAnimationFrame(mainLoop);
 }
 
 function initApp() {
-    initContactLinks();
-    setLanguage(getCurrentLanguage());
-    bindUIEvents();
-    initBgCanvas();
-    initDiorama();
+    initSanctuary(openDrukSystem);
+    initDrukSystem(copyEmail);
     initGame();
     renderStaticPreviews();
+    setLanguage(getCurrentLanguage());
+    bindUIEvents();
     mainLoop();
 }
 
-// Expose helpers on window for backwards compatibility or debugging
 Object.assign(window, {
-    setTheme,
     setLanguage,
     toggleLanguage,
     toggleSound: handleToggleSound,
-    toggleCRT,
     copyEmail,
-    playSound,
-    startGame,
-    triggerJump,
-    triggerAttack
+    openDrukSystem,
+    closeDrukSystem,
+    executeTerminalCommand
 });
 
 if (document.readyState === 'loading') {

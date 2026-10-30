@@ -24,8 +24,8 @@ const SOUND_PRESETS = {
     },
     coin: {
         waveType: 'square',
-        startFrequency: 587.33, // D5
-        stepFrequency: 880,     // A5
+        startFrequency: 587.33,
+        stepFrequency: 880,
         stepTimeOffset: 0.06,
         gainVolume: 0.08,
         duration: 0.18
@@ -51,6 +51,38 @@ const SOUND_PRESETS = {
         startFrequency: 660,
         gainVolume: 0.05,
         duration: 0.05
+    },
+    tree: {
+        waveType: 'triangle',
+        startFrequency: 420,
+        endFrequency: 680,
+        rampType: 'exponential',
+        gainVolume: 0.07,
+        duration: 0.22
+    },
+    water: {
+        waveType: 'sine',
+        startFrequency: 520,
+        endFrequency: 980,
+        rampType: 'exponential',
+        gainVolume: 0.1,
+        duration: 0.16
+    },
+    seal: {
+        waveType: 'sawtooth',
+        startFrequency: 140,
+        endFrequency: 58,
+        rampType: 'linear',
+        gainVolume: 0.11,
+        duration: 0.28
+    },
+    terminal: {
+        waveType: 'square',
+        startFrequency: 440,
+        stepFrequency: 880,
+        stepTimeOffset: 0.05,
+        gainVolume: 0.06,
+        duration: 0.14
     }
 };
 

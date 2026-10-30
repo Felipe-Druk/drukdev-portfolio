@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DrukDev | Coming Soon — Pixel Art & Code</title>
+    <title>DrukDev | Sanctuary & DrukSystem OS</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Pixel & Mono -->
+    <!-- Google Fonts: IBM Plex Mono, VT323 & Press Start 2P -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Modular CSS -->
@@ -17,19 +17,23 @@
     <link rel="stylesheet" href="./css/base.css">
     <link rel="stylesheet" href="./css/components.css">
 </head>
-<body class="min-h-screen flex flex-col justify-between relative selection:bg-[#B92B92] selection:text-white">
+<body class="relative w-screen h-screen overflow-hidden select-none">
 
-    <!-- Background Interactive Particle Canvas -->
-    <canvas id="bgCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+    <!-- ===================================================================
+         MAIN STAGE: FULLSCREEN INTERACTIVE PIXEL-ART SANCTUARY
+         =================================================================== -->
+    <canvas id="sanctuaryCanvas" class="fixed inset-0 w-full h-full block z-0"></canvas>
 
-    <!-- CRT Scanline Overlay (Toggleable) -->
-    <div id="crtOverlay" class="fixed inset-0 scanlines z-40 opacity-60"></div>
+    <!-- Subtle Global CRT Scanline Overlay -->
+    <div id="crtOverlay" class="fixed inset-0 scanlines z-10 opacity-40 pointer-events-none"></div>
 
-    <!-- Top Navigation / Theme & FX Bar -->
-    <header class="relative z-20 w-full max-w-6xl mx-auto px-4 pt-5 pb-2 flex flex-wrap items-center justify-between gap-4">
+    <!-- ===================================================================
+         MINIMAL TOP HUD (BRAND AVATAR, TERMINAL SHORTCUT, ES|EN, MUTE)
+         =================================================================== -->
+    <header class="fixed top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-4 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         <!-- Brand Logo with Circular Forged Steel Avatar -->
-        <div class="flex items-center gap-3.5">
-            <div class="avatar-steel-ring w-12 h-12 flex items-center justify-center shrink-0">
+        <div class="flex items-center gap-3 bg-[#0D0D0F]/85 px-3.5 py-2 border-2 border-[#56616E] shadow-[4px_4px_0_#0D0D0F] pointer-events-auto">
+            <div class="avatar-steel-ring w-11 h-11 flex items-center justify-center shrink-0">
                 <img
                     id="brandLogoImg"
                     src="./assets/img/logo-drukdev.png"
@@ -37,237 +41,189 @@
                     class="w-full h-full object-cover"
                     onerror="this.classList.add('hidden'); document.getElementById('logoSpriteCanvas').classList.remove('hidden');"
                 >
-                <canvas id="logoSpriteCanvas" width="44" height="44" class="w-11 h-11 hidden"></canvas>
+                <canvas id="logoSpriteCanvas" width="44" height="44" class="w-10 h-10 hidden"></canvas>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="font-pixel text-base sm:text-lg tracking-wider text-steel">DRUK<span id="brandSuffix" class="text-bronze">.DEV</span></span>
-                    <span class="text-[10px] font-pixel px-2 py-0.5 rounded bg-[#7A1F73]/40 border border-[#B92B92] text-[#D4957A] animate-pulse" id="statusBadge">BUILD v0.35</span>
+                    <span class="font-gothic-pixel text-sm sm:text-base tracking-wider text-steel">DRUK<span id="brandSuffix" class="text-bronze">.DEV</span></span>
+                    <span class="text-[9px] font-gothic-pixel px-2 py-0.5 bg-[#7A1F73]/50 border border-[#B92B92] text-[#D4957A]" id="statusBadge">SANCTUARY</span>
                 </div>
-                <p class="text-xs opacity-75" id="themeSubtitle">Grimorio Digital & Código Artesanal</p>
+                <p class="text-[11px] opacity-80" id="themeSubtitle" data-i18n="nav.subtitle">Santuario Pixel-Art & Consola Interactiva</p>
             </div>
         </div>
 
-        <!-- Theme Switcher, Language Toggle & Audio/CRT Controls -->
-        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div class="flex items-center bg-[#0D0D0F]/80 p-1 rounded border-2 border-[#56616E]">
-                <button id="btnFantasy" type="button" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all bg-[#B92B92] border border-[#D8E2EB] text-[#D8E2EB] shadow">
-                    <span>🐉</span> <span class="hidden sm:inline">DARK FANTASY</span>
-                </button>
-                <button id="btnCyber" type="button" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5 transition-all text-gray-400 hover:text-white">
-                    <span>⚡</span> <span class="hidden sm:inline">CYBER NEON</span>
-                </button>
-            </div>
+        <!-- Minimal Controls: Open DrukSystem OS, Language (ES | EN) & Audio (MUTE) -->
+        <div class="flex flex-wrap items-center gap-2.5 pointer-events-auto">
+            <button id="btnOpenTerminal" type="button" class="pixel-btn px-3 py-2 text-xs font-gothic-pixel flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-[#00FF41]"></i>
+                <span data-i18n="nav.openTerminalBtn">DRUKSYSTEM OS</span>
+            </button>
 
-            <button id="lang-toggle" type="button" class="px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.langTitle" title="Cambiar idioma (ES / EN)">
+            <button id="lang-toggle" type="button" class="px-3 py-2 text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.langTitle" title="Cambiar idioma (ES / EN)">
                 <span id="langEsOption" class="lang-option active">ES</span>
                 <span class="opacity-40">|</span>
                 <span id="langEnOption" class="lang-option">EN</span>
             </button>
 
-            <button id="btnSound" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
+            <button id="btnSound" type="button" class="pixel-btn px-3 py-2 text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
                 <i id="soundIcon" class="fa-solid fa-volume-high text-bronze"></i>
-                <span id="soundLabel" class="hidden md:inline">SFX ON</span>
-            </button>
-
-            <button id="btnCrt" type="button" class="pixel-btn px-3 py-1.5 rounded text-xs font-pixel flex items-center gap-1.5" data-i18n-title="nav.crtTitle" title="Filtro Monitor Retro CRT">
-                <i class="fa-solid fa-tv"></i>
-                <span class="hidden md:inline">CRT</span>
+                <span id="soundLabel" class="hidden sm:inline">SFX ON</span>
             </button>
         </div>
     </header>
 
-    <!-- Main Content Grid -->
-    <main class="relative z-10 w-full max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start my-auto">
-        
-        <!-- Left Column: Hero "Coming Soon", Progress & Recruiter Info (7 cols) -->
-        <section class="lg:col-span-7 flex flex-col gap-5">
-            
-            <!-- Hero Card -->
-            <div class="pixel-box rounded-lg p-6 sm:p-8">
-                <!-- Interactive Pixel Diorama Banner -->
-                <div class="canvas-frame relative w-full h-36 sm:h-44 mb-6 rounded overflow-hidden bg-[#0D0D0F] group cursor-crosshair" id="dioramaContainer" data-i18n-title="hero.dioramaTitle" title="Haz clic en el escenario para interactuar">
-                    <canvas id="dioramaCanvas" class="w-full h-full block"></canvas>
-                    <div class="absolute bottom-2 right-2 bg-[#0D0D0F]/85 px-2.5 py-1 rounded text-[11px] font-vt tracking-wider text-bronze border border-[#56616E] pointer-events-none" data-i18n="hero.dioramaHint">
-                        ✨ Click en la escena para interactuar
-                    </div>
+    <!-- Bottom Sanctuary Exploration Hint -->
+    <footer class="fixed bottom-3 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
+        <div class="bg-[#0D0D0F]/85 border-2 border-[#56616E] px-4 py-1.5 text-xs text-bronze shadow-[4px_4px_0_#0D0D0F] text-center" data-i18n="sanctuary.hint">
+            ✨ Interactúa con el Santuario: Árbol Antiguo, Laguna, Portal Dungeon o la Consola DrukSystem en el pasto
+        </div>
+    </footer>
+
+    <!-- ===================================================================
+         THE ARTIFACT: DRUKSYSTEM OS CRT MONITOR MODAL
+         =================================================================== -->
+    <div
+        id="drukSystemModal"
+        data-terminal-color="matrix"
+        data-terminal-font="ibm"
+        class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-6"
+    >
+        <div class="crt-monitor-frame w-full max-w-4xl flex flex-col p-3 sm:p-5">
+
+            <!-- Monitor Bezel Header -->
+            <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b-2 border-[#56616E]">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 inline-block bg-[#00FF41] shadow-[0_0_8px_#00FF41]"></span>
+                    <span class="font-gothic-pixel text-[10px] sm:text-xs text-steel tracking-wider" data-i18n="terminal.windowTitle">
+                        DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO
+                    </span>
                 </div>
-
-                <!-- Coming Soon Tag -->
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#0D0D0F]/60 border border-[#56616E] mb-3">
-                    <span class="w-2 h-2 rounded-full bg-[#B92B92] animate-ping"></span>
-                    <span class="font-pixel text-[10px] sm:text-xs tracking-widest uppercase text-bronze" id="comingSoonBadge" data-i18n="hero.comingSoonBadge">PRÓXIMAMENTE // COMING SOON</span>
-                </div>
-
-                <!-- Main Headline -->
-                <h1 class="font-pixel text-2xl sm:text-4xl leading-snug mb-4 title-glow" id="heroTitle">
-                    FORJANDO EL PORTAFOLIO DE DRUKDEV
-                </h1>
-
-                <p class="text-sm sm:text-base leading-relaxed opacity-90 mb-6" id="heroDescription" data-i18n-html="hero.descriptionHtml">
-                    ¡Hola! Estoy construyendo un portafolio interactivo fuera de lo común: gráficos <strong class="text-bronze">pixel-art generados 100% por código</strong>, minijuegos integrados y mis mejores proyectos de desarrollo. Mientras termino de pulir los últimos niveles, puedes jugar una partida rápida o contactarme directamente.
-                </p>
-
-                <!-- Build Progress Bar -->
-                <div class="bg-[#0D0D0F]/70 p-4 rounded border-2 border-[#56616E] mb-6">
-                    <div class="flex justify-between items-center text-xs font-pixel mb-2">
-                        <span id="progressTask">🐉 FORJANDO SHADERS & PROYECTOS...</span>
-                        <span id="progressPercent" class="text-bronze">42%</span>
-                    </div>
-                    <div class="w-full h-4 bg-[#0D0D0F] rounded overflow-hidden border border-[#56616E] p-0.5">
-                        <div class="h-full pixel-progress rounded-sm transition-all duration-500" style="width: 42%"></div>
-                    </div>
-                    <div class="mt-2.5 flex flex-wrap gap-2 text-[11px] opacity-90 font-vt text-base">
-                        <span class="px-2 py-0.5 rounded bg-[#7A1F73]/30 text-[#D8E2EB] border border-[#B92B92]/60" data-i18n="hero.stepDomain">✔ Dominio & Hosting</span>
-                        <span class="px-2 py-0.5 rounded bg-[#8A4E3B]/30 text-bronze border border-[#D4957A]/60" data-i18n="hero.stepEngine">⚙ Motor Pixel-Art Procedural</span>
-                        <span class="px-2 py-0.5 rounded bg-white/5 text-gray-400 border border-[#56616E]/50" data-i18n="hero.stepCases">⏳ Casos de Estudio & Demos</span>
-                    </div>
-                </div>
-
-                <!-- Recruiter Quick Access / Contact Buttons (Linked via js/config/links.js) -->
-                <div>
-                    <p class="font-pixel text-[11px] uppercase tracking-wider mb-3 text-bronze">
-                        <i class="fa-solid fa-dragon mr-1"></i>
-                        <span data-i18n="hero.recruiterPrompt">¿Eres reclutador, suscriptor o quieres colaborar? Conecta conmigo:</span>
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a href="#" data-social="github" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-github text-lg"></i>
-                            <span>GitHub</span>
-                        </a>
-                        <a href="#" data-social="youtube" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-youtube text-lg text-[#D4957A]"></i>
-                            <span>YouTube</span>
-                        </a>
-                        <a href="#" data-social="linkedin" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-linkedin text-lg text-[#D8E2EB]"></i>
-                            <span>LinkedIn</span>
-                        </a>
-                        <a href="#" data-social="itchio" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-itch-io text-lg text-[#D4957A]"></i>
-                            <span>Itch.io</span>
-                        </a>
-                        <a href="#" data-social="discord" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-discord text-lg text-[#D8E2EB]"></i>
-                            <span>Discord</span>
-                        </a>
-                        <a href="#" data-social="twitter" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-brands fa-x-twitter text-lg text-[#D8E2EB]"></i>
-                            <span>Twitter / X</span>
-                        </a>
-                        <a href="#" data-contact="cv" data-sfx="click" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-file-arrow-down text-bronze"></i>
-                            <span data-i18n="hero.downloadCv">Descargar CV</span>
-                        </a>
-                        <button id="copy-email-btn" data-contact="email" type="button" class="pixel-btn px-4 py-2.5 rounded text-xs sm:text-sm font-bold flex items-center gap-2">
-                            <i class="fa-solid fa-envelope text-bronze"></i>
-                            <span id="emailBtnText">Copiar Email (fedalto@fi.uba.ar)</span>
-                        </button>
-                    </div>
-                </div>
+                <button
+                    type="button"
+                    data-term-cmd="exit"
+                    class="pixel-btn px-2.5 py-1 text-[10px] font-gothic-pixel"
+                    data-i18n="terminal.btnClose"
+                >
+                    [cerrar]
+                </button>
             </div>
 
-            <!-- Feature Preview Pills (What's coming) -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon1">🐉</div>
-                    <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle1" data-i18n="features.feat1Title">PROYECTOS REALES</h3>
-                        <p class="text-xs opacity-75" data-i18n="features.feat1Desc">Arquitectura, código limpio y demos en vivo.</p>
-                    </div>
-                </div>
-                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon2">👾</div>
-                    <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle2" data-i18n="features.feat2Title">ARTE POR CÓDIGO</h3>
-                        <p class="text-xs opacity-75" data-i18n="features.feat2Desc">Canvas 2D, partículas y diseño con personalidad.</p>
-                    </div>
-                </div>
-                <div class="pixel-box rounded p-3.5 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded bg-[#0D0D0F]/60 border border-[#56616E] flex items-center justify-center text-xl shrink-0" id="featIcon3">🕹️</div>
-                    <div>
-                        <h3 class="font-pixel text-[10px] text-bronze mb-0.5" id="featTitle3" data-i18n="features.feat3Title">GAMIFICACIÓN</h3>
-                        <p class="text-xs opacity-75" data-i18n="features.feat3Desc">Explora mi experiencia como si fuera un RPG.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <!-- Inner CRT Phosphor Screen -->
+            <div class="crt-screen w-full h-[62vh] min-h-[360px] max-h-[540px] flex flex-col p-3 sm:p-4">
+                <!-- Internal CRT Scanlines -->
+                <div class="absolute inset-0 scanlines opacity-55 pointer-events-none z-20"></div>
 
-        <!-- Right Column: Playable Arcade Mini-Game ("While you wait...") (5 cols) -->
-        <section class="lg:col-span-5 flex flex-col">
-            <div class="pixel-box pixel-box-active rounded-lg p-5 flex flex-col">
-                
-                <!-- Arcade Header -->
-                <div class="flex items-center justify-between border-b border-[#56616E] pb-3 mb-3">
-                    <div>
-                        <span class="text-[10px] font-pixel text-bronze block mb-0.5" data-i18n="game.eyebrow">🕹️ MINIJUEGO MIENTRAS ESPERAS</span>
-                        <h2 class="font-pixel text-sm sm:text-base text-steel" id="gameTitle">DRUK'S BUG SLASHER</h2>
-                    </div>
-                    <div class="text-right font-vt text-lg leading-tight bg-[#0D0D0F]/80 px-3 py-1 rounded border border-[#56616E]">
-                        <div>SCORE: <span id="scoreDisplay" class="text-bronze font-bold">0</span></div>
-                        <div class="text-xs opacity-75">HI-SCORE: <span id="hiScoreDisplay">0</span></div>
-                    </div>
+                <!-- 1. CLI Terminal View -->
+                <div id="terminalCliView" class="relative z-10 flex flex-col h-full">
+                    <div id="terminalOutput" class="crt-output flex-1 overflow-y-auto pr-1 text-xs sm:text-sm space-y-1"></div>
+
+                    <!-- Real Command Input -->
+                    <form id="terminalCommandForm" class="mt-2 pt-2 border-t border-[var(--term-dim)] flex items-center gap-2">
+                        <span class="font-bold text-xs sm:text-sm shrink-0">druk@sanctuary:~$</span>
+                        <input
+                            id="terminalInput"
+                            type="text"
+                            autocomplete="off"
+                            spellcheck="false"
+                            class="term-input flex-1 text-xs sm:text-sm"
+                            data-i18n-placeholder="terminal.inputPlaceholder"
+                            placeholder="Escribe un comando (help, ls, contacto, play snake, color, font)..."
+                        >
+                    </form>
                 </div>
 
-                <!-- Game Canvas Wrapper -->
-                <div class="canvas-frame relative w-full aspect-[4/3] bg-[#0D0D0F] rounded overflow-hidden mb-4 select-none">
-                    <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+                <!-- 2. Phosphor Snake Game View (play snake) -->
+                <div id="terminalSnakeView" class="hidden relative z-10 flex flex-col items-center justify-between h-full">
+                    <div class="w-full flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--term-dim)] text-xs">
+                        <span class="font-bold" data-i18n="snake.title">DRUK SNAKE // MODO FÓSFORO</span>
+                        <div class="flex items-center gap-4">
+                            <span>SCORE: <b id="snakeScoreVal">0</b></span>
+                            <span>HI-SCORE: <b id="snakeHiScoreVal">0</b></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="snakeRestartBtn" type="button" class="term-cmd-chip" data-i18n="snake.restartBtn">[REINICIAR]</button>
+                            <button id="snakeExitBtn" type="button" class="term-cmd-chip" data-i18n="snake.exitBtn">[Q / ESC] VOLVER AL PROMPT</button>
+                        </div>
+                    </div>
 
-                    <!-- Start / Game Over Overlay -->
-                    <div id="gameOverlay" class="absolute inset-0 bg-[#0D0D0F]/85 backdrop-blur-[2px] flex flex-col items-center justify-center p-5 text-center z-10">
-                        <canvas id="heroPreviewCanvas" width="64" height="64" class="w-16 h-16 mb-3"></canvas>
-                        <h3 id="overlayTitle" class="font-pixel text-sm sm:text-base text-bronze mb-2" data-i18n="game.overlayTitle">¡DEFIENDE EL REPOSITORIO!</h3>
-                        <p id="overlayDesc" class="text-xs sm:text-sm opacity-90 max-w-xs mb-4" data-i18n-html="game.overlayDescHtml">
-                            Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span> para acelerar el deploy.
+                    <div class="my-auto flex flex-col items-center">
+                        <canvas id="snakeCanvas" class="block"></canvas>
+                        <p id="snakeStatusMsg" class="text-[11px] mt-2 text-center opacity-90" data-i18n="snake.controlsHint">
+                            Controles: WASD / Flechas | [ESPACIO] Reiniciar | [ESC / Q] Salir al prompt
                         </p>
-                        <button id="btnStartGame" type="button" class="pixel-btn px-5 py-3 rounded font-pixel text-xs sm:text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-play text-bronze"></i>
-                            <span id="startBtnText" data-i18n="game.startBtn">INSERT COIN / JUGAR</span>
-                        </button>
+                    </div>
+
+                    <!-- Mobile / Mouse Directional Pad -->
+                    <div class="flex items-center gap-2 sm:hidden">
+                        <button id="snakeLeftBtn" type="button" class="term-cmd-chip px-3 py-1">◀</button>
+                        <button id="snakeUpBtn" type="button" class="term-cmd-chip px-3 py-1">▲</button>
+                        <button id="snakeDownBtn" type="button" class="term-cmd-chip px-3 py-1">▼</button>
+                        <button id="snakeRightBtn" type="button" class="term-cmd-chip px-3 py-1">▶</button>
                     </div>
                 </div>
 
-                <!-- On-Screen Touch / Mouse Controls (Great for Mobile & Desktop) -->
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <button id="btnJump" type="button" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-arrow-up text-bronze"></i>
-                        <span data-i18n="game.jumpBtn">SALTAR (W / ESPACIO)</span>
-                    </button>
-                    <button id="btnAttack" type="button" class="pixel-btn py-3 rounded font-pixel text-xs flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-bolt text-bronze"></i>
-                        <span id="attackBtnLabel">ESPADAZO (K / CLICK)</span>
-                    </button>
-                </div>
+                <!-- 3. Bug Slasher Cartridge View (play slasher) -->
+                <div id="terminalSlasherView" class="hidden relative z-10 flex flex-col justify-between h-full">
+                    <div class="flex items-center justify-between pb-2 border-b border-[var(--term-dim)] text-xs">
+                        <span class="font-bold" id="gameTitle">DRUK'S BUG SLASHER</span>
+                        <div class="flex items-center gap-4">
+                            <span>SCORE: <b id="scoreDisplay">0</b></span>
+                            <span>HI-SCORE: <b id="hiScoreDisplay">0</b></span>
+                        </div>
+                        <button id="slasherExitBtn" type="button" class="term-cmd-chip" data-i18n="snake.exitBtn">[Q / ESC] VOLVER AL PROMPT</button>
+                    </div>
 
-                <div class="text-[11px] opacity-75 flex items-center justify-between px-1">
-                    <span data-i18n-html="game.themeTipHtml">💡 Cambia entre <b>Dark Fantasy</b> y <b>Cyber Neon</b> arriba para transformar al héroe.</span>
+                    <div class="relative w-full max-w-[420px] aspect-[4/3] mx-auto my-auto border border-[var(--term-dim)] overflow-hidden bg-black">
+                        <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+                        <div id="gameOverlay" class="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-4 text-center z-10">
+                            <canvas id="heroPreviewCanvas" width="64" height="64" class="w-14 h-14 mb-2"></canvas>
+                            <h3 id="overlayTitle" class="font-gothic-pixel text-xs text-bronze mb-2" data-i18n="game.overlayTitle">¡DEFIENDE EL REPOSITORIO!</h3>
+                            <p id="overlayDesc" class="text-xs opacity-90 max-w-xs mb-3" data-i18n-html="game.overlayDescHtml">
+                                Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span>.
+                            </p>
+                            <button id="btnStartGame" type="button" class="term-cmd-chip px-4 py-2 font-bold">
+                                <span id="startBtnText" data-i18n="game.startBtn">INSERT COIN / JUGAR</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 max-w-[420px] w-full mx-auto">
+                        <button id="btnJump" type="button" class="term-cmd-chip py-1.5 text-xs font-bold" data-i18n="game.jumpBtn">
+                            SALTAR (W / ESPACIO)
+                        </button>
+                        <button id="btnAttack" type="button" class="term-cmd-chip py-1.5 text-xs font-bold">
+                            <span id="attackBtnLabel">ESPADAZO (K / CLICK)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </section>
 
-    </main>
-
-    <!-- Toast Notification for Copy Email / Easter Eggs -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-        <div class="pixel-box pixel-box-active px-4 py-3 rounded flex items-center gap-3 bg-[#0D0D0F]/95">
-            <span class="text-xl" id="toastIcon">📜</span>
-            <div>
-                <p class="font-pixel text-[10px] text-bronze" id="toastTitle" data-i18n="toast.copiedTitle">¡EMAIL COPIADO!</p>
-                <p class="text-xs text-steel" id="toastMsg">fedalto@fi.uba.ar listo para pegar.</p>
+            <!-- Mouse-Clickable Quick Command Bar (Recruiter Friendly) -->
+            <div class="pt-3 mt-2.5 border-t-2 border-[#56616E] flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button type="button" data-term-cmd="help" class="term-cmd-chip" data-i18n="terminal.btnHelp">[help]</button>
+                    <button type="button" data-term-cmd="ls" class="term-cmd-chip" data-i18n="terminal.btnLs">[ls]</button>
+                    <button type="button" data-term-cmd="contacto" class="term-cmd-chip" data-i18n="terminal.btnContact">[contacto]</button>
+                    <button type="button" data-term-cmd="play snake" class="term-cmd-chip" data-i18n="terminal.btnSnake">[play snake]</button>
+                    <button type="button" data-term-cmd="play slasher" class="term-cmd-chip" data-i18n="terminal.btnSlasher">[play slasher]</button>
+                    <button type="button" data-term-cmd="color" class="term-cmd-chip" data-i18n="terminal.btnColor">[color]</button>
+                    <button type="button" data-term-cmd="font" class="term-cmd-chip" data-i18n="terminal.btnFont">[font]</button>
+                </div>
+                <button type="button" data-term-cmd="clear" class="term-cmd-chip">[clear]</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="relative z-10 w-full max-w-6xl mx-auto px-4 py-4 border-t border-[#56616E]/40 text-xs flex flex-col sm:flex-row items-center justify-between gap-2 opacity-80">
-        <div>
-            <span class="font-pixel text-[10px] text-bronze">DRUKDEV</span> <span data-i18n="footer.madeWith">— Hecho desde cero con HTML5 Canvas & Pixel Art Procedural.</span>
+    <!-- Toast Notification for Copy Email -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="pixel-box pixel-box-active px-4 py-3 flex items-center gap-3 bg-[#0D0D0F]/95">
+            <span class="text-xl" id="toastIcon">📜</span>
+            <div>
+                <p class="font-gothic-pixel text-[10px] text-bronze" id="toastTitle" data-i18n="toast.copiedTitle">¡EMAIL COPIADO!</p>
+                <p class="text-xs text-steel" id="toastMsg">fedalto@fi.uba.ar listo para pegar.</p>
+            </div>
         </div>
-        <div class="font-vt text-base">
-            <span data-i18n="footer.serverStatusLabel">Estado del servidor: </span>
-            <span class="text-bronze" data-i18n="footer.serverStatusOnline">● ONLINE (Esperando Deploy Final)</span>
-        </div>
-    </footer>
+    </div>
 
     <!-- Main Application Module -->
     <script type="module" src="./js/main.js"></script>

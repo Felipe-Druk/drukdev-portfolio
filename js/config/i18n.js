@@ -34,55 +34,100 @@ export const TRANSLATIONS = {
             sfxOn: 'SFX ON',
             sfxMute: 'MUTE',
             soundTitle: 'Efectos de sonido 8-bit',
-            crtTitle: 'Filtro Monitor Retro CRT',
-            langTitle: 'Cambiar idioma (ES / EN)'
+            langTitle: 'Cambiar idioma (ES / EN)',
+            openTerminalBtn: 'DRUKSYSTEM OS',
+            subtitle: 'Santuario Pixel-Art & Consola Interactiva'
+        },
+        sanctuary: {
+            hint: '✨ Interactúa con el Santuario: Árbol Antiguo, Laguna, Portal Dungeon o la Consola DrukSystem en el pasto',
+            treeHover: '[ÁRBOL ANTIGUO]',
+            pondHover: '[LAGUNA DE NENÚFARES]',
+            dungeonSign: 'COMING SOON',
+            dungeonHover: '[ENTRADA A LA DUNGEON]',
+            dungeonSealMsg: 'Sellado por magia antigua... en construcción',
+            consoleHover: '[ABRIR DRUKSYSTEM OS]'
+        },
+        terminal: {
+            windowTitle: 'DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO',
+            inputPlaceholder: 'Escribe un comando (help, ls, contacto, play snake, color, font)...',
+            btnHelp: '[help]',
+            btnLs: '[ls]',
+            btnContact: '[contacto]',
+            btnSnake: '[play snake]',
+            btnSlasher: '[play slasher]',
+            btnColor: '[color]',
+            btnFont: '[font]',
+            btnClose: '[cerrar]',
+            bootBanner: [
+                '========================================================',
+                ' DRUKSYSTEM OS v2.4 — CONSOLA ARCAICA DEL SANTUARIO',
+                ' NÚCLEO: DRUK-KERNEL 8-BIT // ESTADO: ONLINE',
+                '========================================================',
+                'Escribe "help" o haz clic en los botones para navegar.'
+            ],
+            helpLines: [
+                'COMANDOS DISPONIBLES EN DRUKSYSTEM OS:',
+                '  help                       Muestra esta guía de comandos',
+                '  ls                         Lista archivos y módulos del sistema',
+                '  contacto / links           Muestra redes sociales y email directo',
+                '  play                       Lista los minijuegos arcade instalados',
+                '  play snake                 Ejecuta SNAKE en fósforo CRT',
+                '  play slasher               Ejecuta DRUK\'S BUG SLASHER',
+                '  color <matrix|amber|druk|cyan> Cambia el color del fósforo',
+                '  font <ibm|vt323|gothic>    Cambia la tipografía del monitor',
+                '  clear                      Limpia la pantalla de la terminal',
+                '  exit                       Apaga el monitor y vuelve al Santuario'
+            ],
+            lsLines: [
+                'DIRECTORIO: /santuario/drukdev/',
+                '  drwxr-xr-x  dungeon_portafolio/    [SELLADO - COMING SOON]',
+                '  -rw-r--r--  readme_arquitectura.md [ES6 Modules + Canvas 2D]',
+                '  -rwxr-xr-x  contacto.lnk           [Ejecuta "contacto"]',
+                '  -rwxr-xr-x  games/snake.rom        [Ejecuta "play snake"]',
+                '  -rwxr-xr-x  games/bug_slasher.rom  [Ejecuta "play slasher"]'
+            ],
+            contactTitle: '=== ENLACES DE CONTACTO & REDES OFICIALES ===',
+            copyEmailAction: '[COPIAR EMAIL]',
+            copiedEmailAction: '[¡COPIADO!]',
+            playListLines: [
+                'CARTUCHOS ARCADE DISPONIBLES:',
+                '  1. play snake    -> Snake clásico en fósforo Matrix',
+                '  2. play slasher  -> Druk\'s Bug Slasher (Runner 2D)'
+            ],
+            colorUpdated: (mode) => `Fósforo CRT actualizado a: ${mode.toUpperCase()} (Opciones: matrix, amber, druk, cyan)`,
+            fontUpdated: (font) => `Tipografía CRT actualizada a: ${font.toUpperCase()} (Opciones: ibm, vt323, gothic)`,
+            unknownCommand: (cmd) => `Comando no reconocido: "${cmd}". Escribe "help" para ver los comandos.`
+        },
+        snake: {
+            title: 'DRUK SNAKE // MODO FÓSFORO',
+            controlsHint: 'Controles: WASD / Flechas | [ESPACIO] Reiniciar | [ESC / Q] Salir al prompt',
+            gameOver: '¡COLISIÓN DETECTADA! Presiona [ESPACIO] o [REINICIAR]',
+            exitBtn: '[Q / ESC] VOLVER AL PROMPT',
+            restartBtn: '[REINICIAR]'
         },
         hero: {
-            dioramaHint: '✨ Click en la escena para interactuar',
-            dioramaTitle: 'Haz clic en el escenario para interactuar',
-            comingSoonBadge: 'PRÓXIMAMENTE // COMING SOON',
-            descriptionHtml: '¡Hola! Estoy construyendo un portafolio interactivo fuera de lo común: gráficos <strong class="text-bronze">pixel-art generados 100% por código</strong>, minijuegos integrados y mis mejores proyectos de desarrollo. Mientras termino de pulir los últimos niveles, puedes jugar una partida rápida o contactarme directamente.',
-            stepDomain: '✔ Dominio & Hosting',
-            stepEngine: '⚙ Motor Pixel-Art Procedural',
-            stepCases: '⏳ Casos de Estudio & Demos',
-            recruiterPrompt: '¿Eres reclutador, suscriptor o quieres colaborar? Conecta conmigo:',
-            downloadCv: 'Descargar CV',
             copyEmailBtn: 'Copiar Email',
             copiedEmailBtn: '¡Copiado!'
         },
-        features: {
-            feat1Title: 'PROYECTOS REALES',
-            feat1Desc: 'Arquitectura, código limpio y demos en vivo.',
-            feat2Title: 'ARTE POR CÓDIGO',
-            feat2Desc: 'Canvas 2D, partículas y diseño con personalidad.',
-            feat3Title: 'GAMIFICACIÓN',
-            feat3Desc: 'Explora mi experiencia como si fuera un RPG.'
-        },
         game: {
-            eyebrow: '🕹️ MINIJUEGO MIENTRAS ESPERAS',
+            eyebrow: '🕹️ CARTUCHO ARCADE: BUG SLASHER',
             overlayTitle: '¡DEFIENDE EL REPOSITORIO!',
-            overlayDescHtml: 'Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span> para acelerar el deploy.',
+            overlayDescHtml: 'Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span>.',
             startBtn: 'INSERT COIN / JUGAR',
             retryBtn: 'REINTENTAR / PLAY AGAIN',
             jumpBtn: 'SALTAR (W / ESPACIO)',
-            themeTipHtml: '💡 Cambia entre <b>Dark Fantasy</b> y <b>Cyber Neon</b> arriba para transformar al héroe.',
             gameOverTitle: (score) => `¡BUG EN PRODUCCIÓN! (SCORE: ${score})`,
-            gameOverDescHtml: (hiScore) => `Tu récord actual es <b class="text-bronze">${hiScore} pts</b>. ¿Otra partida rápida mientras DrukDev termina el deploy?`
+            gameOverDescHtml: (hiScore) => `Tu récord actual es <b class="text-bronze">${hiScore} pts</b>. ¿Otra partida rápida?`
         },
         toast: {
             copiedTitle: '¡EMAIL COPIADO!',
             copiedMsg: (email) => `${email} listo para pegar.`
         },
-        footer: {
-            madeWith: '— Hecho desde cero con HTML5 Canvas & Pixel Art Procedural.',
-            serverStatusLabel: 'Estado del servidor: ',
-            serverStatusOnline: '● ONLINE (Esperando Deploy Final)'
-        },
         themes: {
             fantasy: {
-                themeSubtitle: 'Grimorio Digital & Código Artesanal',
-                heroTitle: 'FORJANDO EL PORTAFOLIO DE DRUKDEV',
-                progressTask: '🐉 FORJANDO SHADERS & PROYECTOS...',
+                themeSubtitle: 'Santuario Pixel-Art & Consola Interactiva',
+                heroTitle: 'SANTUARIO DE DRUKDEV',
+                progressTask: '🐉 FORJANDO LA DUNGEON DEL PORTAFOLIO...',
                 gameTitle: "DRUK'S BUG SLASHER",
                 attackBtnLabel: 'ESPADAZO (K / CLICK)'
             },
@@ -100,55 +145,100 @@ export const TRANSLATIONS = {
             sfxOn: 'SFX ON',
             sfxMute: 'MUTE',
             soundTitle: '8-bit sound effects',
-            crtTitle: 'Retro CRT Monitor Filter',
-            langTitle: 'Switch language (ES / EN)'
+            langTitle: 'Switch language (ES / EN)',
+            openTerminalBtn: 'DRUKSYSTEM OS',
+            subtitle: 'Pixel-Art Sanctuary & Interactive Console'
+        },
+        sanctuary: {
+            hint: '✨ Interact with the Sanctuary: Ancient Tree, Lagoon, Dungeon Gate, or the DrukSystem Console on the grass',
+            treeHover: '[ANCIENT TREE]',
+            pondHover: '[LILYPAD LAGOON]',
+            dungeonSign: 'COMING SOON',
+            dungeonHover: '[DUNGEON ENTRANCE]',
+            dungeonSealMsg: 'Sealed by ancient magic... under construction',
+            consoleHover: '[OPEN DRUKSYSTEM OS]'
+        },
+        terminal: {
+            windowTitle: 'DRUKSYSTEM OS v2.4 // PHOSPHOR MONITOR',
+            inputPlaceholder: 'Type a command (help, ls, contacto, play snake, color, font)...',
+            btnHelp: '[help]',
+            btnLs: '[ls]',
+            btnContact: '[contact]',
+            btnSnake: '[play snake]',
+            btnSlasher: '[play slasher]',
+            btnColor: '[color]',
+            btnFont: '[font]',
+            btnClose: '[close]',
+            bootBanner: [
+                '========================================================',
+                ' DRUKSYSTEM OS v2.4 — SANCTUARY RELIC TERMINAL',
+                ' KERNEL: DRUK-KERNEL 8-BIT // STATUS: ONLINE',
+                '========================================================',
+                'Type "help" or click the command buttons below to navigate.'
+            ],
+            helpLines: [
+                'AVAILABLE COMMANDS IN DRUKSYSTEM OS:',
+                '  help                       Show this command reference',
+                '  ls                         List virtual files and system modules',
+                '  contact / contacto / links Show social links and direct email',
+                '  play                       List installed arcade mini-games',
+                '  play snake                 Launch SNAKE in CRT phosphor mode',
+                '  play slasher               Launch DRUK\'S BUG SLASHER',
+                '  color <matrix|amber|druk|cyan> Change CRT phosphor color',
+                '  font <ibm|vt323|gothic>    Change terminal font family',
+                '  clear                      Clear terminal screen',
+                '  exit                       Power off monitor and return to Sanctuary'
+            ],
+            lsLines: [
+                'DIRECTORY: /sanctuary/drukdev/',
+                '  drwxr-xr-x  portfolio_dungeon/     [SEALED - COMING SOON]',
+                '  -rw-r--r--  architecture_readme.md [ES6 Modules + 2D Canvas]',
+                '  -rwxr-xr-x  contact.lnk            [Run "contact"]',
+                '  -rwxr-xr-x  games/snake.rom        [Run "play snake"]',
+                '  -rwxr-xr-x  games/bug_slasher.rom  [Run "play slasher"]'
+            ],
+            contactTitle: '=== OFFICIAL CONTACT & SOCIAL NETWORK LINKS ===',
+            copyEmailAction: '[COPY EMAIL]',
+            copiedEmailAction: '[COPIED!]',
+            playListLines: [
+                'AVAILABLE ARCADE CARTRIDGES:',
+                '  1. play snake    -> Classic Snake in Matrix phosphor',
+                '  2. play slasher  -> Druk\'s Bug Slasher (2D Runner)'
+            ],
+            colorUpdated: (mode) => `CRT phosphor updated to: ${mode.toUpperCase()} (Options: matrix, amber, druk, cyan)`,
+            fontUpdated: (font) => `CRT font updated to: ${font.toUpperCase()} (Options: ibm, vt323, gothic)`,
+            unknownCommand: (cmd) => `Unrecognized command: "${cmd}". Type "help" for available commands.`
+        },
+        snake: {
+            title: 'DRUK SNAKE // PHOSPHOR EDITION',
+            controlsHint: 'Controls: WASD / Arrows | [SPACE] Restart | [ESC / Q] Back to prompt',
+            gameOver: 'COLLISION DETECTED! Press [SPACE] or [RESTART]',
+            exitBtn: '[Q / ESC] BACK TO PROMPT',
+            restartBtn: '[RESTART]'
         },
         hero: {
-            dioramaHint: '✨ Click on the scene to interact',
-            dioramaTitle: 'Click on the stage to interact',
-            comingSoonBadge: 'COMING SOON // IN DEVELOPMENT',
-            descriptionHtml: 'Hi! I am building an unconventional interactive portfolio: <strong class="text-bronze">100% code-generated pixel-art</strong> graphics, built-in mini-games, and my best development projects. While I finish polishing the final levels, you can play a quick match or reach out directly.',
-            stepDomain: '✔ Domain & Hosting',
-            stepEngine: '⚙ Procedural Pixel-Art Engine',
-            stepCases: '⏳ Case Studies & Demos',
-            recruiterPrompt: 'Recruiter, subscriber, or looking to collaborate? Connect with me:',
-            downloadCv: 'Download CV',
             copyEmailBtn: 'Copy Email',
             copiedEmailBtn: 'Copied!'
         },
-        features: {
-            feat1Title: 'REAL PROJECTS',
-            feat1Desc: 'Clean architecture, solid code, and live demos.',
-            feat2Title: 'CODE-DRIVEN ART',
-            feat2Desc: '2D Canvas, particles, and distinctive design.',
-            feat3Title: 'GAMIFICATION',
-            feat3Desc: 'Explore my experience like an RPG adventure.'
-        },
         game: {
-            eyebrow: '🕹️ MINI-GAME WHILE YOU WAIT',
+            eyebrow: '🕹️ ARCADE CARTRIDGE: BUG SLASHER',
             overlayTitle: 'DEFEND THE REPOSITORY!',
-            overlayDescHtml: 'Jump over <span class="text-[#B92B92] font-bold">Bugs</span> or slash them with your attack and collect <span class="text-bronze font-bold">Commits</span> to speed up deployment.',
+            overlayDescHtml: 'Jump over <span class="text-[#B92B92] font-bold">Bugs</span> or slash them with your attack and collect <span class="text-bronze font-bold">Commits</span>.',
             startBtn: 'INSERT COIN / PLAY',
             retryBtn: 'RETRY / PLAY AGAIN',
             jumpBtn: 'JUMP (W / SPACE)',
-            themeTipHtml: '💡 Switch between <b>Dark Fantasy</b> and <b>Cyber Neon</b> above to transform the hero.',
             gameOverTitle: (score) => `BUG IN PRODUCTION! (SCORE: ${score})`,
-            gameOverDescHtml: (hiScore) => `Your current high score is <b class="text-bronze">${hiScore} pts</b>. Another quick round while DrukDev finishes the deploy?`
+            gameOverDescHtml: (hiScore) => `Your current high score is <b class="text-bronze">${hiScore} pts</b>. Another quick round?`
         },
         toast: {
             copiedTitle: 'EMAIL COPIED!',
             copiedMsg: (email) => `${email} ready to paste.`
         },
-        footer: {
-            madeWith: '— Built from scratch with HTML5 Canvas & Procedural Pixel Art.',
-            serverStatusLabel: 'Server status: ',
-            serverStatusOnline: '● ONLINE (Awaiting Final Deploy)'
-        },
         themes: {
             fantasy: {
-                themeSubtitle: 'Digital Grimoire & Handcrafted Code',
-                heroTitle: 'FORGING THE DRUKDEV PORTFOLIO',
-                progressTask: '🐉 FORGING SHADERS & PROJECTS...',
+                themeSubtitle: 'Pixel-Art Sanctuary & Interactive Console',
+                heroTitle: 'DRUKDEV SANCTUARY',
+                progressTask: '🐉 FORGING THE PORTFOLIO DUNGEON...',
                 gameTitle: "DRUK'S BUG SLASHER",
                 attackBtnLabel: 'SWORD SLASH (K / CLICK)'
             },

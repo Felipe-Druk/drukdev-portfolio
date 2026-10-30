@@ -1,5 +1,23 @@
+/* ==========================================================================
+   OPTIONAL LOCAL GOTHIC PIXEL FONT (Uncomment when .woff2/.ttf is added)
+   ==========================================================================
+@font-face {
+    font-family: 'DrukGothicPixel';
+    src: url('../assets/fonts/druk-gothic-pixel.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+*/
+
 :root {
-    /* Default: Druk Dark Fantasy Theme (Official Dragon Logo Palette) */
+    /* Typography Tokens */
+    --font-gothic-pixel: 'Press Start 2P', monospace;
+    --font-terminal: 'IBM Plex Mono', monospace;
+    --font-vt: 'VT323', monospace;
+    --term-active-font: var(--font-terminal);
+
+    /* DrukDev DNA & Sanctuary Palette */
     --bg-primary: #0D0D0F;
     --bg-panel: #231C1A;
     --bg-panel-alt: #2B3138;
@@ -16,24 +34,60 @@
     --text-muted: #9BA7B4;
     --border-color: #56616E;
     --border-highlight: #D8E2EB;
+
+    /* Sanctuary Natural Tones */
+    --sanctuary-sky-top: #07080C;
+    --sanctuary-sky-bottom: #16131A;
+    --sanctuary-moss: #1E3A2F;
+    --sanctuary-leaf: #2E5A44;
+    --sanctuary-water: #0E2233;
+    --sanctuary-water-highlight: #2C5E7A;
+
+    /* Default CRT Phosphor Mode: Matrix Green */
+    --term-bg: #030803;
+    --term-fg: #00FF41;
+    --term-dim: #008F11;
+    --term-glow: rgba(0, 255, 65, 0.32);
 }
 
-body.theme-cyber {
-    /* Cyber Neon Theme */
-    --bg-primary: #050510;
-    --bg-panel: #0b0d21;
-    --bg-panel-alt: #121738;
-    --accent-main: #00f5d4;
-    --accent-secondary: #ff007f;
-    --accent-warm: #00f5d4;
-    --shadow-warm: #1d2b64;
-    --steel-base: #1d2b64;
-    --steel-mid: #1d2b64;
-    --steel-dark: #0b0d21;
-    --steel-light: #e2f1ff;
-    --accent-glow: rgba(0, 245, 212, 0.45);
-    --text-main: #e2f1ff;
-    --text-muted: #7b8cde;
-    --border-color: #1d2b64;
-    --border-highlight: #00f5d4;
+/* Terminal Phosphor Color Modes */
+[data-terminal-color="matrix"] {
+    --term-bg: #030803;
+    --term-fg: #00FF41;
+    --term-dim: #008F11;
+    --term-glow: rgba(0, 255, 65, 0.32);
+}
+
+[data-terminal-color="amber"] {
+    --term-bg: #0A0602;
+    --term-fg: #FFB000;
+    --term-dim: #996900;
+    --term-glow: rgba(255, 176, 0, 0.32);
+}
+
+[data-terminal-color="druk"] {
+    --term-bg: #0D070C;
+    --term-fg: #D4957A;
+    --term-dim: #B92B92;
+    --term-glow: rgba(185, 43, 146, 0.38);
+}
+
+[data-terminal-color="cyan"] {
+    --term-bg: #02080A;
+    --term-fg: #00F5D4;
+    --term-dim: #008B76;
+    --term-glow: rgba(0, 245, 212, 0.32);
+}
+
+/* Terminal Font Modes */
+[data-terminal-font="ibm"] {
+    --term-active-font: var(--font-terminal);
+}
+
+[data-terminal-font="vt323"] {
+    --term-active-font: var(--font-vt);
+}
+
+[data-terminal-font="gothic"] {
+    --term-active-font: var(--font-gothic-pixel);
 }
