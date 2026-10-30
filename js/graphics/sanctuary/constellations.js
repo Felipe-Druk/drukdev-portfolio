@@ -2,7 +2,7 @@
  * SKY CONSTELLATIONS — BLUEPRINTS, GEOMETRY & RENDERING
  **************************************************************/
 
-import { CONTACT_LINKS } from '../../config/links.js';
+import { CONTACT_LINKS, getLocalizedCvPath } from '../../config/links.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import { drawRect, drawPixelLine, drawFloatingPixelLabel } from './canvasUtils.js';
 
@@ -12,7 +12,7 @@ export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'github',
         type: 'social',
-        relativeX: 0.16,
+        relativeX: 0.14,
         relativeY: 0.22,
         rotationAngle: -0.18,
         nodes: [
@@ -29,7 +29,7 @@ export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'youtube',
         type: 'social',
-        relativeX: 0.34,
+        relativeX: 0.29,
         relativeY: 0.15,
         rotationAngle: 0.14,
         nodes: [
@@ -44,7 +44,7 @@ export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'linkedin',
         type: 'social',
-        relativeX: 0.52,
+        relativeX: 0.44,
         relativeY: 0.17,
         rotationAngle: -0.13,
         nodes: [
@@ -59,7 +59,7 @@ export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'mail',
         type: 'email',
-        relativeX: 0.70,
+        relativeX: 0.59,
         relativeY: 0.23,
         rotationAngle: 0.19,
         nodes: [
@@ -69,6 +69,24 @@ export const CONSTELLATION_BLUEPRINTS = [
         edges: [
             [0, 1], [1, 2], [2, 3], [3, 0],
             [0, 4], [1, 4]
+        ]
+    },
+    {
+        id: 'cv',
+        type: 'cv',
+        relativeX: 0.74,
+        relativeY: 0.18,
+        rotationAngle: -0.15,
+        nodes: [
+            [-22, -22], [10, -22], [22, -10], [22, 22], [-22, 22],
+            [10, -10],
+            [-12, -2], [10, -2],
+            [-12, 10], [12, 10]
+        ],
+        edges: [
+            [0, 1], [1, 2], [2, 3], [3, 4], [4, 0],
+            [1, 5], [5, 2],
+            [6, 7], [8, 9]
         ]
     }
 ];
@@ -85,6 +103,9 @@ function getConstellationTargetValue(blueprint) {
     if (blueprint.type === 'email') {
         const rawEmail = CONTACT_LINKS.email;
         return typeof rawEmail === 'string' ? rawEmail.trim() : '';
+    }
+    if (blueprint.type === 'cv') {
+        return getLocalizedCvPath(getCurrentLanguage());
     }
     return '';
 }

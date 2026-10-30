@@ -64,6 +64,10 @@ export const TRANSLATIONS = {
                     label: '[MAIL / COPY]',
                     hover: '[COPIAR EMAIL]',
                     copied: '¡CORREO COPIADO!'
+                },
+                cv: {
+                    label: '[CV / RESUME]',
+                    hover: '[ABRIR CV PDF]'
                 }
             }
         },
@@ -83,9 +87,10 @@ export const TRANSLATIONS = {
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO',
-            inputPlaceholder: 'Escribe un comando (help, ls, contacto, play snake, play flappy, color, font)...',
+            inputPlaceholder: 'Escribe un comando (help, ls, cv, contacto, play snake, play flappy, color, font)...',
             btnHelp: '[help]',
             btnLs: '[ls]',
+            btnCv: '[cv]',
             btnContact: '[contacto]',
             btnSnake: '[play snake]',
             btnFlappy: '[play flappy]',
@@ -104,6 +109,7 @@ export const TRANSLATIONS = {
                 'COMANDOS DISPONIBLES EN DRUKSYSTEM OS:',
                 '  help                       Muestra esta guía de comandos',
                 '  ls                         Lista archivos y módulos del sistema',
+                '  cv / resume                Abre el CV en PDF (ES/EN) y enlace de descarga',
                 '  contacto / links           Muestra redes sociales y email directo',
                 '  play                       Lista los minijuegos arcade instalados',
                 '  play snake                 Clásico Snake en fósforo CRT',
@@ -118,6 +124,7 @@ export const TRANSLATIONS = {
                 'DIRECTORIO: /santuario/drukdev/',
                 '  drwxr-xr-x  dungeon_portafolio/    [SELLADO - COMING SOON]',
                 '  -rw-r--r--  readme_arquitectura.md [ES6 Modules + Canvas 2D]',
+                '  -r--r--r--  cv_felipe_druk.pdf     [Ejecuta "cv"]',
                 '  -rwxr-xr-x  contacto.lnk           [Ejecuta "contacto"]',
                 '  -rwxr-xr-x  games/snake.rom        [Ejecuta "play snake"]',
                 '  -rwxr-xr-x  games/flappy_dragon.rom[Ejecuta "play flappy"]',
@@ -126,6 +133,10 @@ export const TRANSLATIONS = {
             contactTitle: '=== ENLACES DE CONTACTO & REDES OFICIALES ===',
             copyEmailAction: '[COPIAR EMAIL]',
             copiedEmailAction: '[¡COPIADO!]',
+            cvOpening: '📄 Abriendo CV en PDF (ES) en una nueva pestaña...',
+            cvDownloadLabel: '• DESCARGA DIRECTA ->',
+            cvDownloadAction: '[DESCARGAR CV PDF]',
+            cvUnavailable: 'El archivo CV no está disponible para el idioma activo.',
             playListLines: [
                 'CARTUCHOS ARCADE DISPONIBLES:',
                 '  • play snake   -> Clásico Snake en fósforo CRT.',
@@ -221,6 +232,10 @@ export const TRANSLATIONS = {
                     label: '[MAIL / COPY]',
                     hover: '[COPY EMAIL]',
                     copied: 'EMAIL COPIED!'
+                },
+                cv: {
+                    label: '[CV / RESUME]',
+                    hover: '[OPEN CV PDF]'
                 }
             }
         },
@@ -240,9 +255,10 @@ export const TRANSLATIONS = {
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // PHOSPHOR MONITOR',
-            inputPlaceholder: 'Type a command (help, ls, contact, play snake, play flappy, color, font)...',
+            inputPlaceholder: 'Type a command (help, ls, cv, contact, play snake, play flappy, color, font)...',
             btnHelp: '[help]',
             btnLs: '[ls]',
+            btnCv: '[cv]',
             btnContact: '[contact]',
             btnSnake: '[play snake]',
             btnFlappy: '[play flappy]',
@@ -261,6 +277,7 @@ export const TRANSLATIONS = {
                 'AVAILABLE COMMANDS IN DRUKSYSTEM OS:',
                 '  help                       Show this command reference',
                 '  ls                         List virtual files and system modules',
+                '  cv / resume                Open PDF Resume / CV (ES/EN) and download link',
                 '  contact / contacto / links Show social links and direct email',
                 '  play                       List installed arcade mini-games',
                 '  play snake                 Classic Snake in CRT phosphor',
@@ -275,6 +292,7 @@ export const TRANSLATIONS = {
                 'DIRECTORY: /sanctuary/drukdev/',
                 '  drwxr-xr-x  portfolio_dungeon/     [SEALED - COMING SOON]',
                 '  -rw-r--r--  architecture_readme.md [ES6 Modules + 2D Canvas]',
+                '  -r--r--r--  cv_felipe_druk.pdf     [Run "cv"]',
                 '  -rwxr-xr-x  contact.lnk            [Run "contact"]',
                 '  -rwxr-xr-x  games/snake.rom        [Run "play snake"]',
                 '  -rwxr-xr-x  games/flappy_dragon.rom[Run "play flappy"]',
@@ -283,6 +301,10 @@ export const TRANSLATIONS = {
             contactTitle: '=== OFFICIAL CONTACT & SOCIAL NETWORK LINKS ===',
             copyEmailAction: '[COPY EMAIL]',
             copiedEmailAction: '[COPIED!]',
+            cvOpening: '📄 Opening CV / Resume PDF (EN) in a new tab...',
+            cvDownloadLabel: '• DIRECT DOWNLOAD  ->',
+            cvDownloadAction: '[DOWNLOAD CV PDF]',
+            cvUnavailable: 'The CV file is not available for the active language.',
             playListLines: [
                 'AVAILABLE ARCADE CARTRIDGES:',
                 '  • play snake   -> Classic Snake in CRT phosphor.',

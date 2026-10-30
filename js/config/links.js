@@ -21,6 +21,20 @@ export const CONTACT_LINKS = {
         twitter: ''
     },
 
-    // Ruta o URL para descargar tu CV (dejar en '' mientras no esté disponible)
-    cv: ''
+    // Rutas locales por idioma para abrir o descargar tu CV en PDF (dejar en '' para ocultar)
+    cv: {
+        es: './assets/docs/CV-Felipe-Druk-ES.pdf',
+        en: './assets/docs/CV-Felipe-Druk-EN.pdf'
+    }
 };
+
+export function getLocalizedCvPath(language) {
+    const cvConfig = CONTACT_LINKS.cv;
+    if (!cvConfig) return '';
+    if (typeof cvConfig === 'string') return cvConfig.trim();
+    if (typeof cvConfig === 'object') {
+        const localizedPath = cvConfig[language];
+        return typeof localizedPath === 'string' ? localizedPath.trim() : '';
+    }
+    return '';
+}

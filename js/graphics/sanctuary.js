@@ -85,7 +85,7 @@ function activateConstellation(constellation) {
     playSound('constellation');
     spawnConstellationStarfall(constellation);
 
-    if (constellation.type === 'social') {
+    if (constellation.type === 'social' || constellation.type === 'cv') {
         window.open(constellation.targetValue, '_blank', 'noopener,noreferrer');
     } else if (constellation.type === 'email') {
         copyTextToClipboard(constellation.targetValue);
