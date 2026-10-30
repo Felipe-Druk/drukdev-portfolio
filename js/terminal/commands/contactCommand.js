@@ -3,9 +3,13 @@
  **************************************************************/
 
 import { CONTACT_LINKS } from '../../config/links.js';
-import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import { playSound } from '../../audio/soundEngine.js';
-import { getOutputContainer, appendLine, scrollToBottom } from '../terminalDom.js';
+import {
+    getActiveTerminalTexts,
+    getOutputContainer,
+    appendLine,
+    scrollToBottom
+} from '../terminalDom.js';
 
 let copyEmailCallback = null;
 
@@ -48,9 +52,9 @@ function createEmailRow(emailAddress, terminalTexts) {
         if (typeof copyEmailCallback === 'function') {
             copyEmailCallback();
         }
-        copyButton.textContent = TRANSLATIONS[getCurrentLanguage()].terminal.copiedEmailAction;
+        copyButton.textContent = getActiveTerminalTexts().copiedEmailAction;
         setTimeout(() => {
-            copyButton.textContent = TRANSLATIONS[getCurrentLanguage()].terminal.copyEmailAction;
+            copyButton.textContent = getActiveTerminalTexts().copyEmailAction;
         }, 2000);
     });
 
@@ -64,7 +68,7 @@ export function runContactCommand() {
     if (!output) return;
 
     playSound('coin');
-    const terminalTexts = TRANSLATIONS[getCurrentLanguage()].terminal;
+    const terminalTexts = getActiveTerminalTexts();
     appendLine(terminalTexts.contactTitle, 'font-bold mt-1');
 
     Object.entries(CONTACT_LINKS.socials || {}).forEach(([networkName, socialUrl]) => {

@@ -2,8 +2,20 @@
  * DRUKSYSTEM OS — DOM HELPERS & CRT VIEW CONTROLLER
  **************************************************************/
 
+import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { stopSnakeGame } from '../game/snakeGame.js';
 import { stopFlappyDragonGame } from '../game/flappyDragon.js';
+
+const TERMINAL_VIEW_IDS = {
+    cli: 'terminalCliView',
+    snake: 'terminalSnakeView',
+    flappy: 'terminalFlappyView',
+    slasher: 'terminalSlasherView'
+};
+
+export function getActiveTerminalTexts() {
+    return TRANSLATIONS[getCurrentLanguage()].terminal;
+}
 
 export function getModalElement() {
     return document.getElementById('drukSystemModal');
@@ -47,15 +59,12 @@ export function appendBlockLines(lines, className = '') {
 }
 
 export function switchTerminalSubView(viewName) {
-    const cliView = document.getElementById('terminalCliView');
-    const snakeView = document.getElementById('terminalSnakeView');
-    const flappyView = document.getElementById('terminalFlappyView');
-    const slasherView = document.getElementById('terminalSlasherView');
-
-    if (cliView) cliView.classList.toggle('hidden', viewName !== 'cli');
-    if (snakeView) snakeView.classList.toggle('hidden', viewName !== 'snake');
-    if (flappyView) flappyView.classList.toggle('hidden', viewName !== 'flappy');
-    if (slasherView) slasherView.classList.toggle('hidden', viewName !== 'slasher');
+    Object.entries(TERMINAL_VIEW_IDS).forEach(([key, elementId]) => {
+        const viewElement = document.getElementById(elementId);
+        if (viewElement) {
+            viewElement.classList.toggle('hidden', key !== viewName);
+        }
+    });
 
     if (viewName !== 'snake') {
         stopSnakeGame();

@@ -2,11 +2,10 @@
  * DRUKSYSTEM OS — CRT APPEARANCE COMMANDS (color, font)
  **************************************************************/
 
-import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import { playSound } from '../../audio/soundEngine.js';
 import { drawSnakeFrame } from '../../game/snakeGame.js';
 import { drawFlappyFrame } from '../../game/flappyDragon.js';
-import { getModalElement, appendLine } from '../terminalDom.js';
+import { getActiveTerminalTexts, getModalElement, appendLine } from '../terminalDom.js';
 
 const COLOR_MODES = ['matrix', 'amber', 'druk', 'cyan'];
 const FONT_MODES = ['ibm', 'vt323', 'gothic'];
@@ -15,6 +14,14 @@ const TERM_FONT_STORAGE_KEY = 'druk_term_font';
 
 let currentColorMode = localStorage.getItem(TERM_COLOR_STORAGE_KEY) || 'matrix';
 let currentFontMode = localStorage.getItem(TERM_FONT_STORAGE_KEY) || 'ibm';
+
+function resolveNextCycleOption(optionsList, currentOption, requestedOption) {
+    if (optionsList.includes(requestedOption)) {
+        return requestedOption;
+    }
+    const nextIndex = (optionsList.indexOf(currentOption) + 1) % optionsList.length;
+    return optionsList[nextIndex];
+}
 
 export function setTerminalColor(mode) {
     const normalizedMode = COLOR_MODES.includes(mode) ? mode : 'matrix';
@@ -48,23 +55,15 @@ export function initTerminalAppearance() {
 }
 
 export function runColorCommand(commandArgument) {
-    const nextColor = COLOR_MODES.includes(commandArgument)
-        ? commandArgument
-        : COLOR_MODES[(COLOR_MODES.indexOf(currentColorMode) + 1) % COLOR_MODES.length];
-
+    const nextColor = resolveNextCycleOption(COLOR_MODES, currentColorMode, commandArgument);
     setTerminalColor(nextColor);
     playSound('coin');
-    const terminalTexts = TRANSLATIONS[getCurrentLanguage()].terminal;
-    appendLine(terminalTexts.colorUpdated(nextColor));
+    appendLine(getActiveTerminalTexts().colorUpdated(nextColor));
 }
 
 export function runFontCommand(commandArgument) {
-    const nextFont = FONT_MODES.includes(commandArgument)
-        ? commandArgument
-        : FONT_MODES[(FONT_MODES.indexOf(currentFontMode) + 1) % FONT_MODES.length];
-
+    const nextFont = resolveNextCycleOption(FONT_MODES, currentFontMode, commandArgument);
     setTerminalFont(nextFont);
     playSound('coin');
-    const terminalTexts = TRANSLATIONS[getCurrentLanguage()].terminal;
-    appendLine(terminalTexts.fontUpdated(nextFont));
+    appendLine(getActiveTerminalTexts().fontUpdated(nextFont));
 }

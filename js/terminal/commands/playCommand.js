@@ -2,12 +2,12 @@
  * DRUKSYSTEM OS — ARCADE CARTRIDGE LAUNCHER COMMAND (play)
  **************************************************************/
 
-import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import { playSound } from '../../audio/soundEngine.js';
 import { startSnakeGame } from '../../game/snakeGame.js';
 import { startFlappyDragonGame } from '../../game/flappyDragon.js';
 import { startGame as startBugSlasherGame } from '../../game/bugSlasher.js';
 import {
+    getActiveTerminalTexts,
     getOutputContainer,
     appendBlockLines,
     scrollToBottom,
@@ -28,8 +28,7 @@ function renderPlayMenuBlock(onExecuteCommand) {
     const output = getOutputContainer();
     if (!output) return;
 
-    const terminalTexts = TRANSLATIONS[getCurrentLanguage()].terminal;
-    appendBlockLines(terminalTexts.playListLines);
+    appendBlockLines(getActiveTerminalTexts().playListLines);
 
     const actionsRow = document.createElement('div');
     actionsRow.className = 'flex flex-wrap gap-2 pl-2 my-1';

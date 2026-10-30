@@ -3,9 +3,14 @@
  **************************************************************/
 
 import { getLocalizedCvPath } from '../../config/links.js';
-import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
+import { getCurrentLanguage } from '../../config/i18n.js';
 import { playSound } from '../../audio/soundEngine.js';
-import { getOutputContainer, appendLine, scrollToBottom } from '../terminalDom.js';
+import {
+    getActiveTerminalTexts,
+    getOutputContainer,
+    appendLine,
+    scrollToBottom
+} from '../terminalDom.js';
 
 function createCvDownloadRow(cvPath, terminalTexts) {
     const fileName = cvPath.split('/').pop() || 'CV-Felipe-Druk.pdf';
@@ -31,9 +36,8 @@ export function runCvCommand() {
     const output = getOutputContainer();
     if (!output) return;
 
-    const activeLanguage = getCurrentLanguage();
-    const terminalTexts = TRANSLATIONS[activeLanguage].terminal;
-    const cvPath = getLocalizedCvPath(activeLanguage);
+    const terminalTexts = getActiveTerminalTexts();
+    const cvPath = getLocalizedCvPath(getCurrentLanguage());
 
     if (!cvPath) {
         playSound('hit');
