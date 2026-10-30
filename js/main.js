@@ -16,6 +16,7 @@ import {
     resizeSanctuary,
     updateAndDrawSanctuary
 } from './graphics/sanctuary.js';
+import { copyTextToClipboard } from './graphics/sanctuary/canvasUtils.js';
 import {
     initDrukSystem,
     openDrukSystem,
@@ -121,26 +122,11 @@ export function showToast(icon, title, message) {
     }
 }
 
-function fallbackCopyTextToClipboard(text) {
-    const clipboardTextarea = document.createElement('textarea');
-    clipboardTextarea.value = text;
-    document.body.appendChild(clipboardTextarea);
-    clipboardTextarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(clipboardTextarea);
-}
-
 export function copyEmail() {
     const emailAddress = getNormalizedContactEmail();
     if (!emailAddress) return;
 
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(emailAddress).catch(() => {
-            fallbackCopyTextToClipboard(emailAddress);
-        });
-    } else {
-        fallbackCopyTextToClipboard(emailAddress);
-    }
+    copyTextToClipboard(emailAddress);
 
     const activeLangTexts = TRANSLATIONS[getCurrentLanguage()];
     playSound('coin');
