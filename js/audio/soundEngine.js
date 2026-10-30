@@ -14,6 +14,14 @@ const SOUND_PRESETS = {
         gainVolume: 0.08,
         duration: 0.14
     },
+    flap: {
+        waveType: 'triangle',
+        startFrequency: 240,
+        endFrequency: 460,
+        rampType: 'exponential',
+        gainVolume: 0.08,
+        duration: 0.09
+    },
     attack: {
         waveType: 'sawtooth',
         startFrequency: 480,

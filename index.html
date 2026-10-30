@@ -127,7 +127,7 @@
                             spellcheck="false"
                             class="term-input flex-1 text-xs sm:text-sm"
                             data-i18n-placeholder="terminal.inputPlaceholder"
-                            placeholder="Escribe un comando (help, ls, contacto, play snake, color, font)..."
+                            placeholder="Escribe un comando (help, ls, contacto, play snake, play flappy, color, font)..."
                         >
                     </form>
                 </div>
@@ -162,7 +162,35 @@
                     </div>
                 </div>
 
-                <!-- 3. Bug Slasher Cartridge View (play slasher) -->
+                <!-- 3. Flappy Dragon Game View (play flappy / play dragon) -->
+                <div id="terminalFlappyView" class="hidden relative z-10 flex flex-col items-center justify-between h-full">
+                    <div class="w-full flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--term-dim)] text-xs">
+                        <span class="font-bold" data-i18n="flappy.title">FLAPPY DRAGON // PILARES DE LA DUNGEON</span>
+                        <div class="flex items-center gap-4">
+                            <span>SCORE: <b id="flappyScoreVal">0</b></span>
+                            <span>HI-SCORE: <b id="flappyHiScoreVal">0</b></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="flappyRestartBtn" type="button" class="term-cmd-chip" data-i18n="flappy.restartBtn">[REINICIAR]</button>
+                            <button id="flappyExitBtn" type="button" class="term-cmd-chip" data-i18n="flappy.exitBtn">[SALIR / ESC]</button>
+                        </div>
+                    </div>
+
+                    <div class="my-auto flex flex-col items-center">
+                        <canvas id="flappyCanvas" class="block cursor-pointer"></canvas>
+                        <p id="flappyStatusMsg" class="text-[11px] mt-2 text-center opacity-90" data-i18n="flappy.controlsHint">
+                            [ESPACIO / CLICK] Aletear • [ESC] Salir
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-center w-full sm:hidden">
+                        <button id="flappyFlapBtn" type="button" class="term-cmd-chip px-6 py-1.5 font-bold" data-i18n="flappy.flapBtn">
+                            🐉 ALETEAR (ESPACIO / CLICK)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Bug Slasher Cartridge View (play slasher) -->
                 <div id="terminalSlasherView" class="hidden relative z-10 flex flex-col justify-between h-full">
                     <div class="flex items-center justify-between pb-2 border-b border-[var(--term-dim)] text-xs">
                         <span class="font-bold" id="gameTitle">DRUK'S BUG SLASHER</span>
@@ -205,6 +233,7 @@
                     <button type="button" data-term-cmd="ls" class="term-cmd-chip" data-i18n="terminal.btnLs">[ls]</button>
                     <button type="button" data-term-cmd="contacto" class="term-cmd-chip" data-i18n="terminal.btnContact">[contacto]</button>
                     <button type="button" data-term-cmd="play snake" class="term-cmd-chip" data-i18n="terminal.btnSnake">[play snake]</button>
+                    <button type="button" data-term-cmd="play flappy" class="term-cmd-chip" data-i18n="terminal.btnFlappy">[play flappy]</button>
                     <button type="button" data-term-cmd="play slasher" class="term-cmd-chip" data-i18n="terminal.btnSlasher">[play slasher]</button>
                     <button type="button" data-term-cmd="color" class="term-cmd-chip" data-i18n="terminal.btnColor">[color]</button>
                     <button type="button" data-term-cmd="font" class="term-cmd-chip" data-i18n="terminal.btnFont">[font]</button>

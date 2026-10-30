@@ -49,11 +49,12 @@ export const TRANSLATIONS = {
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO',
-            inputPlaceholder: 'Escribe un comando (help, ls, contacto, play snake, color, font)...',
+            inputPlaceholder: 'Escribe un comando (help, ls, contacto, play snake, play flappy, color, font)...',
             btnHelp: '[help]',
             btnLs: '[ls]',
             btnContact: '[contacto]',
             btnSnake: '[play snake]',
+            btnFlappy: '[play flappy]',
             btnSlasher: '[play slasher]',
             btnColor: '[color]',
             btnFont: '[font]',
@@ -71,7 +72,8 @@ export const TRANSLATIONS = {
                 '  ls                         Lista archivos y módulos del sistema',
                 '  contacto / links           Muestra redes sociales y email directo',
                 '  play                       Lista los minijuegos arcade instalados',
-                '  play snake                 Ejecuta SNAKE en fósforo CRT',
+                '  play snake                 Clásico Snake en fósforo CRT',
+                '  play flappy / play dragon  Flappy Dragon: Esquiva los pilares de la mazmorra',
                 '  play slasher               Ejecuta DRUK\'S BUG SLASHER',
                 '  color <matrix|amber|druk|cyan> Cambia el color del fósforo',
                 '  font <ibm|vt323|gothic>    Cambia la tipografía del monitor',
@@ -84,6 +86,7 @@ export const TRANSLATIONS = {
                 '  -rw-r--r--  readme_arquitectura.md [ES6 Modules + Canvas 2D]',
                 '  -rwxr-xr-x  contacto.lnk           [Ejecuta "contacto"]',
                 '  -rwxr-xr-x  games/snake.rom        [Ejecuta "play snake"]',
+                '  -rwxr-xr-x  games/flappy_dragon.rom[Ejecuta "play flappy"]',
                 '  -rwxr-xr-x  games/bug_slasher.rom  [Ejecuta "play slasher"]'
             ],
             contactTitle: '=== ENLACES DE CONTACTO & REDES OFICIALES ===',
@@ -91,8 +94,9 @@ export const TRANSLATIONS = {
             copiedEmailAction: '[¡COPIADO!]',
             playListLines: [
                 'CARTUCHOS ARCADE DISPONIBLES:',
-                '  1. play snake    -> Snake clásico en fósforo Matrix',
-                '  2. play slasher  -> Druk\'s Bug Slasher (Runner 2D)'
+                '  • play snake   -> Clásico Snake en fósforo CRT.',
+                '  • play flappy  -> Flappy Dragon: Esquiva los pilares de la mazmorra.',
+                '  • play slasher -> Druk\'s Bug Slasher (Runner 2D).'
             ],
             colorUpdated: (mode) => `Fósforo CRT actualizado a: ${mode.toUpperCase()} (Opciones: matrix, amber, druk, cyan)`,
             fontUpdated: (font) => `Tipografía CRT actualizada a: ${font.toUpperCase()} (Opciones: ibm, vt323, gothic)`,
@@ -104,6 +108,14 @@ export const TRANSLATIONS = {
             gameOver: '¡COLISIÓN DETECTADA! Presiona [ESPACIO] o [REINICIAR]',
             exitBtn: '[Q / ESC] VOLVER AL PROMPT',
             restartBtn: '[REINICIAR]'
+        },
+        flappy: {
+            title: 'FLAPPY DRAGON // PILARES DE LA DUNGEON',
+            controlsHint: '[ESPACIO / CLICK] Aletear • [ESC] Salir',
+            gameOver: (score, hiScore) => `¡IMPACTO CONTRA PILAR! SCORE: ${score} (HI: ${hiScore}) — [ESPACIO / CLICK] Reiniciar`,
+            exitBtn: '[SALIR / ESC]',
+            restartBtn: '[REINICIAR]',
+            flapBtn: '🐉 ALETEAR (ESPACIO / CLICK)'
         },
         hero: {
             copyEmailBtn: 'Copiar Email',
@@ -160,11 +172,12 @@ export const TRANSLATIONS = {
         },
         terminal: {
             windowTitle: 'DRUKSYSTEM OS v2.4 // PHOSPHOR MONITOR',
-            inputPlaceholder: 'Type a command (help, ls, contacto, play snake, color, font)...',
+            inputPlaceholder: 'Type a command (help, ls, contact, play snake, play flappy, color, font)...',
             btnHelp: '[help]',
             btnLs: '[ls]',
             btnContact: '[contact]',
             btnSnake: '[play snake]',
+            btnFlappy: '[play flappy]',
             btnSlasher: '[play slasher]',
             btnColor: '[color]',
             btnFont: '[font]',
@@ -182,7 +195,8 @@ export const TRANSLATIONS = {
                 '  ls                         List virtual files and system modules',
                 '  contact / contacto / links Show social links and direct email',
                 '  play                       List installed arcade mini-games',
-                '  play snake                 Launch SNAKE in CRT phosphor mode',
+                '  play snake                 Classic Snake in CRT phosphor',
+                '  play flappy / play dragon  Flappy Dragon: Dodge the dungeon pillars',
                 '  play slasher               Launch DRUK\'S BUG SLASHER',
                 '  color <matrix|amber|druk|cyan> Change CRT phosphor color',
                 '  font <ibm|vt323|gothic>    Change terminal font family',
@@ -195,6 +209,7 @@ export const TRANSLATIONS = {
                 '  -rw-r--r--  architecture_readme.md [ES6 Modules + 2D Canvas]',
                 '  -rwxr-xr-x  contact.lnk            [Run "contact"]',
                 '  -rwxr-xr-x  games/snake.rom        [Run "play snake"]',
+                '  -rwxr-xr-x  games/flappy_dragon.rom[Run "play flappy"]',
                 '  -rwxr-xr-x  games/bug_slasher.rom  [Run "play slasher"]'
             ],
             contactTitle: '=== OFFICIAL CONTACT & SOCIAL NETWORK LINKS ===',
@@ -202,8 +217,9 @@ export const TRANSLATIONS = {
             copiedEmailAction: '[COPIED!]',
             playListLines: [
                 'AVAILABLE ARCADE CARTRIDGES:',
-                '  1. play snake    -> Classic Snake in Matrix phosphor',
-                '  2. play slasher  -> Druk\'s Bug Slasher (2D Runner)'
+                '  • play snake   -> Classic Snake in CRT phosphor.',
+                '  • play flappy  -> Flappy Dragon: Dodge the dungeon pillars.',
+                '  • play slasher -> Druk\'s Bug Slasher (2D Runner).'
             ],
             colorUpdated: (mode) => `CRT phosphor updated to: ${mode.toUpperCase()} (Options: matrix, amber, druk, cyan)`,
             fontUpdated: (font) => `CRT font updated to: ${font.toUpperCase()} (Options: ibm, vt323, gothic)`,
@@ -215,6 +231,14 @@ export const TRANSLATIONS = {
             gameOver: 'COLLISION DETECTED! Press [SPACE] or [RESTART]',
             exitBtn: '[Q / ESC] BACK TO PROMPT',
             restartBtn: '[RESTART]'
+        },
+        flappy: {
+            title: 'FLAPPY DRAGON // DUNGEON PILLARS',
+            controlsHint: '[SPACE / CLICK] Flap • [ESC] Exit',
+            gameOver: (score, hiScore) => `PILLAR COLLISION! SCORE: ${score} (HI: ${hiScore}) — [SPACE / CLICK] Restart`,
+            exitBtn: '[EXIT / ESC]',
+            restartBtn: '[RESTART]',
+            flapBtn: '🐉 FLAP (SPACE / CLICK)'
         },
         hero: {
             copyEmailBtn: 'Copy Email',
@@ -245,7 +269,7 @@ export const TRANSLATIONS = {
             cyber: {
                 themeSubtitle: 'Synthwave Grid & Full-Stack Architecture',
                 heroTitle: 'INITIALIZING DRUK.DEV SYSTEM',
-                progressTask: '⚡ LOADING NEON SHADERS & MINI-GAMES...',
+                progressTask: '⚡ LOADING NEON SHADERS & MINIJUEGOS...',
                 gameTitle: 'CYBER BUG RUNNER 2099',
                 attackBtnLabel: 'LASER PULSE (K / CLICK)'
             }

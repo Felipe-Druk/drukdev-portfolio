@@ -11,6 +11,12 @@ import {
     drawSnakeFrame,
     initSnakeControls
 } from '../game/snakeGame.js';
+import {
+    startFlappyDragonGame,
+    stopFlappyDragonGame,
+    drawFlappyFrame,
+    initFlappyDragonControls
+} from '../game/flappyDragon.js';
 import { startGame as startBugSlasherGame } from '../game/bugSlasher.js';
 
 const COLOR_MODES = ['matrix', 'amber', 'druk', 'cyan'];
@@ -68,6 +74,7 @@ export function setTerminalColor(mode) {
         modalEl.setAttribute('data-terminal-color', normalized);
     }
     drawSnakeFrame();
+    drawFlappyFrame();
     return normalized;
 }
 
@@ -86,14 +93,19 @@ export function setTerminalFont(font) {
 function switchTerminalSubView(viewName) {
     const cliView = document.getElementById('terminalCliView');
     const snakeView = document.getElementById('terminalSnakeView');
+    const flappyView = document.getElementById('terminalFlappyView');
     const slasherView = document.getElementById('terminalSlasherView');
 
     if (cliView) cliView.classList.toggle('hidden', viewName !== 'cli');
     if (snakeView) snakeView.classList.toggle('hidden', viewName !== 'snake');
+    if (flappyView) flappyView.classList.toggle('hidden', viewName !== 'flappy');
     if (slasherView) slasherView.classList.toggle('hidden', viewName !== 'slasher');
 
     if (viewName !== 'snake') {
         stopSnakeGame();
+    }
+    if (viewName !== 'flappy') {
+        stopFlappyDragonGame();
     }
     if (viewName === 'cli') {
         const inputEl = getTerminalInput();
@@ -121,6 +133,7 @@ export function openDrukSystem() {
 
 export function closeDrukSystem() {
     stopSnakeGame();
+    stopFlappyDragonGame();
     const modalEl = getModalElement();
     if (modalEl) {
         modalEl.classList.add('hidden');
@@ -135,7 +148,6 @@ function renderContactBlock() {
     const termTexts = TRANSLATIONS[getCurrentLanguage()].terminal;
     appendLine(termTexts.contactTitle, 'font-bold mt-1');
 
-    // Render active social links from CONTACT_LINKS.socials
     Object.entries(CONTACT_LINKS.socials || {}).forEach(([network, url]) => {
         if (!url || url.trim() === '') return;
 
@@ -158,7 +170,6 @@ function renderContactBlock() {
         output.appendChild(row);
     });
 
-    // Render Email with inline Copy button
     if (CONTACT_LINKS.email && CONTACT_LINKS.email.trim() !== '') {
         const emailRow = document.createElement('div');
         emailRow.className = 'leading-relaxed flex flex-wrap items-center gap-2 pl-2 mt-1';
@@ -188,6 +199,15 @@ function renderContactBlock() {
     scrollToBottom();
 }
 
+function createPlayActionChip(label, command) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'term-cmd-chip';
+    button.textContent = label;
+    button.addEventListener('click', () => executeTerminalCommand(command));
+    return button;
+}
+
 function renderPlayMenuBlock() {
     const output = getOutputContainer();
     if (!output) return;
@@ -197,21 +217,10 @@ function renderPlayMenuBlock() {
 
     const actionsRow = document.createElement('div');
     actionsRow.className = 'flex flex-wrap gap-2 pl-2 my-1';
+    actionsRow.appendChild(createPlayActionChip('▶ [play snake]', 'play snake'));
+    actionsRow.appendChild(createPlayActionChip('▶ [play flappy]', 'play flappy'));
+    actionsRow.appendChild(createPlayActionChip('▶ [play slasher]', 'play slasher'));
 
-    const snakeBtn = document.createElement('button');
-    snakeBtn.type = 'button';
-    snakeBtn.className = 'term-cmd-chip';
-    snakeBtn.textContent = '▶ [play snake]';
-    snakeBtn.addEventListener('click', () => executeTerminalCommand('play snake'));
-
-    const slasherBtn = document.createElement('button');
-    slasherBtn.type = 'button';
-    slasherBtn.className = 'term-cmd-chip';
-    slasherBtn.textContent = '▶ [play slasher]';
-    slasherBtn.addEventListener('click', () => executeTerminalCommand('play slasher'));
-
-    actionsRow.appendChild(snakeBtn);
-    actionsRow.appendChild(slasherBtn);
     output.appendChild(actionsRow);
     scrollToBottom();
 }
@@ -285,6 +294,12 @@ export function executeTerminalCommand(rawCommand) {
             startSnakeGame(returnToTerminalPrompt);
             return;
         }
+        if (arg === 'flappy' || arg === 'dragon') {
+            playSound('coin');
+            switchTerminalSubView('flappy');
+            startFlappyDragonGame(returnToTerminalPrompt);
+            return;
+        }
         if (arg === 'slasher') {
             playSound('coin');
             switchTerminalSubView('slasher');
@@ -298,6 +313,11 @@ export function executeTerminalCommand(rawCommand) {
 
     if (cmd === 'snake') {
         executeTerminalCommand('play snake');
+        return;
+    }
+
+    if (cmd === 'flappy' || cmd === 'dragon') {
+        executeTerminalCommand('play flappy');
         return;
     }
 
@@ -327,6 +347,7 @@ export function initDrukSystem(onCopyEmail) {
     setTerminalFont(currentFontMode);
     renderBootBanner();
     initSnakeControls();
+    initFlappyDragonControls();
 
     const formEl = document.getElementById('terminalCommandForm');
     const inputEl = getTerminalInput();
@@ -361,7 +382,6 @@ export function initDrukSystem(onCopyEmail) {
         });
     }
 
-    // Bind clickable command chips ([help], [ls], [contacto], [play snake], [color], [font], [cerrar])
     document.querySelectorAll('[data-term-cmd]').forEach((button) => {
         button.addEventListener('click', () => {
             const cmd = button.getAttribute('data-term-cmd');
