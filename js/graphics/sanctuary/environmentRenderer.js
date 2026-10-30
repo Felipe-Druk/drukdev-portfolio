@@ -5,6 +5,12 @@
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import { drawRect, drawFloatingPixelLabel } from './canvasUtils.js';
 import { updateAndDrawPondRipples } from './particles.js';
+import {
+    getActiveBiomePalette,
+    shadeHexColorByDepth,
+    drawProceduralGrass,
+    drawGreenMage
+} from './floraSystem.js';
 
 export function drawNightSkyAndMoon(context, width, height, moonZone, moonPhase) {
     const skyGradient = context.createLinearGradient(0, 0, 0, height * 0.7);
@@ -37,17 +43,35 @@ export function drawNightSkyAndMoon(context, width, height, moonZone, moonPhase)
     }
 }
 
-export function drawSanctuaryMeadowAndLagoon(context, width, height, zones, sanctuaryTick) {
+export function drawSanctuaryMeadowAndLagoon(
+    context,
+    width,
+    height,
+    zones,
+    pointerState,
+    sanctuaryTick
+) {
     const { horizonY, pond } = zones;
+    const biomePalette = getActiveBiomePalette();
 
-    // Terraced pixel-art meadow grass & dark earth
-    drawRect(context, 0, horizonY, width, height - horizonY, '#14241D');
-    drawRect(context, 0, horizonY, width, 6, '#1E3A2F');
-    drawRect(context, 0, horizonY + 6, width, 4, '#2E5A44');
-    drawRect(context, 0, horizonY + 96, width, height - (horizonY + 96), '#0D1713');
+    // Terraced pixel-art meadow soil & base biome layers with progressive depth darkening
+    const depthBands = 14;
+    const meadowTotalHeight = Math.max(1, height - horizonY);
+    const bandHeight = Math.ceil(meadowTotalHeight / depthBands);
+    for (let bandIndex = 0; bandIndex < depthBands; bandIndex++) {
+        const bandY = horizonY + bandIndex * bandHeight;
+        const depthRatio = bandIndex / Math.max(1, depthBands - 1);
+        const shadedSoil = shadeHexColorByDepth(biomePalette.soilMid, depthRatio);
+        drawRect(context, 0, bandY, width, bandHeight + 1, shadedSoil);
+    }
+    drawRect(context, 0, horizonY, width, 6, biomePalette.base);
+    drawRect(context, 0, horizonY + 6, width, 4, biomePalette.mid);
+
+    // Procedural pixel-art grass & swaying blades across the meadow
+    drawProceduralGrass(context, width, height, zones, pointerState, sanctuaryTick);
 
     // Lagoon basin with stepped pixel banks
-    drawRect(context, pond.x - 8, pond.y - 4, pond.w + 16, pond.h + 8, '#0D1713');
+    drawRect(context, pond.x - 8, pond.y - 4, pond.w + 16, pond.h + 8, biomePalette.soilDark);
     drawRect(context, pond.x - 4, pond.y - 2, pond.w + 8, pond.h + 4, '#1A3347');
     drawRect(context, pond.x, pond.y, pond.w, pond.h, '#0E2233');
     drawRect(context, pond.x + 12, pond.y + 8, pond.w - 24, pond.h - 16, '#132D42');
@@ -57,7 +81,7 @@ export function drawSanctuaryMeadowAndLagoon(context, width, height, zones, sanc
     drawRect(context, pond.x + 36 + shimmerOffset, pond.y + 16, 44, 3, '#2C5E7A');
     drawRect(context, pond.x + pond.w - 110 - shimmerOffset, pond.y + 42, 52, 3, '#2C5E7A');
 
-    // Pixel Lilypads & Lotus Blossoms
+    // Pixel Lilypads & Lotus Blossoms harmonized with active biome
     const lilypads = [
         { x: pond.x + 42, y: pond.y + 24, hasFlower: true },
         { x: pond.x + Math.floor(pond.w * 0.52), y: pond.y + 40, hasFlower: false },
@@ -66,11 +90,11 @@ export function drawSanctuaryMeadowAndLagoon(context, width, height, zones, sanc
 
     lilypads.forEach((lilypad, padIndex) => {
         const bobOffsetX = Math.floor(Math.sin(sanctuaryTick * 0.04 + padIndex) * 2);
-        drawRect(context, lilypad.x + bobOffsetX, lilypad.y, 20, 10, '#1E3A2F');
-        drawRect(context, lilypad.x + 2 + bobOffsetX, lilypad.y + 2, 16, 6, '#2E5A44');
+        drawRect(context, lilypad.x + bobOffsetX, lilypad.y, 20, 10, biomePalette.base);
+        drawRect(context, lilypad.x + 2 + bobOffsetX, lilypad.y + 2, 16, 6, biomePalette.mid);
         if (lilypad.hasFlower) {
             drawRect(context, lilypad.x + 6 + bobOffsetX, lilypad.y - 4, 8, 6, '#B92B92');
-            drawRect(context, lilypad.x + 8 + bobOffsetX, lilypad.y - 6, 4, 4, '#D4957A');
+            drawRect(context, lilypad.x + 8 + bobOffsetX, lilypad.y - 6, 4, 4, biomePalette.accent);
         }
     });
 
@@ -78,6 +102,7 @@ export function drawSanctuaryMeadowAndLagoon(context, width, height, zones, sanc
 }
 
 export function drawAncientTree(context, treeZone, isHovered, sanctuaryTick, treeRustleTimer) {
+    const biomePalette = getActiveBiomePalette();
     const rustleShake = treeRustleTimer > 0
         ? Math.floor(Math.sin(sanctuaryTick * 1.4) * 4)
         : 0;
@@ -93,26 +118,26 @@ export function drawAncientTree(context, treeZone, isHovered, sanctuaryTick, tre
 
     // Glowing rune hollow in trunk
     drawRect(context, centerX - 4, baseY - 52, 8, 14, '#B92B92');
-    drawRect(context, centerX - 2, baseY - 48, 4, 8, '#D4957A');
+    drawRect(context, centerX - 2, baseY - 48, 4, 8, biomePalette.accent);
 
-    // Layered Pixel Canopy
-    drawRect(context, centerX - 84 + gentleSway, baseY - 154, 168, 64, '#13261E');
-    drawRect(context, centerX - 72 + gentleSway, baseY - 178, 144, 72, '#1E3A2F');
-    drawRect(context, centerX - 54 + gentleSway, baseY - 196, 108, 64, '#2E5A44');
-    drawRect(context, centerX - 34 + gentleSway, baseY - 206, 68, 36, '#3E7A5C');
+    // Layered Pixel Canopy harmonized with active biome
+    drawRect(context, centerX - 84 + gentleSway, baseY - 154, 168, 64, biomePalette.soilMid);
+    drawRect(context, centerX - 72 + gentleSway, baseY - 178, 144, 72, biomePalette.base);
+    drawRect(context, centerX - 54 + gentleSway, baseY - 196, 108, 64, biomePalette.mid);
+    drawRect(context, centerX - 34 + gentleSway, baseY - 206, 68, 36, biomePalette.tip);
 
     // Glowing Blossom Spores in Canopy
     const sporeOffsets = [
         [-52, -138], [-24, -168], [18, -176], [48, -142], [-10, -130], [30, -152]
     ];
     sporeOffsets.forEach(([offsetX, offsetY], sporeIndex) => {
-        const color = sporeIndex % 2 === 0 ? '#B92B92' : '#D4957A';
+        const color = sporeIndex % 2 === 0 ? '#B92B92' : biomePalette.accent;
         drawRect(context, centerX + offsetX + gentleSway, baseY + offsetY, 6, 6, color);
     });
 
     if (isHovered) {
         const label = TRANSLATIONS[getCurrentLanguage()].sanctuary.treeHover;
-        drawFloatingPixelLabel(context, centerX, baseY - 220, label, '#D4957A');
+        drawFloatingPixelLabel(context, centerX, baseY - 220, label, biomePalette.accent);
     }
 }
 
@@ -186,11 +211,12 @@ export function drawSealedDungeonPortal(
 export function drawDrukSystemRelicConsole(context, consoleZone, isHovered, sanctuaryTick) {
     const centerX = consoleZone.baseX;
     const centerY = consoleZone.baseY;
+    const biomePalette = getActiveBiomePalette();
 
     // Mossy stone pedestal & power cables on the grass
     drawRect(context, centerX - 28, centerY + 28, 56, 12, '#2B3138');
     drawRect(context, centerX - 24, centerY + 24, 48, 6, '#56616E');
-    drawRect(context, centerX - 38, centerY + 34, 16, 4, '#1E3A2F');
+    drawRect(context, centerX - 38, centerY + 34, 16, 4, biomePalette.base);
 
     // Forged Steel CRT Casing (#56616E & #231C1A)
     drawRect(context, centerX - 22, centerY - 8, 44, 34, '#0D0D0F');
@@ -223,3 +249,5 @@ export function drawDrukSystemRelicConsole(context, consoleZone, isHovered, sanc
         drawFloatingPixelLabel(context, centerX, centerY - 22 + floatOffset, '▼ DRUKSYSTEM OS', '#00FF41');
     }
 }
+
+export { drawGreenMage };

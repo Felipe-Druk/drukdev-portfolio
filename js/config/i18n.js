@@ -39,13 +39,14 @@ export const TRANSLATIONS = {
             subtitle: 'Santuario Pixel-Art & Consola Interactiva'
         },
         sanctuary: {
-            hint: '✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Portal Dungeon o Consola DrukSystem',
+            hint: '✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem',
             treeHover: '[ÁRBOL ANTIGUO]',
             pondHover: '[LAGUNA DE NENÚFARES]',
             dungeonSign: 'COMING SOON',
             dungeonHover: '[ENTRADA A LA DUNGEON]',
             dungeonSealMsg: 'Sellado por magia antigua... en construcción',
             consoleHover: '[ABRIR DRUKSYSTEM OS]',
+            mageHover: '[MAGO VERDE // FLORA]',
             constellations: {
                 github: {
                     label: '[GITHUB]',
@@ -64,6 +65,20 @@ export const TRANSLATIONS = {
                     hover: '[COPIAR EMAIL]',
                     copied: '¡CORREO COPIADO!'
                 }
+            }
+        },
+        flora: {
+            panelTitle: '🌿 GRIMORIO BOTÁNICO',
+            densityLabel: 'DISPERSIÓN',
+            clumpingLabel: 'CÚMULO',
+            lengthLabel: 'LARGO',
+            biomeLabel: 'BIOMA',
+            reseedBtn: '[RE-SEMBRAR / SEED]',
+            biomes: {
+                emerald: 'ESMERALDA',
+                druk: 'DRUK',
+                autumn: 'OTOÑO',
+                matrix: 'MATRIX'
             }
         },
         terminal: {
@@ -181,13 +196,14 @@ export const TRANSLATIONS = {
             subtitle: 'Pixel-Art Sanctuary & Interactive Console'
         },
         sanctuary: {
-            hint: '✨ Interact with the Sanctuary: Constellations, Ancient Tree, Lagoon, Dungeon Gate, or DrukSystem Console',
+            hint: '✨ Interact with the Sanctuary: Constellations, Ancient Tree, Lagoon, Green Mage, Dungeon Gate, or DrukSystem Console',
             treeHover: '[ANCIENT TREE]',
             pondHover: '[LILYPAD LAGOON]',
             dungeonSign: 'COMING SOON',
             dungeonHover: '[DUNGEON ENTRANCE]',
             dungeonSealMsg: 'Sealed by ancient magic... under construction',
             consoleHover: '[OPEN DRUKSYSTEM OS]',
+            mageHover: '[GREEN MAGE // FLORA]',
             constellations: {
                 github: {
                     label: '[GITHUB]',
@@ -206,6 +222,20 @@ export const TRANSLATIONS = {
                     hover: '[COPY EMAIL]',
                     copied: 'EMAIL COPIED!'
                 }
+            }
+        },
+        flora: {
+            panelTitle: '🌿 BOTANICAL GRIMOIRE',
+            densityLabel: 'DISPERSION',
+            clumpingLabel: 'CLUMPING',
+            lengthLabel: 'LENGTH',
+            biomeLabel: 'BIOME',
+            reseedBtn: '[RESEED / SEED]',
+            biomes: {
+                emerald: 'EMERALD',
+                druk: 'DRUK',
+                autumn: 'AUTUMN',
+                matrix: 'MATRIX'
             }
         },
         terminal: {

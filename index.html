@@ -75,9 +75,124 @@
     <!-- Bottom Sanctuary Exploration Hint -->
     <footer class="fixed bottom-3 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
         <div class="bg-[#0D0D0F]/85 border-2 border-[#56616E] px-4 py-1.5 text-xs text-bronze shadow-[4px_4px_0_#0D0D0F] text-center" data-i18n="sanctuary.hint">
-            ✨ Interactúa con el Santuario: Árbol Antiguo, Laguna, Portal Dungeon o la Consola DrukSystem en el pasto
+            ✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem
         </div>
     </footer>
+
+    <!-- ===================================================================
+         BOTANICAL GRIMOIRE FLOATING PANEL (GREEN MAGE FLORA CONTROLLER)
+         =================================================================== -->
+    <aside
+        id="floraPanel"
+        data-flora-biome="emerald"
+        class="hidden flora-panel fixed z-30 w-64 p-3 text-xs"
+    >
+        <div class="flora-panel-header flex items-center justify-between pb-2 mb-2.5">
+            <span class="flora-panel-title font-gothic-pixel text-[10px] tracking-wide" data-i18n="flora.panelTitle">
+                🌿 GRIMORIO BOTÁNICO
+            </span>
+            <button
+                id="floraCloseBtn"
+                type="button"
+                class="flora-biome-btn px-2 py-0.5 font-gothic-pixel text-[9px]"
+            >
+                [X]
+            </button>
+        </div>
+
+        <div class="space-y-2.5">
+            <!-- Density Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="floraDensitySlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="flora.densityLabel">
+                        DISPERSIÓN
+                    </label>
+                    <span id="floraDensityVal" class="flora-val-badge font-bold">65%</span>
+                </div>
+                <input
+                    id="floraDensitySlider"
+                    type="range"
+                    min="10"
+                    max="100"
+                    step="5"
+                    value="65"
+                    class="flora-slider w-full"
+                >
+            </div>
+
+            <!-- Clumping Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="floraClumpingSlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="flora.clumpingLabel">
+                        CÚMULO
+                    </label>
+                    <span id="floraClumpingVal" class="flora-val-badge font-bold">60%</span>
+                </div>
+                <input
+                    id="floraClumpingSlider"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value="60"
+                    class="flora-slider w-full"
+                >
+            </div>
+
+            <!-- Grass Length Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="floraLengthSlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="flora.lengthLabel">
+                        LARGO
+                    </label>
+                    <span id="floraLengthVal" class="flora-val-badge font-bold">1.0x</span>
+                </div>
+                <input
+                    id="floraLengthSlider"
+                    type="range"
+                    min="30"
+                    max="200"
+                    step="10"
+                    value="100"
+                    class="flora-slider w-full"
+                >
+            </div>
+
+            <!-- Biome Selector -->
+            <div>
+                <span class="block font-gothic-pixel text-[9px] text-steel mb-1.5" data-i18n="flora.biomeLabel">
+                    BIOMA
+                </span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button type="button" data-flora-biome="emerald" class="flora-biome-btn active py-1 text-[10px] font-bold" data-i18n="flora.biomes.emerald">
+                        ESMERALDA
+                    </button>
+                    <button type="button" data-flora-biome="druk" class="flora-biome-btn py-1 text-[10px] font-bold" data-i18n="flora.biomes.druk">
+                        DRUK
+                    </button>
+                    <button type="button" data-flora-biome="autumn" class="flora-biome-btn py-1 text-[10px] font-bold" data-i18n="flora.biomes.autumn">
+                        OTOÑO
+                    </button>
+                    <button type="button" data-flora-biome="matrix" class="flora-biome-btn py-1 text-[10px] font-bold" data-i18n="flora.biomes.matrix">
+                        MATRIX
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reseed Action -->
+            <button
+                id="floraReseedBtn"
+                type="button"
+                class="flora-reseed-btn w-full py-2 font-gothic-pixel text-[9px] tracking-wider"
+                data-i18n="flora.reseedBtn"
+            >
+                [RE-SEMBRAR / SEED]
+            </button>
+        </div>
+
+        <!-- Pixel-Art Connector Pointer Aiming Down at the Green Mage -->
+        <div id="floraPanelArrow" class="flora-panel-arrow" aria-hidden="true"></div>
+    </aside>
 
     <!-- ===================================================================
          THE ARTIFACT: DRUKSYSTEM OS CRT MONITOR MODAL

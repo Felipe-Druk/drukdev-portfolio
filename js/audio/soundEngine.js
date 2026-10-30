@@ -112,6 +112,18 @@ const SOUND_PRESETS = {
         ],
         gainVolume: 0.08,
         duration: 0.24
+    },
+    floraSpell: {
+        waveType: 'triangle',
+        startFrequency: 523.25,
+        steps: [
+            { frequency: 659.25, timeOffset: 0.04 },
+            { frequency: 783.99, timeOffset: 0.08 },
+            { frequency: 1046.5, timeOffset: 0.13 },
+            { frequency: 1318.51, timeOffset: 0.18 }
+        ],
+        gainVolume: 0.08,
+        duration: 0.26
     }
 };
 
@@ -176,6 +188,10 @@ export function playSound(soundType) {
     }
 }
 
+export function floraSpell() {
+    playSound('floraSpell');
+}
+
 export function toggleSound() {
     soundEnabled = !soundEnabled;
     if (soundEnabled) {
@@ -187,6 +203,7 @@ export function toggleSound() {
 export const SoundEngine = {
     initAudio,
     playSound,
+    floraSpell,
     toggleSound,
     isSoundEnabled
 };

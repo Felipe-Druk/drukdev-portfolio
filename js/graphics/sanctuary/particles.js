@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { snapToPixel, drawRect } from './canvasUtils.js';
+import { getActiveBiomePalette } from './floraSystem.js';
 
 let particles = [];
 let pondRipples = [];
@@ -36,7 +37,8 @@ export function spawnAmbientLagoonRipple(pondZone) {
 }
 
 export function spawnTreeLeavesAndSpores(treeZone) {
-    const leafColors = ['#2E5A44', '#3E7A5C', '#B92B92', '#D4957A', '#00FF41'];
+    const palette = getActiveBiomePalette();
+    const leafColors = [palette.base, palette.mid, palette.tip, palette.accent, '#B92B92'];
     for (let index = 0; index < 28; index++) {
         particles.push({
             x: treeZone.centerX + (Math.random() * 140 - 70),
@@ -114,6 +116,43 @@ export function spawnConstellationStarfall(constellation) {
             });
         }
     });
+}
+
+export function spawnMageFloraWave(mageZone, horizonY, width, includeMeadowBurst = false) {
+    const palette = getActiveBiomePalette();
+    const spellColors = [palette.tip, palette.mid, palette.accent, '#D8E2EB'];
+    const staffOriginX = mageZone.centerX + 14;
+    const staffOriginY = mageZone.baseY - 44;
+
+    for (let index = 0; index < 26; index++) {
+        const angle = (index / 26) * Math.PI * 2;
+        const speed = 1.1 + Math.random() * 2.6;
+        particles.push({
+            x: staffOriginX,
+            y: staffOriginY,
+            velocityX: Math.cos(angle) * speed,
+            velocityY: Math.sin(angle) * speed - 0.4,
+            isLeaf: false,
+            size: index % 2 === 0 ? 4 : 3,
+            life: 1.0,
+            color: spellColors[index % spellColors.length]
+        });
+    }
+
+    if (includeMeadowBurst) {
+        for (let index = 0; index < 32; index++) {
+            particles.push({
+                x: Math.random() * width,
+                y: horizonY + Math.random() * 120,
+                velocityX: (Math.random() - 0.5) * 0.9,
+                velocityY: -0.9 - Math.random() * 1.6,
+                isLeaf: false,
+                size: Math.random() > 0.5 ? 4 : 2,
+                life: 0.95,
+                color: spellColors[index % spellColors.length]
+            });
+        }
+    }
 }
 
 export function updateAndDrawPondRipples(context) {

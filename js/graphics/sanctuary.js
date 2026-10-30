@@ -3,12 +3,17 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound, floraSpell } from '../audio/soundEngine.js';
 import { SPRITES, drawPixelSprite } from './sprites.js';
 import { THEME_PALETTES } from '../config/themes.js';
 import { drawFloatingPixelLabel, copyTextToClipboard } from './sanctuary/canvasUtils.js';
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
 import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
+import {
+    initFloraPanelUI,
+    toggleFloraPanel,
+    positionFloraPanelAboveMage
+} from './sanctuary/floraSystem.js';
 import {
     initAmbientFireflies,
     spawnAmbientLagoonRipple,
@@ -16,6 +21,7 @@ import {
     spawnPondRipple,
     spawnDungeonRuneSparks,
     spawnConstellationStarfall,
+    spawnMageFloraWave,
     updateAndDrawParticles
 } from './sanctuary/particles.js';
 import {
@@ -23,7 +29,8 @@ import {
     drawSanctuaryMeadowAndLagoon,
     drawAncientTree,
     drawSealedDungeonPortal,
-    drawDrukSystemRelicConsole
+    drawDrukSystemRelicConsole,
+    drawGreenMage
 } from './sanctuary/environmentRenderer.js';
 
 let sanctuaryCanvas = null;
@@ -43,6 +50,7 @@ const sanctuaryState = {
     dungeonShakeTimer: 0,
     dungeonMessageTimer: 0,
     mailCopiedTimer: 0,
+    mageCastTimer: 0,
     heroOffsetY: 0,
     heroVelocityY: 0,
     heroJumping: false
@@ -53,6 +61,24 @@ export function resizeSanctuary() {
     sanctuaryCanvas.width = window.innerWidth;
     sanctuaryCanvas.height = window.innerHeight;
     initAmbientFireflies(sanctuaryCanvas.width, sanctuaryCanvas.height);
+
+    const zones = getLayoutZones(
+        sanctuaryCanvas.width,
+        sanctuaryCanvas.height,
+        sanctuaryState.heroOffsetY
+    );
+    positionFloraPanelAboveMage(zones.mage, sanctuaryCanvas.width, sanctuaryCanvas.height);
+}
+
+function triggerMageCastEffect(includeMeadowBurst = false) {
+    if (!sanctuaryCanvas) return;
+    const zones = getLayoutZones(
+        sanctuaryCanvas.width,
+        sanctuaryCanvas.height,
+        sanctuaryState.heroOffsetY
+    );
+    sanctuaryState.mageCastTimer = 32;
+    spawnMageFloraWave(zones.mage, zones.horizonY, sanctuaryCanvas.width, includeMeadowBurst);
 }
 
 function activateConstellation(constellation) {
@@ -73,6 +99,12 @@ const ZONE_CLICK_HANDLERS = {
         if (typeof openTerminalCallback === 'function') {
             openTerminalCallback();
         }
+    },
+    mage: (zones) => {
+        floraSpell();
+        sanctuaryState.mageCastTimer = 32;
+        spawnMageFloraWave(zones.mage, zones.horizonY, sanctuaryCanvas.width, true);
+        toggleFloraPanel(null, zones.mage);
     },
     tree: (zones) => {
         sanctuaryState.treeRustleTimer = 28;
@@ -132,6 +164,7 @@ export function initSanctuary(onOpenTerminal) {
     sanctuaryContext = sanctuaryCanvas.getContext('2d');
 
     resizeSanctuary();
+    initFloraPanelUI(triggerMageCastEffect);
 
     sanctuaryCanvas.addEventListener('mousemove', (event) => {
         const rect = sanctuaryCanvas.getBoundingClientRect();
@@ -165,6 +198,7 @@ function updateSanctuaryState(zones) {
     if (sanctuaryState.dungeonShakeTimer > 0) sanctuaryState.dungeonShakeTimer--;
     if (sanctuaryState.dungeonMessageTimer > 0) sanctuaryState.dungeonMessageTimer--;
     if (sanctuaryState.mailCopiedTimer > 0) sanctuaryState.mailCopiedTimer--;
+    if (sanctuaryState.mageCastTimer > 0) sanctuaryState.mageCastTimer--;
 
     if (sanctuaryState.heroJumping) {
         sanctuaryState.heroOffsetY += sanctuaryState.heroVelocityY;
@@ -199,7 +233,14 @@ export function updateAndDrawSanctuary() {
         sanctuaryTick,
         sanctuaryState.mailCopiedTimer
     );
-    drawSanctuaryMeadowAndLagoon(sanctuaryContext, width, height, zones, sanctuaryTick);
+    drawSanctuaryMeadowAndLagoon(
+        sanctuaryContext,
+        width,
+        height,
+        zones,
+        pointerState,
+        sanctuaryTick
+    );
     drawAncientTree(
         sanctuaryContext,
         zones.tree,
@@ -220,6 +261,13 @@ export function updateAndDrawSanctuary() {
         zones.console,
         pointerState.hoveredZone === 'console',
         sanctuaryTick
+    );
+    drawGreenMage(
+        sanctuaryContext,
+        zones.mage,
+        pointerState.hoveredZone === 'mage',
+        sanctuaryTick,
+        sanctuaryState.mageCastTimer
     );
 
     if (pointerState.hoveredZone === 'pond') {
