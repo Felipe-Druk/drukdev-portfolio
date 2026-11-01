@@ -30,7 +30,7 @@ portfolio/
     │   ├── dungeonData.js              # Datos puros de dominio RPG: las 4 clases, proyectos, experiencia, FIUBA y Boot.dev
     │   ├── i18n.js                     # Diccionarios ES / EN y persistencia de idioma en localStorage
     │   ├── links.js                    # Fuente única de verdad para correo electrónico, redes sociales y rutas de CV por idioma
-    │   └── themes.js                   # Paletas cromáticas base para escenarios y minijuegos
+    │   └── palettes.js                 # Fuente única de verdad de colores: ADN DrukDev, Santuario, Biomas, Fósforo CRT y Sprites
     ├── dungeon/
     │   ├── dungeonUI.js                # Orquestador del modal de la Dungeon, estado de vista y navegación híbrida Mouse/Teclado
     │   └── chamberRenderer.js          # Renderizador DOM puro para Armas, Reliquias (Proyectos), Crónicas (Experiencia) y Sellos
@@ -44,10 +44,11 @@ portfolio/
     │   │   ├── classEmblems.js         # Emblemas procedurales de las 4 clases RPG + Modo Omnisciente para la Dungeon
     │   │   └── arcadeSprites.js        # Sprites procedurales para Bug Slasher (héroe, onda de espada, bugs, gemas) y Snake CRT
     │   └── sanctuary/
-    │       ├── constellations.js       # Planos, rotación 2D, escalado y renderizado de las 5 constelaciones (redes, mail y CV)
+    │       ├── constellations.js       # Planos, rotación 2D, caché de zonas y renderizado de las 5 constelaciones (redes, mail y CV)
     │       ├── environmentRenderer.js  # Renderizado del cielo/luna, pradera/laguna, Árbol Antiguo, Portal Dungeon y Consola CRT
-    │       ├── floraSystem.js          # Vegetación procedural (dispersión, cúmulos, 4 biomas) y controlador del Grimorio Botánico UI
-    │       ├── layoutZones.js          # Cálculo responsivo de hitboxes/zonas interactivas y detección de hover
+    │       ├── floraSystem.js          # Motor matemático y generación procedural del pasto (dispersión, cúmulos y sombreado por profundidad)
+    │       ├── floraPanelUI.js         # Controlador DOM del Grimorio Botánico (#floraPanel), sliders, biomas y posicionamiento sobre el Mago
+    │       ├── layoutZones.js          # Cálculo responsivo con memoización de hitboxes/zonas interactivas y detección de hover
     │       └── particles.js            # Sistema de partículas: luciérnagas, hojas/esporas, ondas de agua, chispas rúnicas y lluvia estelar
     ├── terminal/
     │   ├── drukSystem.js               # Controlador principal del monitor CRT: ciclo de vida del modal, historial y eventos de entrada
@@ -71,18 +72,19 @@ portfolio/
 
 1. **Punto de Entrada (`js/main.js`):**
    - Inicializa el escenario del Santuario (`initSanctuary`), la terminal (`initDrukSystem`), la Dungeon Interactiva (`initDungeonUI`), el cartucho runner (`initGame`), las vistas previas procedurales (`renderStaticPreviews`) y el idioma activo (`setLanguage`).
-   - Ejecuta el bucle principal `requestAnimationFrame` (`mainLoop`) que invoca en cada frame a `updateAndDrawSanctuary()` y `updateAndDrawGame()`.
+   - Ejecuta el bucle principal `requestAnimationFrame` (`mainLoop`) pausando automáticamente `updateAndDrawSanctuary()` cuando los modales de pantalla completa están abiertos y ejecutando `updateAndDrawGame()` exclusivamente en la vista `slasher`.
 2. **Motor de Sprites Procedurales (`js/graphics/sprites/*`):**
-   - Centraliza todas las primitivas de dibujo pixel-art (`canvasUtils.js`) y estandariza cada entidad visual mediante funciones procedurales basadas en `drawRect`:
-     - `greenMageSprite.js` dibuja al **Mago Verde** sincronizado con la paleta del bioma activo.
+   - Centraliza todas las primitivas de dibujo pixel-art (`canvasUtils.js`) y estandariza cada entidad visual mediante funciones procedurales basadas en `drawRect` consumiendo colores desde `js/config/palettes.js`:
+     - `greenMageSprite.js` dibuja al **Mago Verde** sincronizado con la paleta del bioma activo sin acoplamiento al DOM.
      - `dragonSprite.js` renderiza al Guardián en el Santuario, las vistas previas estáticas y el dragón en vuelo de `flappyDragon.js`.
      - `classEmblems.js` traza los emblemas pixel-art de las 4 clases RPG (`backend`, `algorithms`, `gamedev`, `fullstack`) y del Modo Omnisciente.
      - `arcadeSprites.js` provee los sprites procedurales para `bugSlasher.js` y `snakeGame.js`.
 3. **Escenario del Santuario (`js/graphics/sanctuary.js` + `js/graphics/sanctuary/*`):**
    - `sanctuary.js` actúa como controlador de estado e input del canvas `#sanctuaryCanvas` y delega responsabilidades en `js/graphics/sanctuary/`:
-     - `layoutZones.js` calcula las coordenadas relativas al viewport para que ningún elemento colisione en distintas resoluciones.
+     - `layoutZones.js` calcula y memoiza las coordenadas relativas al viewport para que ningún elemento colisione ni recalcule geometría innecesariamente.
      - `environmentRenderer.js` dibuja el cielo nocturno, la luna de fases interactivas, la pradera, la laguna con nenúfares, el Árbol Antiguo, el Portal de la Dungeon (`DUNGEON // ENTER`) y la consola reliquia `DrukSystem`.
-     - `floraSystem.js` gestiona exclusivamente la generación procedural del pasto (`seed`, `density`, `clumping`, `grassLength` y biomas `emerald`, `druk`, `autumn`, `matrix`) y el panel `#floraPanel`.
+     - `floraSystem.js` gestiona exclusivamente el motor matemático y la generación procedural del pasto (`seed`, `density`, `clumping`, `grassLength` y sombreado por profundidad).
+     - `floraPanelUI.js` controla exclusivamente el DOM y eventos del Grimorio Botánico (`#floraPanel`).
      - `constellations.js` traza las 5 constelaciones interactivas (**GitHub**, **YouTube**, **LinkedIn**, **Mail** y **CV**).
      - `particles.js` actualiza y dibuja luciérnagas ambientales, ondas en el agua, hojas, chispas del portal y lluvia estelar.
 4. **La Dungeon Interactiva (`js/dungeon/dungeonUI.js` + `js/dungeon/chamberRenderer.js` + `js/config/dungeonData.js`):**

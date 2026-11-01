@@ -2,19 +2,10 @@
  * PROCEDURAL RPG CLASS EMBLEMS (BACKEND, ALGORITHMS, GAMEDEV, FULLSTACK)
  **************************************************************/
 
+import { SPRITE_PALETTES } from '../../config/palettes.js';
 import { drawRect } from './canvasUtils.js';
 
-const EMBLEM_COLORS = {
-    abyss: '#0D0D0F',
-    darkEarth: '#231C1A',
-    steelDark: '#2B3138',
-    steelBase: '#56616E',
-    steelLight: '#D8E2EB',
-    dragonLight: '#B92B92',
-    dragonBase: '#7A1F73',
-    bronzeWarm: '#D4957A',
-    ivoryGlow: '#F3D5B5'
-};
+const EMBLEM_COLORS = SPRITE_PALETTES.emblems;
 
 export function drawBackendEmblem(context, offsetX = 0, offsetY = 0) {
     // Forged Steel Server Rack & Technomancer Core

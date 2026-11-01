@@ -3,6 +3,10 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
+import {
+    DRUK_CORE_PALETTE,
+    getActiveTerminalPalette
+} from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
 import { drawFlyingDragon } from '../graphics/sprites/index.js';
 
@@ -42,16 +46,6 @@ let pillars = [];
 let flapParticles = [];
 let spawnCounter = 0;
 
-function getActivePhosphorColors() {
-    const monitorEl = document.getElementById('drukSystemModal');
-    const computed = monitorEl ? getComputedStyle(monitorEl) : getComputedStyle(document.documentElement);
-    return {
-        bg: computed.getPropertyValue('--term-bg').trim() || '#030803',
-        fg: computed.getPropertyValue('--term-fg').trim() || '#00FF41',
-        dim: computed.getPropertyValue('--term-dim').trim() || '#008F11'
-    };
-}
-
 function updateFlappyHud() {
     const scoreEl = document.getElementById('flappyScoreVal');
     const hiScoreEl = document.getElementById('flappyHiScoreVal');
@@ -68,7 +62,11 @@ function updateFlappyHud() {
 }
 
 function spawnFlapParticles(phosphorColor) {
-    const palette = ['#B92B92', '#D4957A', phosphorColor];
+    const palette = [
+        DRUK_CORE_PALETTE.dragonLight,
+        DRUK_CORE_PALETTE.bronzeWarm,
+        phosphorColor
+    ];
     for (let index = 0; index < 3; index++) {
         flapParticles.push({
             x: dragon.x + 2,
@@ -131,7 +129,7 @@ export function triggerDragonFlap() {
     dragon.vy = FLAP_VELOCITY;
     dragon.flapTimer = 10;
     playSound('flap');
-    const colors = getActivePhosphorColors();
+    const colors = getActiveTerminalPalette();
     spawnFlapParticles(colors.fg);
 }
 
@@ -140,7 +138,7 @@ function triggerFlappyGameOver() {
     gameOverCooldown = 16;
     playSound('gameover');
 
-    const colors = getActivePhosphorColors();
+    const colors = getActiveTerminalPalette();
     for (let index = 0; index < 14; index++) {
         flapParticles.push({
             x: dragon.x + 16,
@@ -149,7 +147,7 @@ function triggerFlappyGameOver() {
             vy: (Math.random() - 0.5) * 4.2,
             size: 4,
             life: 1.0,
-            color: index % 2 === 0 ? '#B92B92' : colors.fg
+            color: index % 2 === 0 ? DRUK_CORE_PALETTE.dragonLight : colors.fg
         });
     }
     updateFlappyHud();
@@ -231,7 +229,7 @@ function drawDungeonPillarSection(x, y, width, height, isTopCap, colors) {
     if (height <= 0) return;
 
     // Dark stone core + forged steel / phosphor borders
-    flappyContext.fillStyle = '#0D0D0F';
+    flappyContext.fillStyle = DRUK_CORE_PALETTE.abyss;
     flappyContext.fillRect(Math.floor(x), Math.floor(y), width, height);
 
     flappyContext.strokeStyle = colors.dim;
@@ -257,7 +255,7 @@ function drawDungeonPillarSection(x, y, width, height, isTopCap, colors) {
 export function drawFlappyFrame() {
     if (!flappyCanvas || !flappyContext) return;
 
-    const colors = getActivePhosphorColors();
+    const colors = getActiveTerminalPalette();
 
     // 1. Background CRT Sky & Horizon Grid
     flappyContext.fillStyle = colors.bg;

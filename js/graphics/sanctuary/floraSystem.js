@@ -1,50 +1,21 @@
 /**************************************************************
- * PROCEDURAL FLORA SYSTEM & GREEN MAGE NPC (floraSystem.js)
+ * PROCEDURAL FLORA ENGINE — MEADOW GEOMETRY, DEPTH SHADING & STATE
  **************************************************************/
 
-import { floraSpell, playSound } from '../../audio/soundEngine.js';
+import {
+    BIOME_PALETTES,
+    SANCTUARY_SCENE_PALETTE,
+    setActiveBiomeKey,
+    getActiveBiomePalette
+} from '../../config/palettes.js';
 import { drawRect } from '../sprites/index.js';
 
+export { BIOME_PALETTES as FLORA_BIOMES, getActiveBiomePalette };
+
 export const FLORA_STORAGE_KEY = 'druk_flora_config';
-const ABYSS_SHADOW_HEX = '#080D0A';
 const CLUMP_CENTER_COUNT = 26;
 const POINTER_REPULSION_RADIUS_SQUARED = 3025;
 const POINTER_STRONG_RADIUS_SQUARED = 900;
-
-export const FLORA_BIOMES = {
-    emerald: {
-        soilDark: '#0D1713',
-        soilMid: '#14241D',
-        base: '#1E3F2B',
-        mid: '#38754A',
-        tip: '#58A668',
-        accent: '#D4957A'
-    },
-    druk: {
-        soilDark: '#120817',
-        soilMid: '#1E0D24',
-        base: '#3D1247',
-        mid: '#7A1F73',
-        tip: '#B92B92',
-        accent: '#F3D5B5'
-    },
-    autumn: {
-        soilDark: '#170E0A',
-        soilMid: '#241610',
-        base: '#4A2B1D',
-        mid: '#8A4E3B',
-        tip: '#D4957A',
-        accent: '#F3D5B5'
-    },
-    matrix: {
-        soilDark: '#020C02',
-        soilMid: '#041804',
-        base: '#003B00',
-        mid: '#008F11',
-        tip: '#00FF41',
-        accent: '#D8E2EB'
-    }
-};
 
 const DEFAULT_FLORA_CONFIG = {
     seed: 738192,
@@ -54,7 +25,7 @@ const DEFAULT_FLORA_CONFIG = {
     biome: 'emerald'
 };
 
-function clampValue(value, minValue, maxValue) {
+export function clampFloraValue(value, minValue, maxValue) {
     return Math.max(minValue, Math.min(maxValue, value));
 }
 
@@ -63,18 +34,19 @@ function loadFloraConfig() {
         const rawSaved = localStorage.getItem(FLORA_STORAGE_KEY);
         if (!rawSaved) return { ...DEFAULT_FLORA_CONFIG };
         const parsed = JSON.parse(rawSaved);
+        const resolvedBiome = BIOME_PALETTES[parsed.biome] ? parsed.biome : DEFAULT_FLORA_CONFIG.biome;
         return {
             seed: Number.isFinite(parsed.seed) ? parsed.seed : DEFAULT_FLORA_CONFIG.seed,
             density: typeof parsed.density === 'number'
-                ? clampValue(parsed.density, 0.1, 1.0)
+                ? clampFloraValue(parsed.density, 0.1, 1.0)
                 : DEFAULT_FLORA_CONFIG.density,
             clumping: typeof parsed.clumping === 'number'
-                ? clampValue(parsed.clumping, 0.0, 1.0)
+                ? clampFloraValue(parsed.clumping, 0.0, 1.0)
                 : DEFAULT_FLORA_CONFIG.clumping,
             grassLength: typeof parsed.grassLength === 'number'
-                ? clampValue(parsed.grassLength, 0.3, 2.0)
+                ? clampFloraValue(parsed.grassLength, 0.3, 2.0)
                 : DEFAULT_FLORA_CONFIG.grassLength,
-            biome: FLORA_BIOMES[parsed.biome] ? parsed.biome : DEFAULT_FLORA_CONFIG.biome
+            biome: resolvedBiome
         };
     } catch {
         return { ...DEFAULT_FLORA_CONFIG };
@@ -82,6 +54,7 @@ function loadFloraConfig() {
 }
 
 const floraConfig = loadFloraConfig();
+setActiveBiomeKey(floraConfig.biome);
 
 let cachedFloraGeometry = {
     cacheKey: '',
@@ -101,25 +74,21 @@ export function getFloraConfig() {
     return floraConfig;
 }
 
-export function getActiveBiomePalette() {
-    return FLORA_BIOMES[floraConfig.biome] || FLORA_BIOMES.emerald;
-}
-
 export function updateFloraConfig(partialConfig) {
     if (typeof partialConfig.seed === 'number') {
         floraConfig.seed = Math.floor(partialConfig.seed);
     }
     if (typeof partialConfig.density === 'number') {
-        floraConfig.density = clampValue(partialConfig.density, 0.1, 1.0);
+        floraConfig.density = clampFloraValue(partialConfig.density, 0.1, 1.0);
     }
     if (typeof partialConfig.clumping === 'number') {
-        floraConfig.clumping = clampValue(partialConfig.clumping, 0.0, 1.0);
+        floraConfig.clumping = clampFloraValue(partialConfig.clumping, 0.0, 1.0);
     }
     if (typeof partialConfig.grassLength === 'number') {
-        floraConfig.grassLength = clampValue(partialConfig.grassLength, 0.3, 2.0);
+        floraConfig.grassLength = clampFloraValue(partialConfig.grassLength, 0.3, 2.0);
     }
-    if (typeof partialConfig.biome === 'string' && FLORA_BIOMES[partialConfig.biome]) {
-        floraConfig.biome = partialConfig.biome;
+    if (typeof partialConfig.biome === 'string' && BIOME_PALETTES[partialConfig.biome]) {
+        floraConfig.biome = setActiveBiomeKey(partialConfig.biome);
     }
     saveFloraConfig();
 }
@@ -133,10 +102,10 @@ function parseHexToRgb(hexColor) {
     };
 }
 
-const ABYSS_RGB = parseHexToRgb(ABYSS_SHADOW_HEX);
+const ABYSS_RGB = parseHexToRgb(SANCTUARY_SCENE_PALETTE.abyssSoilShadow);
 
 export function shadeHexColorByDepth(hexColor, depthRatio) {
-    const clampedRatio = clampValue(depthRatio, 0, 1);
+    const clampedRatio = clampFloraValue(depthRatio, 0, 1);
     const darkenStrength = Math.min(0.84, Math.pow(clampedRatio, 1.05) * 0.82);
     const sourceRgb = parseHexToRgb(hexColor);
 
@@ -207,8 +176,8 @@ function generateClumpedPosition(random, width, minY, maxY, clumpCenters, clumpi
     const finalY = uniformY * (1 - clumpingFactor) + clumpedY * clumpingFactor;
 
     return {
-        x: clampValue(finalX, 4, width - 6),
-        y: clampValue(finalY, minY, maxY)
+        x: clampFloraValue(finalX, 4, width - 6),
+        y: clampFloraValue(finalY, minY, maxY)
     };
 }
 
@@ -222,7 +191,7 @@ function pickOrganicBaseBladeHeight(random) {
 }
 
 function createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, accentThreshold) {
-    const depthRatio = clampValue((bladeY - horizonY) / totalDepthSpan, 0, 1);
+    const depthRatio = clampFloraValue((bladeY - horizonY) / totalDepthSpan, 0, 1);
     return {
         x: bladeX,
         y: bladeY,
@@ -265,7 +234,7 @@ function generateGroundPixels(random, width, horizonY, meadowTopY, meadowBottomY
             width: random() > 0.45 ? 4 : 2,
             height: 2,
             colorTier,
-            depthRatio: clampValue((snappedY - horizonY) / totalDepthSpan, 0, 1)
+            depthRatio: clampFloraValue((snappedY - horizonY) / totalDepthSpan, 0, 1)
         });
     }
 
@@ -392,7 +361,7 @@ function drawSingleGrassBlade(
     const windSway = Math.round(Math.sin(sanctuaryTick * 0.05 + blade.x * 0.03 + blade.phase) * 1.3);
     const pointerBend = calculatePointerBladeBend(blade, pointerState, isPointerActiveInMeadow);
     const maxBend = scaledHeight >= 8 ? 3 : 2;
-    const tipOffset = clampValue(windSway + pointerBend, -maxBend, maxBend);
+    const tipOffset = clampFloraValue(windSway + pointerBend, -maxBend, maxBend);
     const midOffset = Math.trunc(tipOffset * 0.5);
 
     const baseSegmentHeight = Math.max(2, Math.floor(scaledHeight * 0.45));
@@ -440,129 +409,4 @@ export function drawProceduralGrass(context, width, height, zones, pointerState,
             sanctuaryTick
         );
     });
-}
-
-export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHeight) {
-    const panelElement = document.getElementById('floraPanel');
-    if (!panelElement || panelElement.classList.contains('hidden') || !mageZone) return;
-
-    const panelWidth = panelElement.offsetWidth || 256;
-    const panelHeight = panelElement.offsetHeight || 290;
-    const screenMargin = 12;
-
-    const idealLeft = Math.round(mageZone.centerX - panelWidth / 2);
-    const clampedLeft = clampValue(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
-
-    const idealTop = Math.round(mageZone.baseY - 68 - panelHeight);
-    const minTop = 76;
-    const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
-    const clampedTop = clampValue(idealTop, minTop, maxTop);
-
-    panelElement.style.left = `${clampedLeft}px`;
-    panelElement.style.top = `${clampedTop}px`;
-
-    const arrowElement = document.getElementById('floraPanelArrow');
-    if (arrowElement) {
-        const arrowLocalX = clampValue(mageZone.centerX - clampedLeft, 18, panelWidth - 18);
-        arrowElement.style.left = `${arrowLocalX}px`;
-    }
-}
-
-function updateSliderAndBadge(sliderId, badgeId, rawValue, formattedText) {
-    const sliderElement = document.getElementById(sliderId);
-    const badgeElement = document.getElementById(badgeId);
-    if (sliderElement) {
-        sliderElement.value = String(rawValue);
-    }
-    if (badgeElement) {
-        badgeElement.textContent = formattedText;
-    }
-}
-
-export function syncFloraPanelUI() {
-    const panelElement = document.getElementById('floraPanel');
-    if (panelElement) {
-        panelElement.setAttribute('data-flora-biome', floraConfig.biome);
-    }
-
-    const densityPercent = Math.round(floraConfig.density * 100);
-    const clumpingPercent = Math.round(floraConfig.clumping * 100);
-    const lengthPercent = Math.round(floraConfig.grassLength * 100);
-
-    updateSliderAndBadge('floraDensitySlider', 'floraDensityVal', densityPercent, `${densityPercent}%`);
-    updateSliderAndBadge('floraClumpingSlider', 'floraClumpingVal', clumpingPercent, `${clumpingPercent}%`);
-    updateSliderAndBadge('floraLengthSlider', 'floraLengthVal', lengthPercent, `${floraConfig.grassLength.toFixed(1)}x`);
-
-    document.querySelectorAll('.flora-biome-btn[data-flora-biome]').forEach((button) => {
-        const biomeKey = button.getAttribute('data-flora-biome');
-        button.classList.toggle('active', biomeKey === floraConfig.biome);
-    });
-}
-
-export function toggleFloraPanel(forceOpen = null, mageZone = null) {
-    const panelElement = document.getElementById('floraPanel');
-    if (!panelElement) return false;
-
-    const isCurrentlyHidden = panelElement.classList.contains('hidden');
-    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : isCurrentlyHidden;
-    panelElement.classList.toggle('hidden', !shouldOpen);
-    if (shouldOpen) {
-        syncFloraPanelUI();
-        if (mageZone) {
-            positionFloraPanelAboveMage(mageZone, window.innerWidth, window.innerHeight);
-        }
-    }
-    return shouldOpen;
-}
-
-function bindPercentageSlider(sliderId, configProperty) {
-    const sliderElement = document.getElementById(sliderId);
-    if (!sliderElement) return;
-
-    sliderElement.addEventListener('input', (event) => {
-        const normalizedValue = parseInt(event.target.value, 10) / 100;
-        updateFloraConfig({ [configProperty]: normalizedValue });
-        syncFloraPanelUI();
-    });
-}
-
-export function initFloraPanelUI(onMageSpellCast) {
-    bindPercentageSlider('floraDensitySlider', 'density');
-    bindPercentageSlider('floraClumpingSlider', 'clumping');
-    bindPercentageSlider('floraLengthSlider', 'grassLength');
-
-    document.querySelectorAll('.flora-biome-btn[data-flora-biome]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const selectedBiome = button.getAttribute('data-flora-biome');
-            updateFloraConfig({ biome: selectedBiome });
-            syncFloraPanelUI();
-            floraSpell();
-            if (typeof onMageSpellCast === 'function') {
-                onMageSpellCast(false);
-            }
-        });
-    });
-
-    const reseedButton = document.getElementById('floraReseedBtn');
-    if (reseedButton) {
-        reseedButton.addEventListener('click', () => {
-            const nextSeed = Math.floor(100000 + Math.random() * 900000);
-            updateFloraConfig({ seed: nextSeed });
-            syncFloraPanelUI();
-            floraSpell();
-            if (typeof onMageSpellCast === 'function') {
-                onMageSpellCast(true);
-            }
-        });
-    }
-
-    const closeButton = document.getElementById('floraCloseBtn');
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            playSound('click');
-            toggleFloraPanel(false);
-        });
-    }
-
-    syncFloraPanelUI();
 }

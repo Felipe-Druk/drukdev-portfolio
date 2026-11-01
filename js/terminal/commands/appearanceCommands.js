@@ -2,12 +2,16 @@
  * DRUKSYSTEM OS — CRT APPEARANCE COMMANDS (color, font)
  **************************************************************/
 
+import {
+    TERMINAL_PALETTES,
+    setActiveTerminalColorMode
+} from '../../config/palettes.js';
 import { playSound } from '../../audio/soundEngine.js';
 import { drawSnakeFrame } from '../../game/snakeGame.js';
 import { drawFlappyFrame } from '../../game/flappyDragon.js';
 import { getActiveTerminalTexts, getModalElement, appendLine } from '../terminalDom.js';
 
-const COLOR_MODES = ['matrix', 'amber', 'druk', 'cyan'];
+const COLOR_MODES = Object.keys(TERMINAL_PALETTES);
 const FONT_MODES = ['ibm', 'vt323', 'gothic'];
 const TERM_COLOR_STORAGE_KEY = 'druk_term_color';
 const TERM_FONT_STORAGE_KEY = 'druk_term_font';
@@ -25,16 +29,16 @@ function resolveNextCycleOption(optionsList, currentOption, requestedOption) {
 
 export function setTerminalColor(mode) {
     const normalizedMode = COLOR_MODES.includes(mode) ? mode : 'matrix';
-    currentColorMode = normalizedMode;
-    localStorage.setItem(TERM_COLOR_STORAGE_KEY, normalizedMode);
+    currentColorMode = setActiveTerminalColorMode(normalizedMode);
+    localStorage.setItem(TERM_COLOR_STORAGE_KEY, currentColorMode);
 
     const modalElement = getModalElement();
     if (modalElement) {
-        modalElement.setAttribute('data-terminal-color', normalizedMode);
+        modalElement.setAttribute('data-terminal-color', currentColorMode);
     }
     drawSnakeFrame();
     drawFlappyFrame();
-    return normalizedMode;
+    return currentColorMode;
 }
 
 export function setTerminalFont(font) {

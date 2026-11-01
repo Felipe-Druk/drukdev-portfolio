@@ -2,8 +2,12 @@
  * SANCTUARY PARTICLES, AMBIENT FIREFLIES & WATER RIPPLES
  **************************************************************/
 
+import {
+    DRUK_CORE_PALETTE,
+    SANCTUARY_SCENE_PALETTE,
+    getActiveBiomePalette
+} from '../../config/palettes.js';
 import { snapToPixel, drawRect } from '../sprites/index.js';
-import { getActiveBiomePalette } from './floraSystem.js';
 
 let particles = [];
 let pondRipples = [];
@@ -19,7 +23,9 @@ export function initAmbientFireflies(width, height) {
             velocityY: -0.15 - Math.random() * 0.25,
             size: Math.random() > 0.6 ? 4 : 3,
             phase: Math.random() * Math.PI * 2,
-            color: index % 3 === 0 ? '#00FF41' : (index % 2 === 0 ? '#D4957A' : '#B92B92')
+            color: index % 3 === 0
+                ? DRUK_CORE_PALETTE.matrixGreen
+                : (index % 2 === 0 ? DRUK_CORE_PALETTE.bronzeWarm : DRUK_CORE_PALETTE.dragonLight)
         });
     }
 }
@@ -38,7 +44,13 @@ export function spawnAmbientLagoonRipple(pondZone) {
 
 export function spawnTreeLeavesAndSpores(treeZone) {
     const palette = getActiveBiomePalette();
-    const leafColors = [palette.base, palette.mid, palette.tip, palette.accent, '#B92B92'];
+    const leafColors = [
+        palette.base,
+        palette.mid,
+        palette.tip,
+        palette.accent,
+        DRUK_CORE_PALETTE.dragonLight
+    ];
     for (let index = 0; index < 28; index++) {
         particles.push({
             x: treeZone.centerX + (Math.random() * 140 - 70),
@@ -65,7 +77,11 @@ export function spawnPondRipple(originX, originY, pondZone) {
         life: 1.0
     });
 
-    const dropletColors = ['#7AD7F0', '#D8E2EB', '#2C5E7A'];
+    const dropletColors = [
+        SANCTUARY_SCENE_PALETTE.waterFoam,
+        DRUK_CORE_PALETTE.steelLight,
+        SANCTUARY_SCENE_PALETTE.waterHighlight
+    ];
     for (let index = 0; index < 10; index++) {
         const angle = -Math.PI * Math.random();
         const speed = 1.0 + Math.random() * 2.2;
@@ -83,7 +99,12 @@ export function spawnPondRipple(originX, originY, pondZone) {
 }
 
 export function spawnDungeonRuneSparks(dungeonZone) {
-    const runeColors = ['#B92B92', '#7A1F73', '#D4957A', '#D8E2EB'];
+    const runeColors = [
+        DRUK_CORE_PALETTE.dragonLight,
+        DRUK_CORE_PALETTE.dragonBase,
+        DRUK_CORE_PALETTE.bronzeWarm,
+        DRUK_CORE_PALETTE.steelLight
+    ];
     for (let index = 0; index < 32; index++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = 1.2 + Math.random() * 3.5;
@@ -101,7 +122,13 @@ export function spawnDungeonRuneSparks(dungeonZone) {
 }
 
 export function spawnConstellationStarfall(constellation) {
-    const starColors = ['#F3D5B5', '#D8E2EB', '#D4957A', '#B92B92', '#00FF41'];
+    const starColors = [
+        DRUK_CORE_PALETTE.ivoryGlow,
+        DRUK_CORE_PALETTE.steelLight,
+        DRUK_CORE_PALETTE.bronzeWarm,
+        DRUK_CORE_PALETTE.dragonLight,
+        DRUK_CORE_PALETTE.matrixGreen
+    ];
     constellation.nodes.forEach((node) => {
         for (let index = 0; index < 4; index++) {
             particles.push({
@@ -120,7 +147,7 @@ export function spawnConstellationStarfall(constellation) {
 
 export function spawnMageFloraWave(mageZone, horizonY, width, includeMeadowBurst = false) {
     const palette = getActiveBiomePalette();
-    const spellColors = [palette.tip, palette.mid, palette.accent, '#D8E2EB'];
+    const spellColors = [palette.tip, palette.mid, palette.accent, DRUK_CORE_PALETTE.steelLight];
     const staffOriginX = mageZone.centerX + 14;
     const staffOriginY = mageZone.baseY - 44;
 
@@ -165,7 +192,7 @@ export function updateAndDrawPondRipples(context) {
         if (ripple.life <= 0) {
             pondRipples.splice(index, 1);
         } else {
-            context.strokeStyle = `rgba(216, 226, 235, ${ripple.life * 0.7})`;
+            context.strokeStyle = `rgba(${SANCTUARY_SCENE_PALETTE.rippleStrokeRgb}, ${ripple.life * 0.7})`;
             context.lineWidth = 2;
             context.strokeRect(
                 snapToPixel(ripple.x - ripple.radiusX),

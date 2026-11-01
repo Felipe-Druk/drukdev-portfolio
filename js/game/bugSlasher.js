@@ -2,8 +2,8 @@
  * PLAYABLE MINI-GAME ENGINE: "DRUK'S BUG SLASHER"
  **************************************************************/
 
-import { THEME_PALETTES, HISCORE_STORAGE_KEY, getCurrentTheme } from '../config/themes.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
+import { SPRITE_PALETTES } from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
 import {
     drawSlasherHero,
@@ -12,6 +12,9 @@ import {
     drawCommitGem
 } from '../graphics/sprites/index.js';
 
+export const HISCORE_STORAGE_KEY = 'drukdev_hiscore';
+
+const SLASHER_PALETTE = SPRITE_PALETTES.slasher;
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 300;
 const GROUND_Y = 248;
@@ -161,7 +164,7 @@ export function triggerJump(event) {
     player.vy = JUMP_VELOCITY;
     player.grounded = false;
     playSound('jump');
-    spawnGameParticles(player.x + 12, player.y + 34, 6, '#ffffff');
+    spawnGameParticles(player.x + 12, player.y + 34, 6, SLASHER_PALETTE.jumpDust);
 }
 
 export function triggerAttack(event) {
@@ -171,13 +174,12 @@ export function triggerAttack(event) {
     player.attackTimer = 14;
     playSound('attack');
 
-    const palette = THEME_PALETTES[getCurrentTheme()];
     const slashHitbox = getPlayerSlashHitbox();
 
     for (let index = entities.length - 1; index >= 0; index--) {
         const entity = entities[index];
         if (entity.type === 'bug' && rectIntersect(slashHitbox, entity)) {
-            destroyBugEntity(index, palette.slashColor, 16);
+            destroyBugEntity(index, SLASHER_PALETTE.slashColor, 16);
         }
     }
 }
@@ -302,13 +304,13 @@ function updateGameEntities(palette) {
     }
 }
 
-function drawGameScene(currentTheme, palette) {
+function drawGameScene(palette) {
     // Clear Sky
     gameContext.fillStyle = palette.bgSkyTop;
     gameContext.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     // Retro Horizon Grid Lines
-    gameContext.fillStyle = 'rgba(255,255,255,0.04)';
+    gameContext.fillStyle = palette.gridLine;
     for (let gridY = 40; gridY < GROUND_Y; gridY += 35) {
         gameContext.fillRect(0, gridY, GAME_WIDTH, 1);
     }
@@ -366,16 +368,13 @@ function updateAndDrawGameParticles() {
 export function updateAndDrawGame() {
     if (!gameCanvas || !gameContext) return;
 
-    const currentTheme = getCurrentTheme();
-    const palette = THEME_PALETTES[currentTheme];
-
     if (gameRunning) {
         updatePlayerPhysics();
         gameSpeed = Math.min(MAX_GAME_SPEED, INITIAL_GAME_SPEED + score * 0.012);
         updateEntitySpawner();
-        updateGameEntities(palette);
+        updateGameEntities(SLASHER_PALETTE);
     }
 
-    drawGameScene(currentTheme, palette);
+    drawGameScene(SLASHER_PALETTE);
     updateAndDrawGameParticles();
 }

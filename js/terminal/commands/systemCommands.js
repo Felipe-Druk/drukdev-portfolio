@@ -3,7 +3,6 @@
  **************************************************************/
 
 import { playSound } from '../../audio/soundEngine.js';
-import { openDungeonModal } from '../../dungeon/dungeonUI.js';
 import {
     getActiveTerminalTexts,
     appendLine,
@@ -38,5 +37,7 @@ export function runDungeonCommand(_, context) {
     if (context && typeof context.closeTerminal === 'function') {
         context.closeTerminal();
     }
-    openDungeonModal('select');
+    if (context && typeof context.openDungeon === 'function') {
+        context.openDungeon();
+    }
 }

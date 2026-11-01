@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
+import { getActiveTerminalPalette } from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
 import { drawSnakeFoodNode, drawSnakeSegment } from '../graphics/sprites/index.js';
 
@@ -25,16 +26,6 @@ let nextDirection = { x: 1, y: 0 };
 let foodPosition = { x: 12, y: 8 };
 let snakeScore = 0;
 let snakeHiScore = parseInt(localStorage.getItem(SNAKE_HISCORE_KEY) || '0', 10);
-
-function getActivePhosphorColors() {
-    const monitorEl = document.getElementById('drukSystemModal');
-    const computed = monitorEl ? getComputedStyle(monitorEl) : getComputedStyle(document.documentElement);
-    return {
-        bg: computed.getPropertyValue('--term-bg').trim() || '#030803',
-        fg: computed.getPropertyValue('--term-fg').trim() || '#00FF41',
-        dim: computed.getPropertyValue('--term-dim').trim() || '#008F11'
-    };
-}
 
 function updateSnakeHud() {
     const scoreEl = document.getElementById('snakeScoreVal');
@@ -134,7 +125,7 @@ function handleSnakeCollision() {
 export function drawSnakeFrame() {
     if (!snakeCanvas || !snakeContext) return;
 
-    const colors = getActivePhosphorColors();
+    const colors = getActiveTerminalPalette();
     const width = snakeCanvas.width;
     const height = snakeCanvas.height;
 

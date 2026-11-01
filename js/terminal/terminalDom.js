@@ -13,6 +13,25 @@ const TERMINAL_VIEW_IDS = {
     slasher: 'terminalSlasherView'
 };
 
+let terminalModalOpen = false;
+let activeTerminalSubView = 'cli';
+
+export function isTerminalModalOpen() {
+    return terminalModalOpen;
+}
+
+export function setTerminalModalOpenState(isOpen) {
+    terminalModalOpen = Boolean(isOpen);
+}
+
+export function getActiveTerminalSubView() {
+    return activeTerminalSubView;
+}
+
+export function isSlasherViewActive() {
+    return terminalModalOpen && activeTerminalSubView === 'slasher';
+}
+
 export function getActiveTerminalTexts() {
     return TRANSLATIONS[getCurrentLanguage()].terminal;
 }
@@ -59,20 +78,22 @@ export function appendBlockLines(lines, className = '') {
 }
 
 export function switchTerminalSubView(viewName) {
+    activeTerminalSubView = TERMINAL_VIEW_IDS[viewName] ? viewName : 'cli';
+
     Object.entries(TERMINAL_VIEW_IDS).forEach(([key, elementId]) => {
         const viewElement = document.getElementById(elementId);
         if (viewElement) {
-            viewElement.classList.toggle('hidden', key !== viewName);
+            viewElement.classList.toggle('hidden', key !== activeTerminalSubView);
         }
     });
 
-    if (viewName !== 'snake') {
+    if (activeTerminalSubView !== 'snake') {
         stopSnakeGame();
     }
-    if (viewName !== 'flappy') {
+    if (activeTerminalSubView !== 'flappy') {
         stopFlappyDragonGame();
     }
-    if (viewName === 'cli') {
+    if (activeTerminalSubView === 'cli') {
         const inputElement = getTerminalInput();
         if (inputElement) inputElement.focus();
     }

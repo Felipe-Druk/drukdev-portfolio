@@ -2,6 +2,8 @@
  * PIXEL-ART CANVAS PRIMITIVES, GEOMETRY & CLIPBOARD UTILITIES
  **************************************************************/
 
+import { DRUK_CORE_PALETTE } from '../../config/palettes.js';
+
 export const PIXEL_UNIT = 4;
 
 const LABEL_PADDING_X = 18;
@@ -60,9 +62,9 @@ export function drawFloatingPixelLabel(context, centerX, topY, text, borderColor
         boxY - LABEL_BORDER_OUTSET,
         boxWidth + LABEL_BORDER_OUTSET * 2,
         LABEL_BOX_HEIGHT + LABEL_BORDER_OUTSET * 2,
-        '#0D0D0F'
+        DRUK_CORE_PALETTE.abyss
     );
-    drawRect(context, boxX, boxY, boxWidth, LABEL_BOX_HEIGHT, '#141116');
+    drawRect(context, boxX, boxY, boxWidth, LABEL_BOX_HEIGHT, DRUK_CORE_PALETTE.obsidianLabelBg);
     context.strokeStyle = borderColor;
     context.lineWidth = 2;
     context.strokeRect(boxX, boxY, boxWidth, LABEL_BOX_HEIGHT);

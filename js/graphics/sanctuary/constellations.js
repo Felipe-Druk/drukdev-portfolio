@@ -4,6 +4,7 @@
 
 import { CONTACT_LINKS, getLocalizedCvPath } from '../../config/links.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
+import { DRUK_CORE_PALETTE, SANCTUARY_SCENE_PALETTE } from '../../config/palettes.js';
 import { drawRect, drawPixelLine, drawFloatingPixelLabel } from '../sprites/index.js';
 
 export const CONSTELLATION_ZONE_PREFIX = 'constellation:';
@@ -91,11 +92,16 @@ export const CONSTELLATION_BLUEPRINTS = [
     }
 ];
 
+let cachedConstellationState = {
+    cacheKey: '',
+    zones: []
+};
+
 export function isConstellationZone(zoneKey) {
     return typeof zoneKey === 'string' && zoneKey.startsWith(CONSTELLATION_ZONE_PREFIX);
 }
 
-function getConstellationTargetValue(blueprint) {
+function getConstellationTargetValue(blueprint, language) {
     if (blueprint.type === 'social') {
         const rawUrl = CONTACT_LINKS.socials?.[blueprint.id];
         return typeof rawUrl === 'string' ? rawUrl.trim() : '';
@@ -105,7 +111,7 @@ function getConstellationTargetValue(blueprint) {
         return typeof rawEmail === 'string' ? rawEmail.trim() : '';
     }
     if (blueprint.type === 'cv') {
-        return getLocalizedCvPath(getCurrentLanguage());
+        return getLocalizedCvPath(language);
     }
     return '';
 }
@@ -123,13 +129,19 @@ function rotateAndScaleNode([offsetX, offsetY], centerX, centerY, scale, rotatio
 }
 
 export function buildConstellationZones(width, height, horizonY) {
+    const activeLanguage = getCurrentLanguage();
+    const cacheKey = `${width}x${height}:${horizonY}:${activeLanguage}`;
+    if (cachedConstellationState.cacheKey === cacheKey) {
+        return cachedConstellationState.zones;
+    }
+
     const scale = Math.max(0.85, Math.min(1.35, Math.min(width / 1180, height / 720)));
     const minSkyY = width < 640 ? 122 : 104;
     const maxSkyY = Math.max(minSkyY + 24, horizonY - 250);
 
     const activeConstellations = [];
     CONSTELLATION_BLUEPRINTS.forEach((blueprint) => {
-        const targetValue = getConstellationTargetValue(blueprint);
+        const targetValue = getConstellationTargetValue(blueprint, activeLanguage);
         if (!targetValue) return;
 
         const centerX = Math.floor(width * blueprint.relativeX);
@@ -160,6 +172,11 @@ export function buildConstellationZones(width, height, horizonY) {
         });
     });
 
+    cachedConstellationState = {
+        cacheKey,
+        zones: activeConstellations
+    };
+
     return activeConstellations;
 }
 
@@ -171,12 +188,12 @@ function drawConstellationEdges(context, constellation, isHovered) {
 
         if (isHovered) {
             context.globalAlpha = 0.26;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, '#B92B92', 4);
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonLight, 4);
             context.globalAlpha = 1.0;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, '#B92B92', 2);
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonLight, 2);
         } else {
             context.globalAlpha = 0.52;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, '#7A1F73', 2);
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonBase, 2);
             context.globalAlpha = 1.0;
         }
     });
@@ -185,15 +202,15 @@ function drawConstellationEdges(context, constellation, isHovered) {
 function drawConstellationStars(context, constellation, constellationIndex, isHovered, sanctuaryTick) {
     constellation.nodes.forEach((node, nodeIndex) => {
         if (isHovered) {
-            drawRect(context, node.x - 5, node.y - 1, 10, 2, '#F3D5B5');
-            drawRect(context, node.x - 1, node.y - 5, 2, 10, '#F3D5B5');
-            drawRect(context, node.x - 2, node.y - 2, 4, 4, '#F3D5B5');
-            drawRect(context, node.x - 1, node.y - 1, 2, 2, '#D8E2EB');
+            drawRect(context, node.x - 5, node.y - 1, 10, 2, DRUK_CORE_PALETTE.ivoryGlow);
+            drawRect(context, node.x - 1, node.y - 5, 2, 10, DRUK_CORE_PALETTE.ivoryGlow);
+            drawRect(context, node.x - 2, node.y - 2, 4, 4, DRUK_CORE_PALETTE.ivoryGlow);
+            drawRect(context, node.x - 1, node.y - 1, 2, 2, DRUK_CORE_PALETTE.steelLight);
             return;
         }
 
         const isBrightPhase = Math.sin(sanctuaryTick * 0.06 + nodeIndex * 1.7 + constellationIndex * 1.3) > 0;
-        const starColor = isBrightPhase ? '#D8E2EB' : '#D4957A';
+        const starColor = isBrightPhase ? DRUK_CORE_PALETTE.steelLight : DRUK_CORE_PALETTE.bronzeWarm;
         const starSize = (nodeIndex % 2 === 0 || isBrightPhase) ? 4 : 2;
         drawRect(
             context,
@@ -222,12 +239,14 @@ function drawConstellationLabel(context, constellation, translationEntry, isHove
             labelY - 10,
             labelWidth,
             14,
-            'rgba(13, 13, 15, 0.85)'
+            SANCTUARY_SCENE_PALETTE.constellationHoverBg
         );
-        context.fillStyle = constellation.type === 'email' ? '#00FF41' : '#D8E2EB';
+        context.fillStyle = constellation.type === 'email'
+            ? DRUK_CORE_PALETTE.matrixGreen
+            : DRUK_CORE_PALETTE.steelLight;
         context.fillText(labelText, constellation.centerX, labelY);
     } else {
-        context.fillStyle = '#8E8582';
+        context.fillStyle = SANCTUARY_SCENE_PALETTE.constellationMutedLabel;
         context.fillText(labelText, constellation.centerX, labelY);
     }
 
@@ -239,7 +258,7 @@ function drawConstellationLabel(context, constellation, translationEntry, isHove
             constellation.centerX,
             constellation.centerY - Math.floor(34 * constellation.scale) - floatRiseOffset,
             translationEntry.copied,
-            '#00FF41'
+            DRUK_CORE_PALETTE.matrixGreen
         );
     }
 }

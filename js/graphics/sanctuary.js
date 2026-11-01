@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
+import { SANCTUARY_SCENE_PALETTE } from '../config/palettes.js';
 import { playSound, floraSpell } from '../audio/soundEngine.js';
 import {
     drawFloatingPixelLabel,
@@ -13,10 +14,11 @@ import {
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
 import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
 import {
+    isFloraPanelOpen,
     initFloraPanelUI,
     toggleFloraPanel,
     positionFloraPanelAboveMage
-} from './sanctuary/floraSystem.js';
+} from './sanctuary/floraPanelUI.js';
 import {
     initAmbientFireflies,
     spawnAmbientLagoonRipple,
@@ -274,7 +276,8 @@ export function updateAndDrawSanctuary() {
         zones.mage,
         pointerState.hoveredZone === 'mage',
         sanctuaryTick,
-        sanctuaryState.mageCastTimer
+        sanctuaryState.mageCastTimer,
+        isFloraPanelOpen()
     );
 
     if (pointerState.hoveredZone === 'pond') {
@@ -284,7 +287,7 @@ export function updateAndDrawSanctuary() {
             zones.pond.x + zones.pond.w / 2,
             zones.pond.y - 14,
             pondLabel,
-            '#7AD7F0'
+            SANCTUARY_SCENE_PALETTE.waterFoam
         );
     }
 

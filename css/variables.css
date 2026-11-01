@@ -21,9 +21,12 @@
     --bg-primary: #0D0D0F;
     --bg-panel: #231C1A;
     --bg-panel-alt: #2B3138;
+    --bg-card-deep: #171211;
     --accent-main: #B92B92;
+    --accent-main-bright: #C938A0;
     --accent-secondary: #7A1F73;
     --accent-warm: #D4957A;
+    --accent-ivory: #F3D5B5;
     --shadow-warm: #8A4E3B;
     --steel-base: #56616E;
     --steel-mid: #56616E;
@@ -67,8 +70,8 @@
 
 [data-terminal-color="druk"] {
     --term-bg: #0D070C;
-    --term-fg: #D4957A;
-    --term-dim: #B92B92;
+    --term-fg: var(--accent-warm);
+    --term-dim: var(--accent-main);
     --term-glow: rgba(185, 43, 146, 0.38);
 }
 

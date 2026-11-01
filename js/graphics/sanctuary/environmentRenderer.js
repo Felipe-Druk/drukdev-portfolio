@@ -3,42 +3,46 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
+import {
+    DRUK_CORE_PALETTE,
+    SANCTUARY_SCENE_PALETTE,
+    getActiveBiomePalette
+} from '../../config/palettes.js';
 import { drawRect, drawFloatingPixelLabel } from '../sprites/index.js';
 import { updateAndDrawPondRipples } from './particles.js';
 import {
-    getActiveBiomePalette,
     shadeHexColorByDepth,
     drawProceduralGrass
 } from './floraSystem.js';
 
 export function drawNightSkyAndMoon(context, width, height, moonZone, moonPhase) {
     const skyGradient = context.createLinearGradient(0, 0, 0, height * 0.7);
-    skyGradient.addColorStop(0, '#07080C');
-    skyGradient.addColorStop(0.6, '#120E18');
-    skyGradient.addColorStop(1, '#1E1622');
+    skyGradient.addColorStop(0, SANCTUARY_SCENE_PALETTE.skyTop);
+    skyGradient.addColorStop(0.6, SANCTUARY_SCENE_PALETTE.skyMid);
+    skyGradient.addColorStop(1, SANCTUARY_SCENE_PALETTE.skyBottom);
     context.fillStyle = skyGradient;
     context.fillRect(0, 0, width, height);
 
     // Distant mountain silhouettes
-    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, '#0D0C12');
-    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, '#100E16');
-    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, '#0B0A10');
+    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, SANCTUARY_SCENE_PALETTE.mountainLeft);
+    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, SANCTUARY_SCENE_PALETTE.mountainCenter);
+    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, SANCTUARY_SCENE_PALETTE.mountainRight);
 
     // Mystic Moon with interactive phases
     const moonCenterX = moonZone.centerX;
     const moonCenterY = moonZone.centerY;
-    drawRect(context, moonCenterX - 30, moonCenterY - 30, 60, 60, 'rgba(185, 43, 146, 0.16)');
-    drawRect(context, moonCenterX - 22, moonCenterY - 22, 44, 44, '#7A1F73');
-    drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, '#B92B92');
-    drawRect(context, moonCenterX - 10, moonCenterY - 10, 20, 20, '#D4957A');
+    drawRect(context, moonCenterX - 30, moonCenterY - 30, 60, 60, SANCTUARY_SCENE_PALETTE.moonHalo);
+    drawRect(context, moonCenterX - 22, moonCenterY - 22, 44, 44, DRUK_CORE_PALETTE.dragonBase);
+    drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, moonCenterX - 10, moonCenterY - 10, 20, 20, DRUK_CORE_PALETTE.bronzeWarm);
 
     if (moonPhase === 1) {
-        drawRect(context, moonCenterX - 2, moonCenterY - 20, 22, 40, '#09090E');
+        drawRect(context, moonCenterX - 2, moonCenterY - 20, 22, 40, SANCTUARY_SCENE_PALETTE.moonShadow);
     } else if (moonPhase === 2) {
-        drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, '#09090E');
-        drawRect(context, moonCenterX - 4, moonCenterY - 4, 8, 8, '#B92B92');
+        drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, SANCTUARY_SCENE_PALETTE.moonShadow);
+        drawRect(context, moonCenterX - 4, moonCenterY - 4, 8, 8, DRUK_CORE_PALETTE.dragonLight);
     } else if (moonPhase === 3) {
-        drawRect(context, moonCenterX - 20, moonCenterY - 20, 22, 40, '#09090E');
+        drawRect(context, moonCenterX - 20, moonCenterY - 20, 22, 40, SANCTUARY_SCENE_PALETTE.moonShadow);
     }
 }
 
@@ -71,14 +75,14 @@ export function drawSanctuaryMeadowAndLagoon(
 
     // Lagoon basin with stepped pixel banks
     drawRect(context, pond.x - 8, pond.y - 4, pond.w + 16, pond.h + 8, biomePalette.soilDark);
-    drawRect(context, pond.x - 4, pond.y - 2, pond.w + 8, pond.h + 4, '#1A3347');
-    drawRect(context, pond.x, pond.y, pond.w, pond.h, '#0E2233');
-    drawRect(context, pond.x + 12, pond.y + 8, pond.w - 24, pond.h - 16, '#132D42');
+    drawRect(context, pond.x - 4, pond.y - 2, pond.w + 8, pond.h + 4, SANCTUARY_SCENE_PALETTE.waterBank);
+    drawRect(context, pond.x, pond.y, pond.w, pond.h, SANCTUARY_SCENE_PALETTE.waterDeep);
+    drawRect(context, pond.x + 12, pond.y + 8, pond.w - 24, pond.h - 16, SANCTUARY_SCENE_PALETTE.waterMid);
 
     // Shimmering water reflections
     const shimmerOffset = Math.floor(Math.sin(sanctuaryTick * 0.05) * 6);
-    drawRect(context, pond.x + 36 + shimmerOffset, pond.y + 16, 44, 3, '#2C5E7A');
-    drawRect(context, pond.x + pond.w - 110 - shimmerOffset, pond.y + 42, 52, 3, '#2C5E7A');
+    drawRect(context, pond.x + 36 + shimmerOffset, pond.y + 16, 44, 3, SANCTUARY_SCENE_PALETTE.waterHighlight);
+    drawRect(context, pond.x + pond.w - 110 - shimmerOffset, pond.y + 42, 52, 3, SANCTUARY_SCENE_PALETTE.waterHighlight);
 
     // Pixel Lilypads & Lotus Blossoms harmonized with active biome
     const lilypads = [
@@ -92,7 +96,7 @@ export function drawSanctuaryMeadowAndLagoon(
         drawRect(context, lilypad.x + bobOffsetX, lilypad.y, 20, 10, biomePalette.base);
         drawRect(context, lilypad.x + 2 + bobOffsetX, lilypad.y + 2, 16, 6, biomePalette.mid);
         if (lilypad.hasFlower) {
-            drawRect(context, lilypad.x + 6 + bobOffsetX, lilypad.y - 4, 8, 6, '#B92B92');
+            drawRect(context, lilypad.x + 6 + bobOffsetX, lilypad.y - 4, 8, 6, DRUK_CORE_PALETTE.dragonLight);
             drawRect(context, lilypad.x + 8 + bobOffsetX, lilypad.y - 6, 4, 4, biomePalette.accent);
         }
     });
@@ -109,14 +113,14 @@ export function drawAncientTree(context, treeZone, isHovered, sanctuaryTick, tre
     const centerX = treeZone.centerX;
     const baseY = treeZone.baseY;
 
-    // Roots & Gnarled Trunk (#231C1A & #4A3024)
-    drawRect(context, centerX - 32, baseY - 14, 64, 16, '#231C1A');
-    drawRect(context, centerX - 20, baseY - 96, 40, 84, '#231C1A');
-    drawRect(context, centerX - 14, baseY - 92, 24, 78, '#3D271E');
-    drawRect(context, centerX - 6, baseY - 86, 8, 68, '#5C3A2B');
+    // Roots & Gnarled Trunk
+    drawRect(context, centerX - 32, baseY - 14, 64, 16, DRUK_CORE_PALETTE.darkEarth);
+    drawRect(context, centerX - 20, baseY - 96, 40, 84, DRUK_CORE_PALETTE.darkEarth);
+    drawRect(context, centerX - 14, baseY - 92, 24, 78, SANCTUARY_SCENE_PALETTE.trunkDark);
+    drawRect(context, centerX - 6, baseY - 86, 8, 68, SANCTUARY_SCENE_PALETTE.trunkLight);
 
     // Glowing rune hollow in trunk
-    drawRect(context, centerX - 4, baseY - 52, 8, 14, '#B92B92');
+    drawRect(context, centerX - 4, baseY - 52, 8, 14, DRUK_CORE_PALETTE.dragonLight);
     drawRect(context, centerX - 2, baseY - 48, 4, 8, biomePalette.accent);
 
     // Layered Pixel Canopy harmonized with active biome
@@ -130,7 +134,7 @@ export function drawAncientTree(context, treeZone, isHovered, sanctuaryTick, tre
         [-52, -138], [-24, -168], [18, -176], [48, -142], [-10, -130], [30, -152]
     ];
     sporeOffsets.forEach(([offsetX, offsetY], sporeIndex) => {
-        const color = sporeIndex % 2 === 0 ? '#B92B92' : biomePalette.accent;
+        const color = sporeIndex % 2 === 0 ? DRUK_CORE_PALETTE.dragonLight : biomePalette.accent;
         drawRect(context, centerX + offsetX + gentleSway, baseY + offsetY, 6, 6, color);
     });
 
@@ -158,51 +162,51 @@ export function drawSealedDungeonPortal(
     const centerX = dungeonZone.centerX + shakeX;
     const baseY = dungeonZone.baseY + shakeY;
 
-    // Stone & Forged Steel Outer Monolith (#56616E, #2B3138, #0D0D0F)
-    drawRect(context, centerX - 68, baseY - 132, 136, 134, '#0D0D0F');
-    drawRect(context, centerX - 64, baseY - 128, 128, 128, '#2B3138');
-    drawRect(context, centerX - 56, baseY - 120, 112, 120, '#56616E');
-    drawRect(context, centerX - 48, baseY - 112, 96, 112, '#231C1A');
+    // Stone & Forged Steel Outer Monolith
+    drawRect(context, centerX - 68, baseY - 132, 136, 134, DRUK_CORE_PALETTE.abyss);
+    drawRect(context, centerX - 64, baseY - 128, 128, 128, DRUK_CORE_PALETTE.steelDark);
+    drawRect(context, centerX - 56, baseY - 120, 112, 120, DRUK_CORE_PALETTE.steelBase);
+    drawRect(context, centerX - 48, baseY - 112, 96, 112, DRUK_CORE_PALETTE.darkEarth);
 
     // Sealed Dark Inner Gate
-    drawRect(context, centerX - 36, baseY - 92, 72, 92, '#0D0D0F');
+    drawRect(context, centerX - 36, baseY - 92, 72, 92, DRUK_CORE_PALETTE.abyss);
 
     // Forged Steel Bars & Mystic Chains
     for (let barX = -24; barX <= 24; barX += 16) {
-        drawRect(context, centerX + barX - 2, baseY - 90, 4, 90, '#56616E');
+        drawRect(context, centerX + barX - 2, baseY - 90, 4, 90, DRUK_CORE_PALETTE.steelBase);
     }
 
-    // Glowing Magenta Magic Runes (#B92B92 & #D4957A)
+    // Glowing Magenta Magic Runes
     const runePulse = 0.65 + 0.35 * Math.sin(sanctuaryTick * 0.08);
     context.globalAlpha = runePulse;
-    drawRect(context, centerX - 52, baseY - 84, 6, 14, '#B92B92');
-    drawRect(context, centerX - 52, baseY - 52, 6, 14, '#B92B92');
-    drawRect(context, centerX + 46, baseY - 84, 6, 14, '#B92B92');
-    drawRect(context, centerX + 46, baseY - 52, 6, 14, '#B92B92');
-    drawRect(context, centerX - 14, baseY - 58, 28, 28, '#7A1F73');
-    drawRect(context, centerX - 10, baseY - 54, 20, 20, '#B92B92');
-    drawRect(context, centerX - 4, baseY - 48, 8, 8, '#D4957A');
+    drawRect(context, centerX - 52, baseY - 84, 6, 14, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, centerX - 52, baseY - 52, 6, 14, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, centerX + 46, baseY - 84, 6, 14, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, centerX + 46, baseY - 52, 6, 14, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, centerX - 14, baseY - 58, 28, 28, DRUK_CORE_PALETTE.dragonBase);
+    drawRect(context, centerX - 10, baseY - 54, 20, 20, DRUK_CORE_PALETTE.dragonLight);
+    drawRect(context, centerX - 4, baseY - 48, 8, 8, DRUK_CORE_PALETTE.bronzeWarm);
     context.globalAlpha = 1.0;
 
     // Carved Signboard at top of portal ("DUNGEON // ENTER")
-    drawRect(context, centerX - 76, baseY - 144, 152, 24, '#0D0D0F');
-    drawRect(context, centerX - 74, baseY - 142, 148, 20, '#231C1A');
-    context.strokeStyle = isHovered ? '#B92B92' : '#56616E';
+    drawRect(context, centerX - 76, baseY - 144, 152, 24, DRUK_CORE_PALETTE.abyss);
+    drawRect(context, centerX - 74, baseY - 142, 148, 20, DRUK_CORE_PALETTE.darkEarth);
+    context.strokeStyle = isHovered ? DRUK_CORE_PALETTE.dragonLight : DRUK_CORE_PALETTE.steelBase;
     context.lineWidth = 2;
     context.strokeRect(centerX - 74, baseY - 142, 148, 20);
 
     const signText = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonSign;
     context.font = '8px "Press Start 2P", monospace';
-    context.fillStyle = isHovered ? '#D8E2EB' : '#D4957A';
+    context.fillStyle = isHovered ? DRUK_CORE_PALETTE.steelLight : DRUK_CORE_PALETTE.bronzeWarm;
     context.textAlign = 'center';
     context.fillText(signText, centerX, baseY - 129);
 
     if (dungeonMessageTimer > 0) {
         const sealMsg = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonSealMsg;
-        drawFloatingPixelLabel(context, centerX, baseY - 164, `⚔️ ${sealMsg}`, '#B92B92');
+        drawFloatingPixelLabel(context, centerX, baseY - 164, `⚔️ ${sealMsg}`, DRUK_CORE_PALETTE.dragonLight);
     } else if (isHovered) {
         const hoverLabel = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonHover;
-        drawFloatingPixelLabel(context, centerX, baseY - 160, hoverLabel, '#D4957A');
+        drawFloatingPixelLabel(context, centerX, baseY - 160, hoverLabel, DRUK_CORE_PALETTE.bronzeWarm);
     }
 }
 
@@ -212,38 +216,38 @@ export function drawDrukSystemRelicConsole(context, consoleZone, isHovered, sanc
     const biomePalette = getActiveBiomePalette();
 
     // Mossy stone pedestal & power cables on the grass
-    drawRect(context, centerX - 28, centerY + 28, 56, 12, '#2B3138');
-    drawRect(context, centerX - 24, centerY + 24, 48, 6, '#56616E');
+    drawRect(context, centerX - 28, centerY + 28, 56, 12, DRUK_CORE_PALETTE.steelDark);
+    drawRect(context, centerX - 24, centerY + 24, 48, 6, DRUK_CORE_PALETTE.steelBase);
     drawRect(context, centerX - 38, centerY + 34, 16, 4, biomePalette.base);
 
-    // Forged Steel CRT Casing (#56616E & #231C1A)
-    drawRect(context, centerX - 22, centerY - 8, 44, 34, '#0D0D0F');
-    drawRect(context, centerX - 20, centerY - 6, 40, 30, '#56616E');
-    drawRect(context, centerX - 17, centerY - 3, 34, 24, '#231C1A');
+    // Forged Steel CRT Casing
+    drawRect(context, centerX - 22, centerY - 8, 44, 34, DRUK_CORE_PALETTE.abyss);
+    drawRect(context, centerX - 20, centerY - 6, 40, 30, DRUK_CORE_PALETTE.steelBase);
+    drawRect(context, centerX - 17, centerY - 3, 34, 24, DRUK_CORE_PALETTE.darkEarth);
 
-    // Blinking Matrix Green CRT Screen (#030803 & #00FF41)
-    drawRect(context, centerX - 14, centerY, 28, 18, '#030803');
+    // Blinking Matrix Green CRT Screen
+    drawRect(context, centerX - 14, centerY, 28, 18, DRUK_CORE_PALETTE.matrixBg);
 
     const isCursorVisible = Math.floor(sanctuaryTick / 18) % 2 === 0;
-    drawRect(context, centerX - 11, centerY + 3, 14, 2, '#00FF41');
-    drawRect(context, centerX - 11, centerY + 7, 20, 2, '#008F11');
-    drawRect(context, centerX - 11, centerY + 11, 10, 2, '#00FF41');
+    drawRect(context, centerX - 11, centerY + 3, 14, 2, DRUK_CORE_PALETTE.matrixGreen);
+    drawRect(context, centerX - 11, centerY + 7, 20, 2, DRUK_CORE_PALETTE.matrixDim);
+    drawRect(context, centerX - 11, centerY + 11, 10, 2, DRUK_CORE_PALETTE.matrixGreen);
     if (isCursorVisible) {
-        drawRect(context, centerX + 1, centerY + 11, 4, 3, '#00FF41');
+        drawRect(context, centerX + 1, centerY + 11, 4, 3, DRUK_CORE_PALETTE.matrixGreen);
     }
 
     // Matrix green ambient ground glow
     context.fillStyle = isHovered
-        ? 'rgba(0, 255, 65, 0.28)'
-        : 'rgba(0, 255, 65, 0.12)';
+        ? SANCTUARY_SCENE_PALETTE.crtAmbientGlowHover
+        : SANCTUARY_SCENE_PALETTE.crtAmbientGlowIdle;
     context.fillRect(centerX - 28, centerY - 14, 56, 52);
 
     // Always-visible subtle beacon or full prompt on hover
     const promptText = TRANSLATIONS[getCurrentLanguage()].sanctuary.consoleHover;
     const floatOffset = Math.floor(Math.sin(sanctuaryTick * 0.08) * 3);
     if (isHovered) {
-        drawFloatingPixelLabel(context, centerX, centerY - 24 + floatOffset, promptText, '#00FF41');
+        drawFloatingPixelLabel(context, centerX, centerY - 24 + floatOffset, promptText, DRUK_CORE_PALETTE.matrixGreen);
     } else {
-        drawFloatingPixelLabel(context, centerX, centerY - 22 + floatOffset, '▼ DRUKSYSTEM OS', '#00FF41');
+        drawFloatingPixelLabel(context, centerX, centerY - 22 + floatOffset, '▼ DRUKSYSTEM OS', DRUK_CORE_PALETTE.matrixGreen);
     }
 }

@@ -24,13 +24,16 @@ import {
     openDrukSystem,
     closeDrukSystem,
     executeTerminalCommand,
-    renderBootBanner
+    renderBootBanner,
+    isTerminalModalOpen,
+    isSlasherViewActive
 } from './terminal/drukSystem.js';
 import {
     initDungeonUI,
     openDungeonModal,
     closeDungeonModal,
-    refreshDungeonLanguage
+    refreshDungeonLanguage,
+    isDungeonModalOpen
 } from './dungeon/dungeonUI.js';
 import {
     initGame,
@@ -157,16 +160,22 @@ function bindUIEvents() {
 }
 
 function mainLoop() {
-    updateAndDrawSanctuary();
-    updateAndDrawGame();
+    if (!isDungeonModalOpen() && !isTerminalModalOpen()) {
+        updateAndDrawSanctuary();
+    }
+    if (isSlasherViewActive()) {
+        updateAndDrawGame();
+    }
     requestAnimationFrame(mainLoop);
 }
 
 function initApp() {
-    initSanctuary(openDrukSystem, () => openDungeonModal('select'));
-    initDrukSystem(copyEmail);
+    const openDefaultDungeon = () => openDungeonModal('select');
+    initSanctuary(openDrukSystem, openDefaultDungeon);
+    initDrukSystem(copyEmail, openDefaultDungeon);
     initDungeonUI();
     initGame();
+    updateAndDrawGame();
     renderStaticPreviews();
     setLanguage(getCurrentLanguage());
     bindUIEvents();

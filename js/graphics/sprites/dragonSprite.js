@@ -2,17 +2,10 @@
  * PROCEDURAL DRUK DRAGON & GUARDIAN SPRITE RENDERERS
  **************************************************************/
 
+import { SPRITE_PALETTES } from '../../config/palettes.js';
 import { drawRect } from './canvasUtils.js';
 
-const DRAGON_PALETTE = {
-    scaleLight: '#B92B92',
-    scaleBase: '#7A1F73',
-    chestBronze: '#D4957A',
-    hornGlow: '#F3D5B5',
-    steelLight: '#D8E2EB',
-    shadowDark: '#231C1A',
-    abyssOutline: '#0D0D0F'
-};
+const DRAGON_PALETTE = SPRITE_PALETTES.dragon;
 
 export function drawDragonKnightGuardian(context, originX, originY, pixelUnit = 3) {
     const u = pixelUnit;

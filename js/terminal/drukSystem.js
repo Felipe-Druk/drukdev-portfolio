@@ -10,7 +10,10 @@ import {
     getTerminalInput,
     appendLine,
     switchTerminalSubView,
-    returnToTerminalPrompt
+    returnToTerminalPrompt,
+    isTerminalModalOpen,
+    setTerminalModalOpenState,
+    isSlasherViewActive
 } from './terminalDom.js';
 import { renderBootBanner } from './commands/systemCommands.js';
 import { setCopyEmailHandler } from './commands/contactCommand.js';
@@ -25,16 +28,20 @@ export {
     renderBootBanner,
     returnToTerminalPrompt,
     setTerminalColor,
-    setTerminalFont
+    setTerminalFont,
+    isTerminalModalOpen,
+    isSlasherViewActive
 };
 
 let commandHistory = [];
 let historyIndex = -1;
+let openDungeonHandler = null;
 
 export function openDrukSystem() {
     const modalElement = getModalElement();
     if (!modalElement) return;
 
+    setTerminalModalOpenState(true);
     modalElement.classList.remove('hidden');
     switchTerminalSubView('cli');
     playSound('terminal');
@@ -48,6 +55,8 @@ export function openDrukSystem() {
 export function closeDrukSystem() {
     stopSnakeGame();
     stopFlappyDragonGame();
+    setTerminalModalOpenState(false);
+
     const modalElement = getModalElement();
     if (modalElement) {
         modalElement.classList.add('hidden');
@@ -67,7 +76,8 @@ export function executeTerminalCommand(rawCommand) {
 
     dispatchTerminalCommand(trimmedCommand, {
         executeCommand: executeTerminalCommand,
-        closeTerminal: closeDrukSystem
+        closeTerminal: closeDrukSystem,
+        openDungeon: openDungeonHandler
     });
 }
 
@@ -98,8 +108,9 @@ function handleTerminalInputKeydown(event, inputElement) {
     }
 }
 
-export function initDrukSystem(onCopyEmail) {
+export function initDrukSystem(onCopyEmail, onOpenDungeon) {
     setCopyEmailHandler(onCopyEmail);
+    openDungeonHandler = onOpenDungeon;
     initTerminalAppearance();
     renderBootBanner();
     initSnakeControls();

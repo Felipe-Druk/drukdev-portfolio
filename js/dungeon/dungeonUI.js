@@ -15,14 +15,14 @@ const MAX_STAT_VALUE = 100;
 let currentDungeonView = 'select';
 let selectedCardIndex = 0;
 let activeChamberClassId = OMNISCIENT_CLASS_ID;
+let dungeonModalOpen = false;
 
 function getDungeonModal() {
     return document.getElementById('dungeonModal');
 }
 
 export function isDungeonModalOpen() {
-    const modalElement = getDungeonModal();
-    return Boolean(modalElement && !modalElement.classList.contains('hidden'));
+    return dungeonModalOpen;
 }
 
 function getDungeonTexts(language = getCurrentLanguage()) {
@@ -243,6 +243,7 @@ export function openDungeonModal(initialView = 'select', classId = OMNISCIENT_CL
     const modalElement = getDungeonModal();
     if (!modalElement) return;
 
+    dungeonModalOpen = true;
     modalElement.classList.remove('hidden');
     updateCvDownloadLink(getCurrentLanguage());
     renderClassSelectCards();
@@ -259,6 +260,7 @@ export function closeDungeonModal() {
     const modalElement = getDungeonModal();
     if (!modalElement) return;
 
+    dungeonModalOpen = false;
     modalElement.classList.add('hidden');
     playSound('click');
 }
