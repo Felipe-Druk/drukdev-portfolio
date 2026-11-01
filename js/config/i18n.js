@@ -47,6 +47,8 @@ export const TRANSLATIONS = {
             dungeonSealMsg: 'Abriendo los archivos de la Dungeon...',
             consoleHover: '[ABRIR DRUKSYSTEM OS]',
             mageHover: '[MAGO VERDE // FLORA]',
+            moonHover: '[LUNA // CAMBIAR A DÍA]',
+            sunHover: '[SOL // CAMBIAR A NOCHE]',
             constellations: {
                 github: {
                     label: '[GITHUB]',
@@ -245,6 +247,8 @@ export const TRANSLATIONS = {
             dungeonSealMsg: 'Opening the Dungeon archives...',
             consoleHover: '[OPEN DRUKSYSTEM OS]',
             mageHover: '[GREEN MAGE // FLORA]',
+            moonHover: '[MOON // SWITCH TO DAY]',
+            sunHover: '[SUN // SWITCH TO NIGHT]',
             constellations: {
                 github: {
                     label: '[GITHUB]',

@@ -4,8 +4,13 @@
 
 import { CONTACT_LINKS, getLocalizedCvPath } from '../../config/links.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
-import { DRUK_CORE_PALETTE, SANCTUARY_SCENE_PALETTE } from '../../config/palettes.js';
+import {
+    DRUK_CORE_PALETTE,
+    SANCTUARY_SCENE_PALETTE,
+    getInterpolatedScenePalette
+} from '../../config/palettes.js';
 import { drawRect, drawPixelLine, drawFloatingPixelLabel } from '../sprites/index.js';
+import { getCelestialProgress } from './celestialSystem.js';
 
 export const CONSTELLATION_ZONE_PREFIX = 'constellation:';
 
@@ -180,38 +185,64 @@ export function buildConstellationZones(width, height, horizonY) {
     return activeConstellations;
 }
 
-function drawConstellationEdges(context, constellation, isHovered) {
+function drawConstellationEdges(context, constellation, isHovered, scenePalette, celestialProgress) {
+    const idleAlpha = 0.52 + 0.34 * celestialProgress;
+
     constellation.edges.forEach(([fromNodeIndex, toNodeIndex]) => {
         const fromNode = constellation.nodes[fromNodeIndex];
         const toNode = constellation.nodes[toNodeIndex];
         if (!fromNode || !toNode) return;
 
         if (isHovered) {
-            context.globalAlpha = 0.26;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonLight, 4);
+            context.globalAlpha = 0.30;
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeHover, 4);
             context.globalAlpha = 1.0;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonLight, 2);
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeHover, 2);
         } else {
-            context.globalAlpha = 0.52;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, DRUK_CORE_PALETTE.dragonBase, 2);
+            context.globalAlpha = idleAlpha;
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeIdle, 2);
             context.globalAlpha = 1.0;
         }
     });
 }
 
-function drawConstellationStars(context, constellation, constellationIndex, isHovered, sanctuaryTick) {
+function drawConstellationStars(
+    context,
+    constellation,
+    constellationIndex,
+    isHovered,
+    sanctuaryTick,
+    scenePalette,
+    celestialProgress
+) {
+    const isAstrolabeDay = celestialProgress >= 0.45;
+
     constellation.nodes.forEach((node, nodeIndex) => {
         if (isHovered) {
-            drawRect(context, node.x - 5, node.y - 1, 10, 2, DRUK_CORE_PALETTE.ivoryGlow);
-            drawRect(context, node.x - 1, node.y - 5, 2, 10, DRUK_CORE_PALETTE.ivoryGlow);
-            drawRect(context, node.x - 2, node.y - 2, 4, 4, DRUK_CORE_PALETTE.ivoryGlow);
+            drawRect(context, node.x - 5, node.y - 1, 10, 2, scenePalette.constellationEdgeHover);
+            drawRect(context, node.x - 1, node.y - 5, 2, 10, scenePalette.constellationEdgeHover);
+            drawRect(context, node.x - 2, node.y - 2, 4, 4, scenePalette.constellationStarBright);
             drawRect(context, node.x - 1, node.y - 1, 2, 2, DRUK_CORE_PALETTE.steelLight);
             return;
         }
 
         const isBrightPhase = Math.sin(sanctuaryTick * 0.06 + nodeIndex * 1.7 + constellationIndex * 1.3) > 0;
-        const starColor = isBrightPhase ? DRUK_CORE_PALETTE.steelLight : DRUK_CORE_PALETTE.bronzeWarm;
+        const starColor = isBrightPhase
+            ? scenePalette.constellationStarBright
+            : scenePalette.constellationStarDim;
         const starSize = (nodeIndex % 2 === 0 || isBrightPhase) ? 4 : 2;
+
+        if (isAstrolabeDay) {
+            drawRect(
+                context,
+                node.x - starSize / 2 - 1,
+                node.y - starSize / 2 - 1,
+                starSize + 2,
+                starSize + 2,
+                DRUK_CORE_PALETTE.darkEarth
+            );
+        }
+
         drawRect(
             context,
             node.x - starSize / 2,
@@ -223,7 +254,15 @@ function drawConstellationStars(context, constellation, constellationIndex, isHo
     });
 }
 
-function drawConstellationLabel(context, constellation, translationEntry, isHovered, mailCopiedTimer) {
+function drawConstellationLabel(
+    context,
+    constellation,
+    translationEntry,
+    isHovered,
+    mailCopiedTimer,
+    scenePalette,
+    celestialProgress
+) {
     if (!translationEntry) return;
 
     const labelText = isHovered ? translationEntry.hover : translationEntry.label;
@@ -243,10 +282,14 @@ function drawConstellationLabel(context, constellation, translationEntry, isHove
         );
         context.fillStyle = constellation.type === 'email'
             ? DRUK_CORE_PALETTE.matrixGreen
-            : DRUK_CORE_PALETTE.steelLight;
+            : scenePalette.constellationEdgeHover;
         context.fillText(labelText, constellation.centerX, labelY);
     } else {
-        context.fillStyle = SANCTUARY_SCENE_PALETTE.constellationMutedLabel;
+        if (celestialProgress > 0.25) {
+            context.fillStyle = DRUK_CORE_PALETTE.abyss;
+            context.fillText(labelText, constellation.centerX + 1, labelY + 1);
+        }
+        context.fillStyle = scenePalette.constellationLabel;
         context.fillText(labelText, constellation.centerX, labelY);
     }
 
@@ -265,13 +308,31 @@ function drawConstellationLabel(context, constellation, translationEntry, isHove
 
 export function drawSkyConstellations(context, constellations, hoveredZone, sanctuaryTick, mailCopiedTimer) {
     const activeLangConstellations = TRANSLATIONS[getCurrentLanguage()].sanctuary.constellations;
+    const celestialProgress = getCelestialProgress();
+    const scenePalette = getInterpolatedScenePalette(celestialProgress);
 
     constellations.forEach((constellation, constellationIndex) => {
         const isHovered = hoveredZone === constellation.zoneKey;
         const translationEntry = activeLangConstellations[constellation.id];
 
-        drawConstellationEdges(context, constellation, isHovered);
-        drawConstellationStars(context, constellation, constellationIndex, isHovered, sanctuaryTick);
-        drawConstellationLabel(context, constellation, translationEntry, isHovered, mailCopiedTimer);
+        drawConstellationEdges(context, constellation, isHovered, scenePalette, celestialProgress);
+        drawConstellationStars(
+            context,
+            constellation,
+            constellationIndex,
+            isHovered,
+            sanctuaryTick,
+            scenePalette,
+            celestialProgress
+        );
+        drawConstellationLabel(
+            context,
+            constellation,
+            translationEntry,
+            isHovered,
+            mailCopiedTimer,
+            scenePalette,
+            celestialProgress
+        );
     });
 }

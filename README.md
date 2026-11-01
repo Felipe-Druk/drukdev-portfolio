@@ -44,12 +44,13 @@ portfolio/
     │   │   ├── classEmblems.js         # Emblemas procedurales de las 4 clases RPG + Modo Omnisciente para la Dungeon
     │   │   └── arcadeSprites.js        # Sprites procedurales para Bug Slasher (héroe, onda de espada, bugs, gemas) y Snake CRT
     │   └── sanctuary/
-    │       ├── constellations.js       # Planos, rotación 2D, caché de zonas y renderizado de las 5 constelaciones (redes, mail y CV)
-    │       ├── environmentRenderer.js  # Renderizado del cielo/luna, pradera/laguna, Árbol Antiguo, Portal Dungeon y Consola CRT
+    │       ├── celestialSystem.js      # Ciclo Noche -> Atardecer -> Día, arco parabólico al horizonte y Sol/Luna pixel-art
+    │       ├── constellations.js       # Planos, rotación 2D, caché de zonas y renderizado de las 5 constelaciones (Astrolabio Solar de día)
+    │       ├── environmentRenderer.js  # Renderizado de cielo/montañas/laguna interpolados, Árbol Antiguo, Portal Dungeon y Consola CRT
     │       ├── floraSystem.js          # Motor matemático y generación procedural del pasto (dispersión, cúmulos y sombreado por profundidad)
     │       ├── floraPanelUI.js         # Controlador DOM del Grimorio Botánico (#floraPanel), sliders, biomas y posicionamiento sobre el Mago
     │       ├── layoutZones.js          # Cálculo responsivo con memoización de hitboxes/zonas interactivas y detección de hover
-    │       └── particles.js            # Sistema de partículas: luciérnagas, hojas/esporas, ondas de agua, chispas rúnicas y lluvia estelar
+    │       └── particles.js            # Sistema de partículas: luciérnagas/polen solar, hojas/esporas, ondas de agua, chispas rúnicas y lluvia estelar
     ├── terminal/
     │   ├── drukSystem.js               # Controlador principal del monitor CRT: ciclo de vida del modal, historial y eventos de entrada
     │   ├── terminalDom.js              # Helpers DOM de la terminal, salida de texto y conmutador de sub-vistas CRT (CLI y cartuchos)
@@ -81,12 +82,13 @@ portfolio/
      - `arcadeSprites.js` provee los sprites procedurales para `bugSlasher.js` y `snakeGame.js`.
 3. **Escenario del Santuario (`js/graphics/sanctuary.js` + `js/graphics/sanctuary/*`):**
    - `sanctuary.js` actúa como controlador de estado e input del canvas `#sanctuaryCanvas` y delega responsabilidades en `js/graphics/sanctuary/`:
-     - `layoutZones.js` calcula y memoiza las coordenadas relativas al viewport para que ningún elemento colisione ni recalcule geometría innecesariamente.
-     - `environmentRenderer.js` dibuja el cielo nocturno, la luna de fases interactivas, la pradera, la laguna con nenúfares, el Árbol Antiguo, el Portal de la Dungeon (`DUNGEON // ENTER`) y la consola reliquia `DrukSystem`.
+     - `celestialSystem.js` gestiona el ciclo **Noche -> Atardecer Dorado -> Día** (`druk_celestial_mode`), la trayectoria parabólica del astro hacia el horizonte y el renderizado pixel-art de la Luna y el Sol.
+     - `layoutZones.js` calcula y memoiza las coordenadas relativas al viewport y actualiza el hitbox dinámico del astro en tiempo real.
+     - `environmentRenderer.js` dibuja el cielo, montañas y laguna con interpolación cromática (`getInterpolatedScenePalette`), el Árbol Antiguo, el Portal de la Dungeon (`DUNGEON // ENTER`) y la consola reliquia `DrukSystem`.
      - `floraSystem.js` gestiona exclusivamente el motor matemático y la generación procedural del pasto (`seed`, `density`, `clumping`, `grassLength` y sombreado por profundidad).
      - `floraPanelUI.js` controla exclusivamente el DOM y eventos del Grimorio Botánico (`#floraPanel`).
-     - `constellations.js` traza las 5 constelaciones interactivas (**GitHub**, **YouTube**, **LinkedIn**, **Mail** y **CV**).
-     - `particles.js` actualiza y dibuja luciérnagas ambientales, ondas en el agua, hojas, chispas del portal y lluvia estelar.
+     - `constellations.js` traza las 5 constelaciones interactivas (**GitHub**, **YouTube**, **LinkedIn**, **Mail** y **CV**), adaptándolas como un **Astrolabio Solar** durante el día.
+     - `particles.js` actualiza y dibuja luciérnagas nocturnas / polen solar diurno, ondas en el agua, hojas, chispas del portal y lluvia estelar.
 4. **La Dungeon Interactiva (`js/dungeon/dungeonUI.js` + `js/dungeon/chamberRenderer.js` + `js/config/dungeonData.js`):**
    - `dungeonData.js` contiene datos puros de dominio (sin lógica visual) para las 4 clases RPG, proyectos (`DUNGEON_PROJECTS`), experiencia (`DUNGEON_EXPERIENCE`), materias de **FIUBA** (`DUNGEON_EDUCATION`) y certificaciones de **Boot.dev** (`DUNGEON_CERTIFICATIONS`).
    - `dungeonUI.js` controla el modal `#dungeonModal`, la selección de clase por **Mouse y Teclado** (`ArrowLeft`/`ArrowRight` + `Enter` + `Escape`) y el **Modo Omnisciente**.

@@ -4,7 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SANCTUARY_SCENE_PALETTE } from '../config/palettes.js';
-import { playSound, floraSpell } from '../audio/soundEngine.js';
+import { playSound, floraSpell, celestialShift } from '../audio/soundEngine.js';
 import {
     drawFloatingPixelLabel,
     copyTextToClipboard,
@@ -13,6 +13,10 @@ import {
 } from './sprites/index.js';
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
 import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
+import {
+    toggleCelestialCycle,
+    updateCelestialCycle
+} from './sanctuary/celestialSystem.js';
 import {
     isFloraPanelOpen,
     initFloraPanelUI,
@@ -27,6 +31,7 @@ import {
     spawnDungeonRuneSparks,
     spawnConstellationStarfall,
     spawnMageFloraWave,
+    spawnCelestialBurst,
     updateAndDrawParticles
 } from './sanctuary/particles.js';
 import {
@@ -50,7 +55,6 @@ const pointerState = {
 };
 
 const sanctuaryState = {
-    moonPhase: 0,
     treeRustleTimer: 0,
     dungeonShakeTimer: 0,
     dungeonMessageTimer: 0,
@@ -136,9 +140,10 @@ const ZONE_CLICK_HANDLERS = {
             playSound('jump');
         }
     },
-    moon: () => {
-        sanctuaryState.moonPhase = (sanctuaryState.moonPhase + 1) % 4;
-        playSound('coin');
+    moon: (zones) => {
+        toggleCelestialCycle();
+        celestialShift();
+        spawnCelestialBurst(zones.moon);
     }
 };
 
@@ -228,13 +233,28 @@ export function updateAndDrawSanctuary() {
     if (!sanctuaryCanvas || !sanctuaryContext) return;
 
     sanctuaryTick++;
+    updateCelestialCycle();
+
     const width = sanctuaryCanvas.width;
     const height = sanctuaryCanvas.height;
     const zones = getLayoutZones(width, height, sanctuaryState.heroOffsetY);
 
+    if (pointerState.x >= 0 && pointerState.y >= 0) {
+        pointerState.hoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
+        sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
+    }
+
     updateSanctuaryState(zones);
 
-    drawNightSkyAndMoon(sanctuaryContext, width, height, zones.moon, sanctuaryState.moonPhase);
+    drawNightSkyAndMoon(
+        sanctuaryContext,
+        width,
+        height,
+        zones.moon,
+        sanctuaryTick,
+        pointerState.hoveredZone === 'moon',
+        zones.horizonY
+    );
     drawSkyConstellations(
         sanctuaryContext,
         zones.constellations,

@@ -124,6 +124,19 @@ const SOUND_PRESETS = {
         ],
         gainVolume: 0.08,
         duration: 0.26
+    },
+    celestialShift: {
+        waveType: 'triangle',
+        startFrequency: 329.63,
+        chordFrequencies: [261.63, 392.00, 493.88],
+        steps: [
+            { frequency: 392.00, timeOffset: 0.07 },
+            { frequency: 493.88, timeOffset: 0.14 },
+            { frequency: 659.25, timeOffset: 0.22 },
+            { frequency: 783.99, timeOffset: 0.30 }
+        ],
+        gainVolume: 0.07,
+        duration: 0.42
     }
 };
 
@@ -173,6 +186,24 @@ function synthesizeTone(preset) {
 
     oscillator.start(currentTime);
     oscillator.stop(currentTime + preset.duration);
+
+    if (Array.isArray(preset.chordFrequencies)) {
+        const voiceGain = preset.gainVolume * 0.45;
+        preset.chordFrequencies.forEach((chordFreq) => {
+            const chordOscillator = audioContext.createOscillator();
+            const chordGainNode = audioContext.createGain();
+            chordOscillator.connect(chordGainNode);
+            chordGainNode.connect(audioContext.destination);
+
+            chordOscillator.type = 'sine';
+            chordOscillator.frequency.setValueAtTime(chordFreq, currentTime);
+            chordGainNode.gain.setValueAtTime(voiceGain, currentTime);
+            chordGainNode.gain.linearRampToValueAtTime(0.005, currentTime + preset.duration);
+
+            chordOscillator.start(currentTime);
+            chordOscillator.stop(currentTime + preset.duration);
+        });
+    }
 }
 
 export function playSound(soundType) {
@@ -192,6 +223,10 @@ export function floraSpell() {
     playSound('floraSpell');
 }
 
+export function celestialShift() {
+    playSound('celestialShift');
+}
+
 export function toggleSound() {
     soundEnabled = !soundEnabled;
     if (soundEnabled) {
@@ -204,6 +239,7 @@ export const SoundEngine = {
     initAudio,
     playSound,
     floraSpell,
+    celestialShift,
     toggleSound,
     isSoundEnabled
 };

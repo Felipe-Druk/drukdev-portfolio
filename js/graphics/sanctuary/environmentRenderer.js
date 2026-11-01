@@ -6,7 +6,8 @@ import { TRANSLATIONS, getCurrentLanguage } from '../../config/i18n.js';
 import {
     DRUK_CORE_PALETTE,
     SANCTUARY_SCENE_PALETTE,
-    getActiveBiomePalette
+    getActiveBiomePalette,
+    getInterpolatedScenePalette
 } from '../../config/palettes.js';
 import { drawRect, drawFloatingPixelLabel } from '../sprites/index.js';
 import { updateAndDrawPondRipples } from './particles.js';
@@ -14,37 +15,44 @@ import {
     shadeHexColorByDepth,
     drawProceduralGrass
 } from './floraSystem.js';
+import {
+    getCelestialProgress,
+    drawCelestialBody,
+    drawCelestialHoverLabel
+} from './celestialSystem.js';
 
-export function drawNightSkyAndMoon(context, width, height, moonZone, moonPhase) {
+export function drawNightSkyAndMoon(
+    context,
+    width,
+    height,
+    celestialZone,
+    sanctuaryTick = 0,
+    isCelestialHovered = false,
+    horizonY
+) {
+    const scenePalette = getInterpolatedScenePalette(getCelestialProgress());
+
     const skyGradient = context.createLinearGradient(0, 0, 0, height * 0.7);
-    skyGradient.addColorStop(0, SANCTUARY_SCENE_PALETTE.skyTop);
-    skyGradient.addColorStop(0.6, SANCTUARY_SCENE_PALETTE.skyMid);
-    skyGradient.addColorStop(1, SANCTUARY_SCENE_PALETTE.skyBottom);
+    skyGradient.addColorStop(0, scenePalette.skyTop);
+    skyGradient.addColorStop(0.6, scenePalette.skyMid);
+    skyGradient.addColorStop(1, scenePalette.skyBottom);
     context.fillStyle = skyGradient;
     context.fillRect(0, 0, width, height);
 
-    // Distant mountain silhouettes
-    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, SANCTUARY_SCENE_PALETTE.mountainLeft);
-    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, SANCTUARY_SCENE_PALETTE.mountainCenter);
-    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, SANCTUARY_SCENE_PALETTE.mountainRight);
+    // Celestial body rendered along parabolic arc (occluded by mountains at horizon)
+    drawCelestialBody(context, celestialZone, sanctuaryTick);
 
-    // Mystic Moon with interactive phases
-    const moonCenterX = moonZone.centerX;
-    const moonCenterY = moonZone.centerY;
-    drawRect(context, moonCenterX - 30, moonCenterY - 30, 60, 60, SANCTUARY_SCENE_PALETTE.moonHalo);
-    drawRect(context, moonCenterX - 22, moonCenterY - 22, 44, 44, DRUK_CORE_PALETTE.dragonBase);
-    drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, DRUK_CORE_PALETTE.dragonLight);
-    drawRect(context, moonCenterX - 10, moonCenterY - 10, 20, 20, DRUK_CORE_PALETTE.bronzeWarm);
+    // Distant mountain silhouettes with dynamic atmospheric haze
+    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, scenePalette.mountainMid);
+    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, scenePalette.mountainFar);
+    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, scenePalette.mountainNear);
 
-    if (moonPhase === 1) {
-        drawRect(context, moonCenterX - 2, moonCenterY - 20, 22, 40, SANCTUARY_SCENE_PALETTE.moonShadow);
-    } else if (moonPhase === 2) {
-        drawRect(context, moonCenterX - 16, moonCenterY - 16, 32, 32, SANCTUARY_SCENE_PALETTE.moonShadow);
-        drawRect(context, moonCenterX - 4, moonCenterY - 4, 8, 8, DRUK_CORE_PALETTE.dragonLight);
-    } else if (moonPhase === 3) {
-        drawRect(context, moonCenterX - 20, moonCenterY - 20, 22, 40, SANCTUARY_SCENE_PALETTE.moonShadow);
+    if (isCelestialHovered) {
+        drawCelestialHoverLabel(context, celestialZone, width, horizonY);
     }
 }
+
+export const drawSkyAndCelestialBody = drawNightSkyAndMoon;
 
 export function drawSanctuaryMeadowAndLagoon(
     context,
@@ -56,6 +64,7 @@ export function drawSanctuaryMeadowAndLagoon(
 ) {
     const { horizonY, pond } = zones;
     const biomePalette = getActiveBiomePalette();
+    const scenePalette = getInterpolatedScenePalette(getCelestialProgress());
 
     // Terraced pixel-art meadow soil & base biome layers with progressive depth darkening
     const depthBands = 14;
@@ -73,16 +82,16 @@ export function drawSanctuaryMeadowAndLagoon(
     // Procedural pixel-art grass & swaying blades across the meadow
     drawProceduralGrass(context, width, height, zones, pointerState, sanctuaryTick);
 
-    // Lagoon basin with stepped pixel banks
+    // Lagoon basin with stepped pixel banks & dynamic celestial water reflections
     drawRect(context, pond.x - 8, pond.y - 4, pond.w + 16, pond.h + 8, biomePalette.soilDark);
-    drawRect(context, pond.x - 4, pond.y - 2, pond.w + 8, pond.h + 4, SANCTUARY_SCENE_PALETTE.waterBank);
-    drawRect(context, pond.x, pond.y, pond.w, pond.h, SANCTUARY_SCENE_PALETTE.waterDeep);
-    drawRect(context, pond.x + 12, pond.y + 8, pond.w - 24, pond.h - 16, SANCTUARY_SCENE_PALETTE.waterMid);
+    drawRect(context, pond.x - 4, pond.y - 2, pond.w + 8, pond.h + 4, scenePalette.waterRim);
+    drawRect(context, pond.x, pond.y, pond.w, pond.h, scenePalette.waterDeep);
+    drawRect(context, pond.x + 12, pond.y + 8, pond.w - 24, pond.h - 16, scenePalette.waterInner);
 
     // Shimmering water reflections
     const shimmerOffset = Math.floor(Math.sin(sanctuaryTick * 0.05) * 6);
-    drawRect(context, pond.x + 36 + shimmerOffset, pond.y + 16, 44, 3, SANCTUARY_SCENE_PALETTE.waterHighlight);
-    drawRect(context, pond.x + pond.w - 110 - shimmerOffset, pond.y + 42, 52, 3, SANCTUARY_SCENE_PALETTE.waterHighlight);
+    drawRect(context, pond.x + 36 + shimmerOffset, pond.y + 16, 44, 3, scenePalette.waterHighlight);
+    drawRect(context, pond.x + pond.w - 110 - shimmerOffset, pond.y + 42, 52, 3, scenePalette.waterHighlight);
 
     // Pixel Lilypads & Lotus Blossoms harmonized with active biome
     const lilypads = [

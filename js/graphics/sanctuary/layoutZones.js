@@ -5,6 +5,7 @@
 import { getCurrentLanguage } from '../../config/i18n.js';
 import { isPointInRect } from '../sprites/index.js';
 import { buildConstellationZones } from './constellations.js';
+import { getCelestialBodyZone } from './celestialSystem.js';
 
 let cachedLayoutState = {
     cacheKey: '',
@@ -36,13 +37,11 @@ export function getLayoutZones(width, height, heroOffsetY = 0) {
         const dungeonLeftEdge = dungeonX - 74;
         const mageX = Math.floor((consoleRightEdge + dungeonLeftEdge) / 2);
 
-        const moonX = Math.floor(width * (width < 640 ? 0.88 : 0.84));
-        const moonY = Math.max(58, Math.floor(height * 0.11));
-
         const heroX = Math.floor(width * 0.36);
         const baseHeroY = horizonY - 36;
 
         const constellations = buildConstellationZones(width, height, horizonY);
+        const initialCelestialZone = getCelestialBodyZone(width, height, horizonY);
 
         cachedLayoutState = {
             cacheKey,
@@ -55,7 +54,8 @@ export function getLayoutZones(width, height, heroOffsetY = 0) {
                 console: { x: consoleX - 32, y: consoleY - 16, w: 68, h: 58, baseX: consoleX, baseY: consoleY },
                 mage: { x: mageX - 20, y: horizonY - 58, w: 42, h: 60, centerX: mageX, baseY: horizonY },
                 dungeon: { x: dungeonX - 74, y: dungeonY - 10, w: 148, h: 156, centerX: dungeonX, baseY: horizonY },
-                moon: { x: moonX - 28, y: moonY - 28, w: 64, h: 64, centerX: moonX, centerY: moonY },
+                moon: initialCelestialZone,
+                celestial: initialCelestialZone,
                 hero: { x: heroX - 6, y: baseHeroY - 6, w: 48, h: 48, spriteX: heroX, spriteY: baseHeroY }
             }
         };
@@ -64,6 +64,10 @@ export function getLayoutZones(width, height, heroOffsetY = 0) {
     const dynamicHeroY = cachedLayoutState.baseHeroY + heroOffsetY;
     cachedLayoutState.zones.hero.y = dynamicHeroY - 6;
     cachedLayoutState.zones.hero.spriteY = dynamicHeroY;
+
+    const activeCelestialZone = getCelestialBodyZone(width, height, cachedLayoutState.zones.horizonY);
+    cachedLayoutState.zones.moon = activeCelestialZone;
+    cachedLayoutState.zones.celestial = activeCelestialZone;
 
     return cachedLayoutState.zones;
 }

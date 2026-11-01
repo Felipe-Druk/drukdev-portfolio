@@ -29,6 +29,13 @@ export const SANCTUARY_SCENE_PALETTE = Object.freeze({
     mountainRight: '#0B0A10',
     moonHalo: 'rgba(185, 43, 146, 0.16)',
     moonShadow: '#09090E',
+    sunHalo: 'rgba(255, 176, 0, 0.22)',
+    sunOuterRing: '#E07A2A',
+    sunInnerRing: '#FFB000',
+    sunCore: '#FFF5D6',
+    pollenGold: '#FFB000',
+    pollenIvory: '#FFF5D6',
+    pollenWarm: '#D4957A',
     waterBank: '#1A3347',
     waterDeep: '#0E2233',
     waterMid: '#132D42',
@@ -42,6 +49,60 @@ export const SANCTUARY_SCENE_PALETTE = Object.freeze({
     constellationHoverBg: 'rgba(13, 13, 15, 0.85)',
     crtAmbientGlowHover: 'rgba(0, 255, 65, 0.28)',
     crtAmbientGlowIdle: 'rgba(0, 255, 65, 0.12)'
+});
+
+export const CELESTIAL_STAGES = Object.freeze({
+    night: Object.freeze({
+        skyTop: SANCTUARY_SCENE_PALETTE.skyTop,
+        skyMid: SANCTUARY_SCENE_PALETTE.skyMid,
+        skyBottom: SANCTUARY_SCENE_PALETTE.skyBottom,
+        mountainFar: SANCTUARY_SCENE_PALETTE.mountainCenter,
+        mountainMid: SANCTUARY_SCENE_PALETTE.mountainLeft,
+        mountainNear: SANCTUARY_SCENE_PALETTE.mountainRight,
+        waterDeep: SANCTUARY_SCENE_PALETTE.waterDeep,
+        waterInner: SANCTUARY_SCENE_PALETTE.waterMid,
+        waterRim: SANCTUARY_SCENE_PALETTE.waterBank,
+        waterHighlight: SANCTUARY_SCENE_PALETTE.waterHighlight,
+        constellationEdgeIdle: DRUK_CORE_PALETTE.dragonBase,
+        constellationEdgeHover: DRUK_CORE_PALETTE.dragonLight,
+        constellationStarBright: DRUK_CORE_PALETTE.steelLight,
+        constellationStarDim: DRUK_CORE_PALETTE.bronzeWarm,
+        constellationLabel: SANCTUARY_SCENE_PALETTE.constellationMutedLabel
+    }),
+    sunset: Object.freeze({
+        skyTop: '#1A0F24',
+        skyMid: '#5E2340',
+        skyBottom: '#D48244',
+        mountainFar: '#2A162D',
+        mountainMid: '#211124',
+        mountainNear: '#170B1A',
+        waterDeep: '#2A1829',
+        waterInner: '#8A4E3B',
+        waterRim: '#3E2434',
+        waterHighlight: '#D4957A',
+        constellationEdgeIdle: '#A84A5C',
+        constellationEdgeHover: '#FFF5D6',
+        constellationStarBright: '#FFF5D6',
+        constellationStarDim: '#FFB000',
+        constellationLabel: '#F3D5B5'
+    }),
+    day: Object.freeze({
+        skyTop: '#1B334B',
+        skyMid: '#35607A',
+        skyBottom: '#8CA8AC',
+        mountainFar: '#283D4E',
+        mountainMid: '#1D2D3A',
+        mountainNear: '#15222D',
+        waterDeep: '#1F4E6B',
+        waterInner: '#2B688A',
+        waterRim: '#2C5E7A',
+        waterHighlight: '#4A89A8',
+        constellationEdgeIdle: '#8A4E3B',
+        constellationEdgeHover: '#FFB000',
+        constellationStarBright: '#FFF5D6',
+        constellationStarDim: '#FFB000',
+        constellationLabel: '#F3D5B5'
+    })
 });
 
 export const BIOME_PALETTES = Object.freeze({
@@ -186,4 +247,58 @@ export function setActiveTerminalColorMode(mode) {
 
 export function getActiveTerminalPalette() {
     return TERMINAL_PALETTES[activeTerminalColorMode] || TERMINAL_PALETTES.matrix;
+}
+
+function parseHexColorToRgb(hexColor) {
+    const cleanHex = hexColor.replace('#', '');
+    return {
+        red: parseInt(cleanHex.slice(0, 2), 16),
+        green: parseInt(cleanHex.slice(2, 4), 16),
+        blue: parseInt(cleanHex.slice(4, 6), 16)
+    };
+}
+
+function formatRgbChannelToHex(channelValue) {
+    const clampedValue = Math.max(0, Math.min(255, Math.round(channelValue)));
+    return clampedValue.toString(16).padStart(2, '0').toUpperCase();
+}
+
+export function interpolateHexColor(startHex, endHex, interpolationFactor) {
+    const clampedFactor = Math.max(0, Math.min(1, interpolationFactor));
+    const startRgb = parseHexColorToRgb(startHex);
+    const endRgb = parseHexColorToRgb(endHex);
+
+    const red = startRgb.red + (endRgb.red - startRgb.red) * clampedFactor;
+    const green = startRgb.green + (endRgb.green - startRgb.green) * clampedFactor;
+    const blue = startRgb.blue + (endRgb.blue - startRgb.blue) * clampedFactor;
+
+    return `#${formatRgbChannelToHex(red)}${formatRgbChannelToHex(green)}${formatRgbChannelToHex(blue)}`;
+}
+
+export function getInterpolatedScenePalette(progress = 0) {
+    const clampedProgress = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
+
+    if (clampedProgress === 0) {
+        return CELESTIAL_STAGES.night;
+    }
+    if (clampedProgress === 0.5) {
+        return CELESTIAL_STAGES.sunset;
+    }
+    if (clampedProgress === 1) {
+        return CELESTIAL_STAGES.day;
+    }
+
+    const isFirstHalf = clampedProgress < 0.5;
+    const fromStage = isFirstHalf ? CELESTIAL_STAGES.night : CELESTIAL_STAGES.sunset;
+    const toStage = isFirstHalf ? CELESTIAL_STAGES.sunset : CELESTIAL_STAGES.day;
+    const stageFactor = isFirstHalf ? clampedProgress / 0.5 : (clampedProgress - 0.5) / 0.5;
+
+    const interpolatedPalette = {};
+    const stageKeys = Object.keys(CELESTIAL_STAGES.night);
+    for (let index = 0; index < stageKeys.length; index++) {
+        const key = stageKeys[index];
+        interpolatedPalette[key] = interpolateHexColor(fromStage[key], toStage[key], stageFactor);
+    }
+
+    return interpolatedPalette;
 }

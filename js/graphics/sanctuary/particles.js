@@ -5,9 +5,11 @@
 import {
     DRUK_CORE_PALETTE,
     SANCTUARY_SCENE_PALETTE,
-    getActiveBiomePalette
+    getActiveBiomePalette,
+    interpolateHexColor
 } from '../../config/palettes.js';
 import { snapToPixel, drawRect } from '../sprites/index.js';
+import { getCelestialProgress } from './celestialSystem.js';
 
 let particles = [];
 let pondRipples = [];
@@ -16,6 +18,13 @@ let ambientFireflies = [];
 export function initAmbientFireflies(width, height) {
     ambientFireflies = [];
     for (let index = 0; index < 36; index++) {
+        const nightColor = index % 3 === 0
+            ? DRUK_CORE_PALETTE.matrixGreen
+            : (index % 2 === 0 ? DRUK_CORE_PALETTE.bronzeWarm : DRUK_CORE_PALETTE.dragonLight);
+        const dayColor = index % 3 === 0
+            ? SANCTUARY_SCENE_PALETTE.pollenIvory
+            : (index % 2 === 0 ? SANCTUARY_SCENE_PALETTE.pollenGold : SANCTUARY_SCENE_PALETTE.pollenWarm);
+
         ambientFireflies.push({
             x: Math.random() * width,
             y: Math.random() * (height * 0.85),
@@ -23,9 +32,9 @@ export function initAmbientFireflies(width, height) {
             velocityY: -0.15 - Math.random() * 0.25,
             size: Math.random() > 0.6 ? 4 : 3,
             phase: Math.random() * Math.PI * 2,
-            color: index % 3 === 0
-                ? DRUK_CORE_PALETTE.matrixGreen
-                : (index % 2 === 0 ? DRUK_CORE_PALETTE.bronzeWarm : DRUK_CORE_PALETTE.dragonLight)
+            color: nightColor,
+            nightColor,
+            dayColor
         });
     }
 }
@@ -182,6 +191,38 @@ export function spawnMageFloraWave(mageZone, horizonY, width, includeMeadowBurst
     }
 }
 
+export function spawnCelestialBurst(celestialZone) {
+    const isSun = celestialZone.bodyType === 'sun';
+    const burstColors = isSun
+        ? [
+            SANCTUARY_SCENE_PALETTE.pollenIvory,
+            SANCTUARY_SCENE_PALETTE.pollenGold,
+            SANCTUARY_SCENE_PALETTE.sunOuterRing,
+            DRUK_CORE_PALETTE.bronzeWarm
+        ]
+        : [
+            DRUK_CORE_PALETTE.dragonLight,
+            DRUK_CORE_PALETTE.dragonBase,
+            DRUK_CORE_PALETTE.bronzeWarm,
+            DRUK_CORE_PALETTE.ivoryGlow
+        ];
+
+    for (let index = 0; index < 20; index++) {
+        const angle = (index / 20) * Math.PI * 2;
+        const speed = 1.0 + Math.random() * 2.2;
+        particles.push({
+            x: celestialZone.centerX,
+            y: celestialZone.centerY,
+            velocityX: Math.cos(angle) * speed,
+            velocityY: Math.sin(angle) * speed,
+            isLeaf: false,
+            size: index % 2 === 0 ? 4 : 3,
+            life: 0.9,
+            color: burstColors[index % burstColors.length]
+        });
+    }
+}
+
 export function updateAndDrawPondRipples(context) {
     for (let index = pondRipples.length - 1; index >= 0; index--) {
         const ripple = pondRipples[index];
@@ -205,18 +246,34 @@ export function updateAndDrawPondRipples(context) {
 }
 
 function updateAndDrawAmbientFireflies(context, width, height, sanctuaryTick) {
+    const celestialProgress = getCelestialProgress();
+    const isDayPollen = celestialProgress >= 0.5;
+
     for (let index = 0; index < ambientFireflies.length; index++) {
-        const firefly = ambientFireflies[index];
-        firefly.x += firefly.velocityX + Math.sin(sanctuaryTick * 0.02 + firefly.phase) * 0.2;
-        firefly.y += firefly.velocityY;
+        const mote = ambientFireflies[index];
+        const horizontalSway = isDayPollen
+            ? Math.sin(sanctuaryTick * 0.025 + mote.phase) * 0.35
+            : Math.sin(sanctuaryTick * 0.02 + mote.phase) * 0.2;
+        const verticalSpeedScale = isDayPollen ? 0.55 : 1.0;
 
-        if (firefly.y < 0) firefly.y = height * 0.85;
-        if (firefly.x < 0) firefly.x = width;
-        if (firefly.x > width) firefly.x = 0;
+        mote.x += mote.velocityX + horizontalSway;
+        mote.y += mote.velocityY * verticalSpeedScale;
 
-        const alpha = 0.25 + 0.55 * Math.abs(Math.sin(sanctuaryTick * 0.04 + firefly.phase));
+        if (mote.y < 0) mote.y = height * 0.85;
+        if (mote.x < 0) mote.x = width;
+        if (mote.x > width) mote.x = 0;
+
+        const baseAlpha = isDayPollen ? 0.38 : 0.25;
+        const pulseAmplitude = isDayPollen ? 0.42 : 0.55;
+        const alpha = baseAlpha + pulseAmplitude * Math.abs(Math.sin(sanctuaryTick * 0.04 + mote.phase));
+        const activeColor = celestialProgress <= 0
+            ? mote.nightColor
+            : (celestialProgress >= 1
+                ? mote.dayColor
+                : interpolateHexColor(mote.nightColor, mote.dayColor, celestialProgress));
+
         context.globalAlpha = alpha;
-        drawRect(context, firefly.x, firefly.y, firefly.size, firefly.size, firefly.color);
+        drawRect(context, mote.x, mote.y, mote.size, mote.size, activeColor);
     }
     context.globalAlpha = 1.0;
 }
