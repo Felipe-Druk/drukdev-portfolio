@@ -276,7 +276,10 @@ export function updateAndDrawPondRipples(context) {
         ripple.life -= 0.022;
 
         if (ripple.life <= 0) {
-            pondRipples.splice(index, 1);
+            const last = pondRipples.pop();
+            if (index < pondRipples.length) {
+                pondRipples[index] = last;
+            }
         } else {
             context.strokeStyle = `rgba(${SANCTUARY_SCENE_PALETTE.rippleStrokeRgb}, ${ripple.life * 0.7})`;
             context.lineWidth = 2;
@@ -337,7 +340,10 @@ function updateAndDrawInteractiveParticles(context, sanctuaryTick) {
         }
 
         if (particle.life <= 0) {
-            particles.splice(index, 1);
+            const last = particles.pop();
+            if (index < particles.length) {
+                particles[index] = last;
+            }
         } else {
             context.globalAlpha = Math.min(1, particle.life);
             drawRect(context, particle.x, particle.y, particle.size, particle.size, particle.color);

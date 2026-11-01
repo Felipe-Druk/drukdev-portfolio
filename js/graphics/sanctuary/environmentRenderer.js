@@ -29,14 +29,17 @@ export function drawNightSkyAndMoon(
     celestialZone,
     sanctuaryTick = 0,
     isCelestialHovered = false,
-    horizonY
+    horizonY,
+    scenePalette = null,
+    celestialProgress = null
 ) {
-    const scenePalette = getInterpolatedScenePalette(getCelestialProgress());
+    const progress = celestialProgress !== null ? celestialProgress : getCelestialProgress();
+    const resolvedPalette = scenePalette || getInterpolatedScenePalette(progress);
 
     const skyGradient = context.createLinearGradient(0, 0, 0, height * 0.7);
-    skyGradient.addColorStop(0, scenePalette.skyTop);
-    skyGradient.addColorStop(0.6, scenePalette.skyMid);
-    skyGradient.addColorStop(1, scenePalette.skyBottom);
+    skyGradient.addColorStop(0, resolvedPalette.skyTop);
+    skyGradient.addColorStop(0.6, resolvedPalette.skyMid);
+    skyGradient.addColorStop(1, resolvedPalette.skyBottom);
     context.fillStyle = skyGradient;
     context.fillRect(0, 0, width, height);
 
@@ -44,12 +47,12 @@ export function drawNightSkyAndMoon(
     drawCelestialBody(context, celestialZone, sanctuaryTick);
 
     // Distant mountain silhouettes with dynamic atmospheric haze
-    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, scenePalette.mountainMid);
-    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, scenePalette.mountainFar);
-    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, scenePalette.mountainNear);
+    drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, resolvedPalette.mountainMid);
+    drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, resolvedPalette.mountainFar);
+    drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, resolvedPalette.mountainNear);
 
     // Procedural 3-layer parallax clouds rendered behind constellations
-    updateAndDrawClouds(context, width, height, sanctuaryTick);
+    updateAndDrawClouds(context, width, height, sanctuaryTick, progress);
 
     if (isCelestialHovered) {
         drawCelestialHoverLabel(context, celestialZone, width, horizonY);
@@ -64,11 +67,12 @@ export function drawSanctuaryMeadowAndLagoon(
     height,
     zones,
     pointerState,
-    sanctuaryTick
+    sanctuaryTick,
+    passedScenePalette = null
 ) {
     const { horizonY, pond } = zones;
     const biomePalette = getActiveBiomePalette();
-    const scenePalette = getInterpolatedScenePalette(getCelestialProgress());
+    const scenePalette = passedScenePalette || getInterpolatedScenePalette(getCelestialProgress());
 
     // Terraced pixel-art meadow soil & base biome layers with progressive depth darkening
     const depthBands = 14;

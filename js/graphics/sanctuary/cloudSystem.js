@@ -9,6 +9,9 @@ import {
 } from '../../config/palettes.js';
 import { snapToPixel, drawRect } from '../sprites/index.js';
 import { getCelestialProgress } from './celestialSystem.js';
+import { clamp } from '../../utils/mathUtils.js';
+import { loadJson, saveJson } from '../../utils/safeStorage.js';
+import { createSeededRandom } from '../../utils/seededRandom.js';
 
 export const CLOUD_STORAGE_KEY = 'druk_cloud_config';
 const MAX_CLOUD_COUNT = 18;
@@ -51,36 +54,30 @@ const DEFAULT_CLOUD_CONFIG = {
     weather: 'ethereal'
 };
 
-export function clampCloudValue(value, minValue, maxValue) {
-    return Math.max(minValue, Math.min(maxValue, value));
-}
+export const clampCloudValue = clamp;
 
 function loadCloudConfig() {
-    try {
-        const rawSaved = localStorage.getItem(CLOUD_STORAGE_KEY);
-        if (!rawSaved) return { ...DEFAULT_CLOUD_CONFIG };
-        const parsed = JSON.parse(rawSaved);
-        const resolvedWeather = CLOUD_PALETTES[parsed.weather]
-            ? parsed.weather
-            : DEFAULT_CLOUD_CONFIG.weather;
-        const rawDensity = typeof parsed.density === 'number'
-            ? parsed.density
-            : (typeof parsed.cloudCount === 'number' ? parsed.cloudCount : DEFAULT_CLOUD_CONFIG.density);
+    const parsed = loadJson(CLOUD_STORAGE_KEY, null);
+    if (!parsed) return { ...DEFAULT_CLOUD_CONFIG };
 
-        return {
-            seed: Number.isFinite(parsed.seed) ? parsed.seed : DEFAULT_CLOUD_CONFIG.seed,
-            density: clampCloudValue(rawDensity, 0.0, 1.0),
-            windSpeed: typeof parsed.windSpeed === 'number'
-                ? clampCloudValue(parsed.windSpeed, -2.0, 2.0)
-                : DEFAULT_CLOUD_CONFIG.windSpeed,
-            cloudScale: typeof parsed.cloudScale === 'number'
-                ? clampCloudValue(parsed.cloudScale, 0.5, 1.8)
-                : DEFAULT_CLOUD_CONFIG.cloudScale,
-            weather: resolvedWeather
-        };
-    } catch {
-        return { ...DEFAULT_CLOUD_CONFIG };
-    }
+    const resolvedWeather = CLOUD_PALETTES[parsed.weather]
+        ? parsed.weather
+        : DEFAULT_CLOUD_CONFIG.weather;
+    const rawDensity = typeof parsed.density === 'number'
+        ? parsed.density
+        : (typeof parsed.cloudCount === 'number' ? parsed.cloudCount : DEFAULT_CLOUD_CONFIG.density);
+
+    return {
+        seed: Number.isFinite(parsed.seed) ? parsed.seed : DEFAULT_CLOUD_CONFIG.seed,
+        density: clamp(rawDensity, 0.0, 1.0),
+        windSpeed: typeof parsed.windSpeed === 'number'
+            ? clamp(parsed.windSpeed, -2.0, 2.0)
+            : DEFAULT_CLOUD_CONFIG.windSpeed,
+        cloudScale: typeof parsed.cloudScale === 'number'
+            ? clamp(parsed.cloudScale, 0.5, 1.8)
+            : DEFAULT_CLOUD_CONFIG.cloudScale,
+        weather: resolvedWeather
+    };
 }
 
 const cloudConfig = loadCloudConfig();
@@ -92,11 +89,7 @@ let cachedCloudState = {
 };
 
 function saveCloudConfig() {
-    try {
-        localStorage.setItem(CLOUD_STORAGE_KEY, JSON.stringify(cloudConfig));
-    } catch {
-        // Ignore storage quota errors
-    }
+    saveJson(CLOUD_STORAGE_KEY, cloudConfig);
 }
 
 export function getCloudConfig() {
@@ -108,31 +101,21 @@ export function updateCloudConfig(partialConfig) {
         cloudConfig.seed = Math.floor(partialConfig.seed);
     }
     if (typeof partialConfig.density === 'number') {
-        cloudConfig.density = clampCloudValue(partialConfig.density, 0.0, 1.0);
+        cloudConfig.density = clamp(partialConfig.density, 0.0, 1.0);
     }
     if (typeof partialConfig.cloudCount === 'number') {
-        cloudConfig.density = clampCloudValue(partialConfig.cloudCount, 0.0, 1.0);
+        cloudConfig.density = clamp(partialConfig.cloudCount, 0.0, 1.0);
     }
     if (typeof partialConfig.windSpeed === 'number') {
-        cloudConfig.windSpeed = clampCloudValue(partialConfig.windSpeed, -2.0, 2.0);
+        cloudConfig.windSpeed = clamp(partialConfig.windSpeed, -2.0, 2.0);
     }
     if (typeof partialConfig.cloudScale === 'number') {
-        cloudConfig.cloudScale = clampCloudValue(partialConfig.cloudScale, 0.5, 1.8);
+        cloudConfig.cloudScale = clamp(partialConfig.cloudScale, 0.5, 1.8);
     }
     if (typeof partialConfig.weather === 'string' && CLOUD_PALETTES[partialConfig.weather]) {
         cloudConfig.weather = setActiveWeatherKey(partialConfig.weather);
     }
     saveCloudConfig();
-}
-
-function createSeededRandom(seedValue) {
-    let state = (seedValue >>> 0) || 1;
-    return function nextRandom() {
-        state = (state + 0x6D2B79F5) >>> 0;
-        let bitMix = Math.imul(state ^ (state >>> 15), 1 | state);
-        bitMix = (bitMix + Math.imul(bitMix ^ (bitMix >>> 7), 61 | bitMix)) ^ bitMix;
-        return ((bitMix ^ (bitMix >>> 14)) >>> 0) / 4294967296;
-    };
 }
 
 function createCloudLobes(random) {
@@ -262,19 +245,20 @@ function drawSingleCloud(context, cloud, layerSpec, effectiveScale, cloudPalette
     }
 }
 
-export function updateAndDrawClouds(context, width, height, sanctuaryTick) {
+export function updateAndDrawClouds(context, width, height, sanctuaryTick, celestialProgress = null) {
     rebuildCloudPoolIfNeeded(width, height);
 
     const activeCloudLimit = Math.round(MAX_CLOUD_COUNT * cloudConfig.density);
     if (activeCloudLimit <= 0) return;
 
-    const celestialProgress = getCelestialProgress();
-    const cloudPalette = getActiveCloudPalette(celestialProgress);
-    const activeClouds = cachedCloudState.clouds.slice(0, activeCloudLimit);
+    const currentCelestialProgress = celestialProgress !== null ? celestialProgress : getCelestialProgress();
+    const cloudPalette = getActiveCloudPalette(currentCelestialProgress);
+    const clouds = cachedCloudState.clouds;
+    const activeCount = Math.min(clouds.length, activeCloudLimit);
 
     // Update horizontal parallax positions with screen wrap-around
-    for (let index = 0; index < activeClouds.length; index++) {
-        const cloud = activeClouds[index];
+    for (let index = 0; index < activeCount; index++) {
+        const cloud = clouds[index];
         const layerSpec = PARALLAX_LAYERS[cloud.layerKey];
         cloud.x += cloudConfig.windSpeed * layerSpec.speedMultiplier * 0.85;
 
@@ -292,8 +276,8 @@ export function updateAndDrawClouds(context, width, height, sanctuaryTick) {
         const effectiveScale = cloudConfig.cloudScale * layerSpec.scaleMultiplier;
 
         context.globalAlpha = layerSpec.alpha;
-        for (let index = 0; index < activeClouds.length; index++) {
-            const cloud = activeClouds[index];
+        for (let index = 0; index < activeCount; index++) {
+            const cloud = clouds[index];
             if (cloud.layerKey !== currentLayerKey) continue;
             drawSingleCloud(context, cloud, layerSpec, effectiveScale, cloudPalette, sanctuaryTick);
         }

@@ -306,10 +306,20 @@ function drawConstellationLabel(
     }
 }
 
-export function drawSkyConstellations(context, constellations, hoveredZone, sanctuaryTick, mailCopiedTimer) {
+export function drawSkyConstellations(
+    context,
+    constellations,
+    hoveredZone,
+    sanctuaryTick,
+    mailCopiedTimer,
+    passedScenePalette = null,
+    passedCelestialProgress = null
+) {
     const activeLangConstellations = TRANSLATIONS[getCurrentLanguage()].sanctuary.constellations;
-    const celestialProgress = getCelestialProgress();
-    const scenePalette = getInterpolatedScenePalette(celestialProgress);
+    const celestialProgress = passedCelestialProgress !== null
+        ? passedCelestialProgress
+        : getCelestialProgress();
+    const scenePalette = passedScenePalette || getInterpolatedScenePalette(celestialProgress);
 
     constellations.forEach((constellation, constellationIndex) => {
         const isHovered = hoveredZone === constellation.zoneKey;

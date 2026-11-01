@@ -8,6 +8,7 @@ import {
     SANCTUARY_SCENE_PALETTE
 } from '../../config/palettes.js';
 import { drawRect, drawFloatingPixelLabel } from '../sprites/index.js';
+import { loadItem, saveItem } from '../../utils/safeStorage.js';
 
 export const CELESTIAL_STORAGE_KEY = 'druk_celestial_mode';
 export const CELESTIAL_TRANSITION_DURATION_MS = 2200;
@@ -18,23 +19,15 @@ const CELESTIAL_MODES = Object.freeze({
 });
 
 function loadInitialCelestialMode() {
-    try {
-        const savedMode = localStorage.getItem(CELESTIAL_STORAGE_KEY);
-        if (savedMode === CELESTIAL_MODES.DAY || savedMode === CELESTIAL_MODES.NIGHT) {
-            return savedMode;
-        }
-    } catch {
-        // Ignore storage read errors in restricted environments
+    const savedMode = loadItem(CELESTIAL_STORAGE_KEY);
+    if (savedMode === CELESTIAL_MODES.DAY || savedMode === CELESTIAL_MODES.NIGHT) {
+        return savedMode;
     }
     return CELESTIAL_MODES.NIGHT;
 }
 
 function saveCelestialMode(mode) {
-    try {
-        localStorage.setItem(CELESTIAL_STORAGE_KEY, mode);
-    } catch {
-        // Ignore storage quota errors
-    }
+    saveItem(CELESTIAL_STORAGE_KEY, mode);
 }
 
 const initialMode = loadInitialCelestialMode();

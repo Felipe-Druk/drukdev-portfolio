@@ -2,11 +2,13 @@
  * LIGHTWEIGHT INTERNATIONALIZATION (i18n) CONFIGURATION
  **************************************************************/
 
+import { loadItem, saveItem } from '../utils/safeStorage.js';
+
 export const LANG_STORAGE_KEY = 'druk_lang';
 export const SUPPORTED_LANGUAGES = ['es', 'en'];
 
 function detectInitialLanguage() {
-    const savedLanguage = localStorage.getItem(LANG_STORAGE_KEY);
+    const savedLanguage = loadItem(LANG_STORAGE_KEY);
     if (savedLanguage && SUPPORTED_LANGUAGES.includes(savedLanguage)) {
         return savedLanguage;
     }
@@ -23,7 +25,7 @@ export function getCurrentLanguage() {
 export function setCurrentLanguage(language) {
     if (SUPPORTED_LANGUAGES.includes(language)) {
         currentLanguage = language;
-        localStorage.setItem(LANG_STORAGE_KEY, language);
+        saveItem(LANG_STORAGE_KEY, language);
     }
     return currentLanguage;
 }

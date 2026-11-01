@@ -2,29 +2,22 @@
  * ATMOSPHERIC GRIMOIRE FLOATING PANEL UI CONTROLLER (cloudPanelUI.js)
  **************************************************************/
 
-import { windSpell, playSound } from '../../audio/soundEngine.js';
+import { windSpell } from '../../audio/soundEngine.js';
+import { clamp } from '../../utils/mathUtils.js';
+import { getCloudConfig, updateCloudConfig } from './cloudSystem.js';
 import {
-    clampCloudValue,
-    getCloudConfig,
-    updateCloudConfig
-} from './cloudSystem.js';
-import { toggleFloraPanel } from './floraPanelUI.js';
-
-let cloudPanelOpen = false;
-
-export function isCloudPanelOpen() {
-    return cloudPanelOpen;
-}
+    createGrimoirePanel,
+    updateSliderAndBadge
+} from './grimoirePanelUtils.js';
 
 export function positionCloudPanelNearBlueMage(blueMageZone, viewportWidth, viewportHeight) {
     const panelElement = document.getElementById('cloudPanel');
-    if (!panelElement || !cloudPanelOpen || !blueMageZone) return;
+    if (!panelElement || !isCloudPanelOpen() || !blueMageZone) return;
 
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 296;
     const screenMargin = 12;
 
-    // Place beside the Blue Mage on wide viewports, or centered horizontally on narrow viewports
     const rightCandidateLeft = blueMageZone.centerX + 46;
     const leftCandidateLeft = blueMageZone.centerX - 46 - panelWidth;
     let idealLeft = rightCandidateLeft;
@@ -35,26 +28,15 @@ export function positionCloudPanelNearBlueMage(blueMageZone, viewportWidth, view
             : Math.round(blueMageZone.centerX - panelWidth / 2);
     }
 
-    const clampedLeft = clampCloudValue(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
+    const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
 
     const idealTop = Math.round(blueMageZone.baseY - panelHeight / 2 - 18);
     const minTop = 76;
     const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
-    const clampedTop = clampCloudValue(idealTop, minTop, maxTop);
+    const clampedTop = clamp(idealTop, minTop, maxTop);
 
     panelElement.style.left = `${clampedLeft}px`;
     panelElement.style.top = `${clampedTop}px`;
-}
-
-function updateSliderAndBadge(sliderId, badgeId, rawValue, formattedText) {
-    const sliderElement = document.getElementById(sliderId);
-    const badgeElement = document.getElementById(badgeId);
-    if (sliderElement) {
-        sliderElement.value = String(rawValue);
-    }
-    if (badgeElement) {
-        badgeElement.textContent = formattedText;
-    }
 }
 
 export function syncCloudPanelUI() {
@@ -89,25 +71,17 @@ export function syncCloudPanelUI() {
     });
 }
 
-export function toggleCloudPanel(forceOpen = null, blueMageZone = null) {
-    const panelElement = document.getElementById('cloudPanel');
-    if (!panelElement) return false;
+const grimoire = createGrimoirePanel({
+    panelId: 'cloudPanel',
+    closeBtnId: 'cloudCloseBtn',
+    reseedBtnId: 'cloudReseedBtn',
+    syncUI: syncCloudPanelUI,
+    onReseed: (nextSeed) => updateCloudConfig({ seed: nextSeed }),
+    positionPanel: positionCloudPanelNearBlueMage
+});
 
-    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !cloudPanelOpen;
-    if (shouldOpen) {
-        toggleFloraPanel(false);
-    }
-
-    cloudPanelOpen = shouldOpen;
-    panelElement.classList.toggle('hidden', !shouldOpen);
-    if (shouldOpen) {
-        syncCloudPanelUI();
-        if (blueMageZone) {
-            positionCloudPanelNearBlueMage(blueMageZone, window.innerWidth, window.innerHeight);
-        }
-    }
-    return shouldOpen;
-}
+export const isCloudPanelOpen = grimoire.isOpen;
+export const toggleCloudPanel = grimoire.toggle;
 
 function bindNormalizedSlider(sliderId, configProperty) {
     const sliderElement = document.getElementById(sliderId);
@@ -121,9 +95,6 @@ function bindNormalizedSlider(sliderId, configProperty) {
 }
 
 export function initCloudPanelUI(onBlueMageSpellCast) {
-    const panelElement = document.getElementById('cloudPanel');
-    cloudPanelOpen = Boolean(panelElement && !panelElement.classList.contains('hidden'));
-
     bindNormalizedSlider('cloudDensitySlider', 'density');
     bindNormalizedSlider('cloudWindSlider', 'windSpeed');
     bindNormalizedSlider('cloudScaleSlider', 'cloudScale');
@@ -140,26 +111,5 @@ export function initCloudPanelUI(onBlueMageSpellCast) {
         });
     });
 
-    const reseedButton = document.getElementById('cloudReseedBtn');
-    if (reseedButton) {
-        reseedButton.addEventListener('click', () => {
-            const nextSeed = Math.floor(100000 + Math.random() * 900000);
-            updateCloudConfig({ seed: nextSeed });
-            syncCloudPanelUI();
-            windSpell();
-            if (typeof onBlueMageSpellCast === 'function') {
-                onBlueMageSpellCast(true);
-            }
-        });
-    }
-
-    const closeButton = document.getElementById('cloudCloseBtn');
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            playSound('click');
-            toggleCloudPanel(false);
-        });
-    }
-
-    syncCloudPanelUI();
+    grimoire.init(onBlueMageSpellCast, windSpell);
 }

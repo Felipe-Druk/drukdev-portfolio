@@ -2,54 +2,37 @@
  * BOTANICAL GRIMOIRE FLOATING PANEL UI CONTROLLER (floraPanelUI.js)
  **************************************************************/
 
-import { floraSpell, playSound } from '../../audio/soundEngine.js';
+import { floraSpell } from '../../audio/soundEngine.js';
+import { clamp } from '../../utils/mathUtils.js';
+import { getFloraConfig, updateFloraConfig } from './floraSystem.js';
 import {
-    clampFloraValue,
-    getFloraConfig,
-    updateFloraConfig
-} from './floraSystem.js';
-import { toggleCloudPanel } from './cloudPanelUI.js';
-
-let floraPanelOpen = false;
-
-export function isFloraPanelOpen() {
-    return floraPanelOpen;
-}
+    createGrimoirePanel,
+    updateSliderAndBadge
+} from './grimoirePanelUtils.js';
 
 export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHeight) {
     const panelElement = document.getElementById('floraPanel');
-    if (!panelElement || !floraPanelOpen || !mageZone) return;
+    if (!panelElement || !isFloraPanelOpen() || !mageZone) return;
 
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 290;
     const screenMargin = 12;
 
     const idealLeft = Math.round(mageZone.centerX - panelWidth / 2);
-    const clampedLeft = clampFloraValue(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
+    const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
 
     const idealTop = Math.round(mageZone.baseY - 68 - panelHeight);
     const minTop = 76;
     const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
-    const clampedTop = clampFloraValue(idealTop, minTop, maxTop);
+    const clampedTop = clamp(idealTop, minTop, maxTop);
 
     panelElement.style.left = `${clampedLeft}px`;
     panelElement.style.top = `${clampedTop}px`;
 
     const arrowElement = document.getElementById('floraPanelArrow');
     if (arrowElement) {
-        const arrowLocalX = clampFloraValue(mageZone.centerX - clampedLeft, 18, panelWidth - 18);
+        const arrowLocalX = clamp(mageZone.centerX - clampedLeft, 18, panelWidth - 18);
         arrowElement.style.left = `${arrowLocalX}px`;
-    }
-}
-
-function updateSliderAndBadge(sliderId, badgeId, rawValue, formattedText) {
-    const sliderElement = document.getElementById(sliderId);
-    const badgeElement = document.getElementById(badgeId);
-    if (sliderElement) {
-        sliderElement.value = String(rawValue);
-    }
-    if (badgeElement) {
-        badgeElement.textContent = formattedText;
     }
 }
 
@@ -74,25 +57,17 @@ export function syncFloraPanelUI() {
     });
 }
 
-export function toggleFloraPanel(forceOpen = null, mageZone = null) {
-    const panelElement = document.getElementById('floraPanel');
-    if (!panelElement) return false;
+const grimoire = createGrimoirePanel({
+    panelId: 'floraPanel',
+    closeBtnId: 'floraCloseBtn',
+    reseedBtnId: 'floraReseedBtn',
+    syncUI: syncFloraPanelUI,
+    onReseed: (nextSeed) => updateFloraConfig({ seed: nextSeed }),
+    positionPanel: positionFloraPanelAboveMage
+});
 
-    const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !floraPanelOpen;
-    if (shouldOpen) {
-        toggleCloudPanel(false);
-    }
-
-    floraPanelOpen = shouldOpen;
-    panelElement.classList.toggle('hidden', !shouldOpen);
-    if (shouldOpen) {
-        syncFloraPanelUI();
-        if (mageZone) {
-            positionFloraPanelAboveMage(mageZone, window.innerWidth, window.innerHeight);
-        }
-    }
-    return shouldOpen;
-}
+export const isFloraPanelOpen = grimoire.isOpen;
+export const toggleFloraPanel = grimoire.toggle;
 
 function bindPercentageSlider(sliderId, configProperty) {
     const sliderElement = document.getElementById(sliderId);
@@ -106,9 +81,6 @@ function bindPercentageSlider(sliderId, configProperty) {
 }
 
 export function initFloraPanelUI(onMageSpellCast) {
-    const panelElement = document.getElementById('floraPanel');
-    floraPanelOpen = Boolean(panelElement && !panelElement.classList.contains('hidden'));
-
     bindPercentageSlider('floraDensitySlider', 'density');
     bindPercentageSlider('floraClumpingSlider', 'clumping');
     bindPercentageSlider('floraLengthSlider', 'grassLength');
@@ -125,26 +97,5 @@ export function initFloraPanelUI(onMageSpellCast) {
         });
     });
 
-    const reseedButton = document.getElementById('floraReseedBtn');
-    if (reseedButton) {
-        reseedButton.addEventListener('click', () => {
-            const nextSeed = Math.floor(100000 + Math.random() * 900000);
-            updateFloraConfig({ seed: nextSeed });
-            syncFloraPanelUI();
-            floraSpell();
-            if (typeof onMageSpellCast === 'function') {
-                onMageSpellCast(true);
-            }
-        });
-    }
-
-    const closeButton = document.getElementById('floraCloseBtn');
-    if (closeButton) {
-        closeButton.addEventListener('click', () => {
-            playSound('click');
-            toggleFloraPanel(false);
-        });
-    }
-
-    syncFloraPanelUI();
+    grimoire.init(onMageSpellCast, floraSpell);
 }

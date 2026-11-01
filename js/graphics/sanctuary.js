@@ -3,7 +3,7 @@
  **************************************************************/
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
-import { SANCTUARY_SCENE_PALETTE } from '../config/palettes.js';
+import { SANCTUARY_SCENE_PALETTE, getInterpolatedScenePalette } from '../config/palettes.js';
 import { playSound, floraSpell, windSpell, celestialShift } from '../audio/soundEngine.js';
 import {
     drawFloatingPixelLabel,
@@ -276,6 +276,9 @@ export function updateAndDrawSanctuary() {
 
     updateSanctuaryState(zones);
 
+    const celestialProgress = getCelestialProgress();
+    const scenePalette = getInterpolatedScenePalette(celestialProgress);
+
     drawNightSkyAndMoon(
         sanctuaryContext,
         width,
@@ -283,14 +286,18 @@ export function updateAndDrawSanctuary() {
         zones.moon,
         sanctuaryTick,
         pointerState.hoveredZone === 'moon',
-        zones.horizonY
+        zones.horizonY,
+        scenePalette,
+        celestialProgress
     );
     drawSkyConstellations(
         sanctuaryContext,
         zones.constellations,
         pointerState.hoveredZone,
         sanctuaryTick,
-        sanctuaryState.mailCopiedTimer
+        sanctuaryState.mailCopiedTimer,
+        scenePalette,
+        celestialProgress
     );
     drawBlueMage(
         sanctuaryContext,
@@ -299,7 +306,7 @@ export function updateAndDrawSanctuary() {
         sanctuaryTick,
         sanctuaryState.blueMageCastTimer,
         isCloudPanelOpen(),
-        getCelestialProgress()
+        celestialProgress
     );
     drawSanctuaryMeadowAndLagoon(
         sanctuaryContext,
@@ -307,7 +314,8 @@ export function updateAndDrawSanctuary() {
         height,
         zones,
         pointerState,
-        sanctuaryTick
+        sanctuaryTick,
+        scenePalette
     );
     drawAncientTree(
         sanctuaryContext,

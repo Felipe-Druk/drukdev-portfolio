@@ -4,13 +4,16 @@
 
 import {
     BIOME_PALETTES,
-    SANCTUARY_SCENE_PALETTE,
     setActiveBiomeKey,
     getActiveBiomePalette
 } from '../../config/palettes.js';
 import { drawRect } from '../sprites/index.js';
+import { clamp } from '../../utils/mathUtils.js';
+import { shadeHexColorByDepth } from '../../utils/colorMath.js';
+import { createSeededRandom } from '../../utils/seededRandom.js';
+import { loadJson, saveJson } from '../../utils/safeStorage.js';
 
-export { BIOME_PALETTES as FLORA_BIOMES, getActiveBiomePalette };
+export { BIOME_PALETTES as FLORA_BIOMES, getActiveBiomePalette, shadeHexColorByDepth };
 
 export const FLORA_STORAGE_KEY = 'druk_flora_config';
 const CLUMP_CENTER_COUNT = 26;
@@ -25,32 +28,25 @@ const DEFAULT_FLORA_CONFIG = {
     biome: 'emerald'
 };
 
-export function clampFloraValue(value, minValue, maxValue) {
-    return Math.max(minValue, Math.min(maxValue, value));
-}
+export const clampFloraValue = clamp;
 
 function loadFloraConfig() {
-    try {
-        const rawSaved = localStorage.getItem(FLORA_STORAGE_KEY);
-        if (!rawSaved) return { ...DEFAULT_FLORA_CONFIG };
-        const parsed = JSON.parse(rawSaved);
-        const resolvedBiome = BIOME_PALETTES[parsed.biome] ? parsed.biome : DEFAULT_FLORA_CONFIG.biome;
-        return {
-            seed: Number.isFinite(parsed.seed) ? parsed.seed : DEFAULT_FLORA_CONFIG.seed,
-            density: typeof parsed.density === 'number'
-                ? clampFloraValue(parsed.density, 0.1, 1.0)
-                : DEFAULT_FLORA_CONFIG.density,
-            clumping: typeof parsed.clumping === 'number'
-                ? clampFloraValue(parsed.clumping, 0.0, 1.0)
-                : DEFAULT_FLORA_CONFIG.clumping,
-            grassLength: typeof parsed.grassLength === 'number'
-                ? clampFloraValue(parsed.grassLength, 0.3, 2.0)
-                : DEFAULT_FLORA_CONFIG.grassLength,
-            biome: resolvedBiome
-        };
-    } catch {
-        return { ...DEFAULT_FLORA_CONFIG };
-    }
+    const parsed = loadJson(FLORA_STORAGE_KEY, null);
+    if (!parsed) return { ...DEFAULT_FLORA_CONFIG };
+    const resolvedBiome = BIOME_PALETTES[parsed.biome] ? parsed.biome : DEFAULT_FLORA_CONFIG.biome;
+    return {
+        seed: Number.isFinite(parsed.seed) ? parsed.seed : DEFAULT_FLORA_CONFIG.seed,
+        density: typeof parsed.density === 'number'
+            ? clamp(parsed.density, 0.1, 1.0)
+            : DEFAULT_FLORA_CONFIG.density,
+        clumping: typeof parsed.clumping === 'number'
+            ? clamp(parsed.clumping, 0.0, 1.0)
+            : DEFAULT_FLORA_CONFIG.clumping,
+        grassLength: typeof parsed.grassLength === 'number'
+            ? clamp(parsed.grassLength, 0.3, 2.0)
+            : DEFAULT_FLORA_CONFIG.grassLength,
+        biome: resolvedBiome
+    };
 }
 
 const floraConfig = loadFloraConfig();
@@ -63,11 +59,7 @@ let cachedFloraGeometry = {
 };
 
 function saveFloraConfig() {
-    try {
-        localStorage.setItem(FLORA_STORAGE_KEY, JSON.stringify(floraConfig));
-    } catch {
-        // Ignore storage quota errors
-    }
+    saveJson(FLORA_STORAGE_KEY, floraConfig);
 }
 
 export function getFloraConfig() {
@@ -79,51 +71,18 @@ export function updateFloraConfig(partialConfig) {
         floraConfig.seed = Math.floor(partialConfig.seed);
     }
     if (typeof partialConfig.density === 'number') {
-        floraConfig.density = clampFloraValue(partialConfig.density, 0.1, 1.0);
+        floraConfig.density = clamp(partialConfig.density, 0.1, 1.0);
     }
     if (typeof partialConfig.clumping === 'number') {
-        floraConfig.clumping = clampFloraValue(partialConfig.clumping, 0.0, 1.0);
+        floraConfig.clumping = clamp(partialConfig.clumping, 0.0, 1.0);
     }
     if (typeof partialConfig.grassLength === 'number') {
-        floraConfig.grassLength = clampFloraValue(partialConfig.grassLength, 0.3, 2.0);
+        floraConfig.grassLength = clamp(partialConfig.grassLength, 0.3, 2.0);
     }
     if (typeof partialConfig.biome === 'string' && BIOME_PALETTES[partialConfig.biome]) {
         floraConfig.biome = setActiveBiomeKey(partialConfig.biome);
     }
     saveFloraConfig();
-}
-
-function parseHexToRgb(hexColor) {
-    const cleanHex = hexColor.replace('#', '');
-    return {
-        red: parseInt(cleanHex.slice(0, 2), 16),
-        green: parseInt(cleanHex.slice(2, 4), 16),
-        blue: parseInt(cleanHex.slice(4, 6), 16)
-    };
-}
-
-const ABYSS_RGB = parseHexToRgb(SANCTUARY_SCENE_PALETTE.abyssSoilShadow);
-
-export function shadeHexColorByDepth(hexColor, depthRatio) {
-    const clampedRatio = clampFloraValue(depthRatio, 0, 1);
-    const darkenStrength = Math.min(0.84, Math.pow(clampedRatio, 1.05) * 0.82);
-    const sourceRgb = parseHexToRgb(hexColor);
-
-    const red = Math.round(sourceRgb.red + (ABYSS_RGB.red - sourceRgb.red) * darkenStrength);
-    const green = Math.round(sourceRgb.green + (ABYSS_RGB.green - sourceRgb.green) * darkenStrength);
-    const blue = Math.round(sourceRgb.blue + (ABYSS_RGB.blue - sourceRgb.blue) * darkenStrength);
-
-    return `rgb(${red}, ${green}, ${blue})`;
-}
-
-function createSeededRandom(seedValue) {
-    let state = (seedValue >>> 0) || 1;
-    return function nextRandom() {
-        state = (state + 0x6D2B79F5) >>> 0;
-        let bitMix = Math.imul(state ^ (state >>> 15), 1 | state);
-        bitMix = (bitMix + Math.imul(bitMix ^ (bitMix >>> 7), 61 | bitMix)) ^ bitMix;
-        return ((bitMix ^ (bitMix >>> 14)) >>> 0) / 4294967296;
-    };
 }
 
 function isInsideExcludedZone(pointX, pointY, zones) {
@@ -176,8 +135,8 @@ function generateClumpedPosition(random, width, minY, maxY, clumpCenters, clumpi
     const finalY = uniformY * (1 - clumpingFactor) + clumpedY * clumpingFactor;
 
     return {
-        x: clampFloraValue(finalX, 4, width - 6),
-        y: clampFloraValue(finalY, minY, maxY)
+        x: clamp(finalX, 4, width - 6),
+        y: clamp(finalY, minY, maxY)
     };
 }
 
@@ -190,19 +149,23 @@ function pickOrganicBaseBladeHeight(random) {
     return 12;
 }
 
-function createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, accentThreshold) {
-    const depthRatio = clampFloraValue((bladeY - horizonY) / totalDepthSpan, 0, 1);
+function createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, accentThreshold, palette) {
+    const depthRatio = clamp((bladeY - horizonY) / totalDepthSpan, 0, 1);
+    const baseHeight = pickOrganicBaseBladeHeight(random);
+    const phase = random() * Math.PI * 2;
+    const tipTier = random() > accentThreshold ? 'accent' : 'tip';
     return {
         x: bladeX,
         y: bladeY,
-        baseHeight: pickOrganicBaseBladeHeight(random),
-        phase: random() * Math.PI * 2,
-        tipTier: random() > accentThreshold ? 'accent' : 'tip',
-        depthRatio
+        baseHeight,
+        phase,
+        baseColor: shadeHexColorByDepth(palette.base, depthRatio),
+        midColor: shadeHexColorByDepth(palette.mid, depthRatio),
+        tipColor: shadeHexColorByDepth(palette[tipTier] || palette.tip, depthRatio)
     };
 }
 
-function generateGroundPixels(random, width, horizonY, meadowTopY, meadowBottomY, totalDepthSpan, clumpCenters, zones) {
+function generateGroundPixels(random, width, horizonY, meadowTopY, meadowBottomY, totalDepthSpan, clumpCenters, zones, palette) {
     const groundPixels = [];
     const totalGroundPixels = Math.floor((width * (meadowBottomY - meadowTopY)) / 950 * floraConfig.density);
 
@@ -228,13 +191,15 @@ function generateGroundPixels(random, width, horizonY, meadowTopY, meadowBottomY
             colorTier = 'tip';
         }
 
+        const depthRatio = clamp((snappedY - horizonY) / totalDepthSpan, 0, 1);
+        const rawColor = palette[colorTier] || palette.mid;
+
         groundPixels.push({
             x: snappedX,
             y: snappedY,
             width: random() > 0.45 ? 4 : 2,
             height: 2,
-            colorTier,
-            depthRatio: clampFloraValue((snappedY - horizonY) / totalDepthSpan, 0, 1)
+            color: shadeHexColorByDepth(rawColor, depthRatio)
         });
     }
 
@@ -250,7 +215,8 @@ function generateGrassBlades(
     totalDepthSpan,
     totalGroundPixels,
     clumpCenters,
-    zones
+    zones,
+    palette
 ) {
     const grassBlades = [];
     const horizonBladeCount = Math.floor((width / 8) * floraConfig.density);
@@ -263,7 +229,7 @@ function generateGrassBlades(
         const bladeY = horizonY + Math.floor(random() * 6);
 
         if (isInsideExcludedZone(bladeX, bladeY, zones)) continue;
-        grassBlades.push(createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, 0.88));
+        grassBlades.push(createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, 0.88, palette));
     }
 
     const meadowBladeCount = Math.floor(totalGroundPixels * 0.62);
@@ -280,16 +246,17 @@ function generateGrassBlades(
         const bladeY = Math.floor(position.y / 2) * 2;
 
         if (isInsideExcludedZone(bladeX, bladeY, zones)) continue;
-        grassBlades.push(createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, 0.9));
+        grassBlades.push(createGrassBladeEntry(random, bladeX, bladeY, horizonY, totalDepthSpan, 0.9, palette));
     }
 
     return grassBlades;
 }
 
 function rebuildFloraGeometryIfNeeded(width, height, zones) {
-    const cacheKey = `${width}x${height}:${floraConfig.seed}:${floraConfig.density.toFixed(2)}:${floraConfig.clumping.toFixed(2)}`;
+    const cacheKey = `${width}x${height}:${floraConfig.seed}:${floraConfig.density.toFixed(2)}:${floraConfig.clumping.toFixed(2)}:${floraConfig.biome}`;
     if (cachedFloraGeometry.cacheKey === cacheKey) return;
 
+    const palette = getActiveBiomePalette();
     const random = createSeededRandom(floraConfig.seed);
     const { horizonY } = zones;
     const meadowTopY = horizonY + 8;
@@ -305,7 +272,8 @@ function rebuildFloraGeometryIfNeeded(width, height, zones) {
         meadowBottomY,
         totalDepthSpan,
         clumpCenters,
-        zones
+        zones,
+        palette
     );
     const grassBlades = generateGrassBlades(
         random,
@@ -316,7 +284,8 @@ function rebuildFloraGeometryIfNeeded(width, height, zones) {
         totalDepthSpan,
         totalGroundPixels,
         clumpCenters,
-        zones
+        zones,
+        palette
     );
 
     cachedFloraGeometry = {
@@ -342,16 +311,13 @@ function calculatePointerBladeBend(blade, pointerState, isPointerActiveInMeadow)
 function drawSingleGrassBlade(
     context,
     blade,
-    palette,
     lengthScale,
     pointerState,
     isPointerActiveInMeadow,
     sanctuaryTick
 ) {
     const scaledHeight = Math.max(2, Math.round((blade.baseHeight * lengthScale) / 2) * 2);
-    const baseColor = shadeHexColorByDepth(palette.base, blade.depthRatio);
-    const midColor = shadeHexColorByDepth(palette.mid, blade.depthRatio);
-    const tipColor = shadeHexColorByDepth(palette[blade.tipTier] || palette.tip, blade.depthRatio);
+    const { baseColor, midColor, tipColor } = blade;
 
     if (scaledHeight <= 2) {
         drawRect(context, blade.x, blade.y - 2, 2, 2, tipColor);
@@ -361,7 +327,7 @@ function drawSingleGrassBlade(
     const windSway = Math.round(Math.sin(sanctuaryTick * 0.05 + blade.x * 0.03 + blade.phase) * 1.3);
     const pointerBend = calculatePointerBladeBend(blade, pointerState, isPointerActiveInMeadow);
     const maxBend = scaledHeight >= 8 ? 3 : 2;
-    const tipOffset = clampFloraValue(windSway + pointerBend, -maxBend, maxBend);
+    const tipOffset = clamp(windSway + pointerBend, -maxBend, maxBend);
     const midOffset = Math.trunc(tipOffset * 0.5);
 
     const baseSegmentHeight = Math.max(2, Math.floor(scaledHeight * 0.45));
@@ -386,27 +352,26 @@ function drawSingleGrassBlade(
 
 export function drawProceduralGrass(context, width, height, zones, pointerState, sanctuaryTick) {
     rebuildFloraGeometryIfNeeded(width, height, zones);
-    const palette = getActiveBiomePalette();
     const lengthScale = floraConfig.grassLength;
     const isPointerActiveInMeadow = Boolean(
         pointerState && pointerState.x >= 0 && pointerState.y >= zones.horizonY - 24
     );
 
-    cachedFloraGeometry.groundPixels.forEach((pixel) => {
-        const rawColor = palette[pixel.colorTier] || palette.mid;
-        const shadedColor = shadeHexColorByDepth(rawColor, pixel.depthRatio);
-        drawRect(context, pixel.x, pixel.y, pixel.width, pixel.height, shadedColor);
-    });
+    const groundPixels = cachedFloraGeometry.groundPixels;
+    for (let index = 0; index < groundPixels.length; index++) {
+        const pixel = groundPixels[index];
+        drawRect(context, pixel.x, pixel.y, pixel.width, pixel.height, pixel.color);
+    }
 
-    cachedFloraGeometry.grassBlades.forEach((blade) => {
+    const grassBlades = cachedFloraGeometry.grassBlades;
+    for (let index = 0; index < grassBlades.length; index++) {
         drawSingleGrassBlade(
             context,
-            blade,
-            palette,
+            grassBlades[index],
             lengthScale,
             pointerState,
             isPointerActiveInMeadow,
             sanctuaryTick
         );
-    });
+    }
 }
