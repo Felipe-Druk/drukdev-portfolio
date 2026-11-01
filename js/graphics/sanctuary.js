@@ -4,16 +4,18 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SANCTUARY_SCENE_PALETTE } from '../config/palettes.js';
-import { playSound, floraSpell, celestialShift } from '../audio/soundEngine.js';
+import { playSound, floraSpell, windSpell, celestialShift } from '../audio/soundEngine.js';
 import {
     drawFloatingPixelLabel,
     copyTextToClipboard,
     drawGreenMage,
+    drawBlueMage,
     drawDragonKnightGuardian
 } from './sprites/index.js';
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
 import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
 import {
+    getCelestialProgress,
     toggleCelestialCycle,
     updateCelestialCycle
 } from './sanctuary/celestialSystem.js';
@@ -24,6 +26,12 @@ import {
     positionFloraPanelAboveMage
 } from './sanctuary/floraPanelUI.js';
 import {
+    isCloudPanelOpen,
+    initCloudPanelUI,
+    toggleCloudPanel,
+    positionCloudPanelNearBlueMage
+} from './sanctuary/cloudPanelUI.js';
+import {
     initAmbientFireflies,
     spawnAmbientLagoonRipple,
     spawnTreeLeavesAndSpores,
@@ -31,6 +39,7 @@ import {
     spawnDungeonRuneSparks,
     spawnConstellationStarfall,
     spawnMageFloraWave,
+    spawnBlueMageWindWave,
     spawnCelestialBurst,
     updateAndDrawParticles
 } from './sanctuary/particles.js';
@@ -60,6 +69,7 @@ const sanctuaryState = {
     dungeonMessageTimer: 0,
     mailCopiedTimer: 0,
     mageCastTimer: 0,
+    blueMageCastTimer: 0,
     heroOffsetY: 0,
     heroVelocityY: 0,
     heroJumping: false
@@ -77,6 +87,7 @@ export function resizeSanctuary() {
         sanctuaryState.heroOffsetY
     );
     positionFloraPanelAboveMage(zones.mage, sanctuaryCanvas.width, sanctuaryCanvas.height);
+    positionCloudPanelNearBlueMage(zones.blueMage, sanctuaryCanvas.width, sanctuaryCanvas.height);
 }
 
 function triggerMageCastEffect(includeMeadowBurst = false) {
@@ -88,6 +99,17 @@ function triggerMageCastEffect(includeMeadowBurst = false) {
     );
     sanctuaryState.mageCastTimer = 32;
     spawnMageFloraWave(zones.mage, zones.horizonY, sanctuaryCanvas.width, includeMeadowBurst);
+}
+
+function triggerBlueMageCastEffect(includeSkyGust = false) {
+    if (!sanctuaryCanvas) return;
+    const zones = getLayoutZones(
+        sanctuaryCanvas.width,
+        sanctuaryCanvas.height,
+        sanctuaryState.heroOffsetY
+    );
+    sanctuaryState.blueMageCastTimer = 32;
+    spawnBlueMageWindWave(zones.blueMage, zones.horizonY, sanctuaryCanvas.width, includeSkyGust);
 }
 
 function activateConstellation(constellation) {
@@ -114,6 +136,12 @@ const ZONE_CLICK_HANDLERS = {
         sanctuaryState.mageCastTimer = 32;
         spawnMageFloraWave(zones.mage, zones.horizonY, sanctuaryCanvas.width, true);
         toggleFloraPanel(null, zones.mage);
+    },
+    blueMage: (zones) => {
+        windSpell();
+        sanctuaryState.blueMageCastTimer = 32;
+        spawnBlueMageWindWave(zones.blueMage, zones.horizonY, sanctuaryCanvas.width, true);
+        toggleCloudPanel(null, zones.blueMage);
     },
     tree: (zones) => {
         sanctuaryState.treeRustleTimer = 28;
@@ -179,6 +207,7 @@ export function initSanctuary(onOpenTerminal, onOpenDungeon) {
 
     resizeSanctuary();
     initFloraPanelUI(triggerMageCastEffect);
+    initCloudPanelUI(triggerBlueMageCastEffect);
 
     sanctuaryCanvas.addEventListener('mousemove', (event) => {
         const rect = sanctuaryCanvas.getBoundingClientRect();
@@ -213,6 +242,7 @@ function updateSanctuaryState(zones) {
     if (sanctuaryState.dungeonMessageTimer > 0) sanctuaryState.dungeonMessageTimer--;
     if (sanctuaryState.mailCopiedTimer > 0) sanctuaryState.mailCopiedTimer--;
     if (sanctuaryState.mageCastTimer > 0) sanctuaryState.mageCastTimer--;
+    if (sanctuaryState.blueMageCastTimer > 0) sanctuaryState.blueMageCastTimer--;
 
     if (sanctuaryState.heroJumping) {
         sanctuaryState.heroOffsetY += sanctuaryState.heroVelocityY;
@@ -261,6 +291,15 @@ export function updateAndDrawSanctuary() {
         pointerState.hoveredZone,
         sanctuaryTick,
         sanctuaryState.mailCopiedTimer
+    );
+    drawBlueMage(
+        sanctuaryContext,
+        zones.blueMage,
+        pointerState.hoveredZone === 'blueMage',
+        sanctuaryTick,
+        sanctuaryState.blueMageCastTimer,
+        isCloudPanelOpen(),
+        getCelestialProgress()
     );
     drawSanctuaryMeadowAndLagoon(
         sanctuaryContext,

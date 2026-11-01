@@ -8,6 +8,7 @@ import {
     getFloraConfig,
     updateFloraConfig
 } from './floraSystem.js';
+import { toggleCloudPanel } from './cloudPanelUI.js';
 
 let floraPanelOpen = false;
 
@@ -78,6 +79,10 @@ export function toggleFloraPanel(forceOpen = null, mageZone = null) {
     if (!panelElement) return false;
 
     const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !floraPanelOpen;
+    if (shouldOpen) {
+        toggleCloudPanel(false);
+    }
+
     floraPanelOpen = shouldOpen;
     panelElement.classList.toggle('hidden', !shouldOpen);
     if (shouldOpen) {

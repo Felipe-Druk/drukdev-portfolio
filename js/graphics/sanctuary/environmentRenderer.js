@@ -20,6 +20,7 @@ import {
     drawCelestialBody,
     drawCelestialHoverLabel
 } from './celestialSystem.js';
+import { updateAndDrawClouds } from './cloudSystem.js';
 
 export function drawNightSkyAndMoon(
     context,
@@ -46,6 +47,9 @@ export function drawNightSkyAndMoon(
     drawRect(context, 0, height * 0.56, width * 0.45, height * 0.14, scenePalette.mountainMid);
     drawRect(context, width * 0.35, height * 0.53, width * 0.40, height * 0.17, scenePalette.mountainFar);
     drawRect(context, width * 0.65, height * 0.50, width * 0.35, height * 0.20, scenePalette.mountainNear);
+
+    // Procedural 3-layer parallax clouds rendered behind constellations
+    updateAndDrawClouds(context, width, height, sanctuaryTick);
 
     if (isCelestialHovered) {
         drawCelestialHoverLabel(context, celestialZone, width, horizonY);

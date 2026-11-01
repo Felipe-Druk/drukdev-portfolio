@@ -37,6 +37,17 @@ export function getLayoutZones(width, height, heroOffsetY = 0) {
         const dungeonLeftEdge = dungeonX - 74;
         const mageX = Math.floor((consoleRightEdge + dungeonLeftEdge) / 2);
 
+        const blueMageX = Math.floor(width * 0.46);
+        const blueMageBaseY = Math.max(210, Math.min(horizonY - 82, Math.floor(horizonY * 0.68)));
+        const blueMageZone = {
+            x: blueMageX - 32,
+            y: blueMageBaseY - 64,
+            w: 64,
+            h: 78,
+            centerX: blueMageX,
+            baseY: blueMageBaseY
+        };
+
         const heroX = Math.floor(width * 0.36);
         const baseHeroY = horizonY - 36;
 
@@ -53,6 +64,8 @@ export function getLayoutZones(width, height, heroOffsetY = 0) {
                 pond: { x: pondX, y: pondY, w: pondW, h: pondH },
                 console: { x: consoleX - 32, y: consoleY - 16, w: 68, h: 58, baseX: consoleX, baseY: consoleY },
                 mage: { x: mageX - 20, y: horizonY - 58, w: 42, h: 60, centerX: mageX, baseY: horizonY },
+                blueMage: blueMageZone,
+                blueMageZone,
                 dungeon: { x: dungeonX - 74, y: dungeonY - 10, w: 148, h: 156, centerX: dungeonX, baseY: horizonY },
                 moon: initialCelestialZone,
                 celestial: initialCelestialZone,
@@ -81,6 +94,7 @@ export function detectHoveredZone(pointX, pointY, zones) {
     }
     if (isPointInRect(pointX, pointY, zones.console)) return 'console';
     if (isPointInRect(pointX, pointY, zones.mage)) return 'mage';
+    if (isPointInRect(pointX, pointY, zones.blueMage)) return 'blueMage';
     if (isPointInRect(pointX, pointY, zones.dungeon)) return 'dungeon';
     if (isPointInRect(pointX, pointY, zones.tree)) return 'tree';
     if (isPointInRect(pointX, pointY, zones.pond)) return 'pond';

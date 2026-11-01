@@ -383,6 +383,143 @@
 }
 
 /* ==========================================================================
+   ATMOSPHERIC GRIMOIRE FLOATING UI (#cloudPanel — Strictly 0px radius)
+   ========================================================================== */
+#cloudPanel,
+#cloudPanel[data-cloud-weather="ethereal"] {
+    --cloud-ui-bg: #0D1824;
+    --cloud-ui-border: #2C5E7A;
+    --cloud-ui-inner: #1A3347;
+    --cloud-ui-accent: #7AD7F0;
+    --cloud-ui-active-bg: #1F4E6B;
+    --cloud-ui-detail: var(--steel-light);
+}
+
+#cloudPanel[data-cloud-weather="storm"] {
+    --cloud-ui-bg: #120E1D;
+    --cloud-ui-border: #56616E;
+    --cloud-ui-inner: #3D1247;
+    --cloud-ui-accent: #00E5FF;
+    --cloud-ui-active-bg: #2B3138;
+    --cloud-ui-detail: var(--accent-main);
+}
+
+#cloudPanel[data-cloud-weather="aurora"] {
+    --cloud-ui-bg: #071A24;
+    --cloud-ui-border: #1F4E6B;
+    --cloud-ui-inner: #0E2233;
+    --cloud-ui-accent: #00F5D4;
+    --cloud-ui-active-bg: #16425B;
+    --cloud-ui-detail: #7AD7F0;
+}
+
+#cloudPanel[data-cloud-weather="crimson"] {
+    --cloud-ui-bg: #1E0F1D;
+    --cloud-ui-border: var(--accent-main);
+    --cloud-ui-inner: #3D1247;
+    --cloud-ui-accent: var(--accent-warm);
+    --cloud-ui-active-bg: var(--accent-secondary);
+    --cloud-ui-detail: var(--accent-ivory);
+}
+
+.cloud-panel {
+    background: var(--cloud-ui-bg);
+    border: 3px solid var(--cloud-ui-border);
+    outline: 2px solid var(--bg-primary);
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px var(--cloud-ui-inner),
+        6px 6px 0px var(--bg-primary);
+}
+
+.cloud-panel-header {
+    border-bottom: 2px solid var(--cloud-ui-border);
+}
+
+.cloud-panel-title {
+    color: var(--cloud-ui-accent);
+}
+
+.cloud-val-badge {
+    color: var(--cloud-ui-detail);
+}
+
+.cloud-weather-btn {
+    background: var(--bg-primary);
+    border: 2px solid var(--cloud-ui-border);
+    border-radius: 0;
+    color: var(--steel-light);
+    box-shadow: 2px 2px 0px var(--bg-primary);
+    cursor: pointer;
+    transition: border-color 0.1s ease, color 0.1s ease, background-color 0.1s ease;
+}
+
+.cloud-weather-btn:hover {
+    border-color: var(--cloud-ui-accent);
+    color: var(--cloud-ui-detail);
+}
+
+.cloud-weather-btn.active {
+    background: var(--cloud-ui-active-bg);
+    border-color: var(--cloud-ui-accent);
+    color: var(--cloud-ui-detail);
+}
+
+.cloud-reseed-btn {
+    background: var(--cloud-ui-active-bg);
+    border: 2px solid var(--cloud-ui-accent);
+    outline: 1px solid var(--bg-primary);
+    border-radius: 0;
+    color: var(--cloud-ui-detail);
+    box-shadow: 4px 4px 0px var(--bg-primary);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.15s ease;
+}
+
+.cloud-reseed-btn:hover {
+    border-color: var(--cloud-ui-detail);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px var(--bg-primary);
+}
+
+.cloud-reseed-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px var(--bg-primary);
+}
+
+.cloud-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: var(--bg-primary);
+    border: 2px solid var(--cloud-ui-border);
+    border-radius: 0;
+    outline: none;
+    cursor: pointer;
+}
+
+.cloud-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 16px;
+    background: var(--cloud-ui-accent);
+    border: 2px solid var(--bg-primary);
+    border-radius: 0;
+    cursor: pointer;
+}
+
+.cloud-slider::-moz-range-thumb {
+    width: 12px;
+    height: 16px;
+    background: var(--cloud-ui-accent);
+    border: 2px solid var(--bg-primary);
+    border-radius: 0;
+    cursor: pointer;
+}
+
+/* ==========================================================================
    INTERACTIVE DUNGEON ARCHIVE (#dungeonModal — Strictly 0px radius & 0px blur)
    ========================================================================== */
 .dungeon-modal-frame {

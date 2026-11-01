@@ -47,6 +47,7 @@ export const TRANSLATIONS = {
             dungeonSealMsg: 'Abriendo los archivos de la Dungeon...',
             consoleHover: '[ABRIR DRUKSYSTEM OS]',
             mageHover: '[MAGO VERDE // FLORA]',
+            blueMageHover: '[MAGO AZUL // CLIMA]',
             moonHover: '[LUNA // CAMBIAR A DÍA]',
             sunHover: '[SOL // CAMBIAR A NOCHE]',
             constellations: {
@@ -85,6 +86,20 @@ export const TRANSLATIONS = {
                 druk: 'DRUK',
                 autumn: 'OTOÑO',
                 matrix: 'MATRIX'
+            }
+        },
+        cloud: {
+            panelTitle: '☁️ GRIMORIO ATMOSFÉRICO',
+            densityLabel: 'CANTIDAD',
+            windLabel: 'VIENTO',
+            scaleLabel: 'TAMAÑO',
+            weatherLabel: 'CLIMA',
+            reseedBtn: '[INVOCAR RÁFAGA / SEED]',
+            weathers: {
+                ethereal: 'ETÉREO',
+                storm: 'TORMENTA',
+                aurora: 'AURORA',
+                crimson: 'CARMESÍ'
             }
         },
         terminal: {
@@ -247,6 +262,7 @@ export const TRANSLATIONS = {
             dungeonSealMsg: 'Opening the Dungeon archives...',
             consoleHover: '[OPEN DRUKSYSTEM OS]',
             mageHover: '[GREEN MAGE // FLORA]',
+            blueMageHover: '[BLUE MAGE // WEATHER]',
             moonHover: '[MOON // SWITCH TO DAY]',
             sunHover: '[SUN // SWITCH TO NIGHT]',
             constellations: {
@@ -285,6 +301,20 @@ export const TRANSLATIONS = {
                 druk: 'DRUK',
                 autumn: 'AUTUMN',
                 matrix: 'MATRIX'
+            }
+        },
+        cloud: {
+            panelTitle: '☁️ ATMOSPHERIC GRIMOIRE',
+            densityLabel: 'DENSITY',
+            windLabel: 'WIND',
+            scaleLabel: 'SCALE',
+            weatherLabel: 'WEATHER',
+            reseedBtn: '[SUMMON GUST / SEED]',
+            weathers: {
+                ethereal: 'ETHEREAL',
+                storm: 'STORM',
+                aurora: 'AURORA',
+                crimson: 'CRIMSON'
             }
         },
         terminal: {

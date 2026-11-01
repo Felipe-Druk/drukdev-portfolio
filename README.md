@@ -39,12 +39,14 @@ portfolio/
     │   ├── sprites/
     │   │   ├── index.js                # Archivo barril de primitivas Canvas y renderizadores procedurales de sprites
     │   │   ├── canvasUtils.js          # Primitivas pixel-art (drawRect, drawPixelLine, etiquetas flotantes, colisión y portapapeles)
-    │   │   ├── greenMageSprite.js      # Renderizado procedural del Mago Verde NPC (túnica reactiva al bioma, báculo y sombrero)
+    │   │   ├── mageSprite.js           # Renderizador unificado de magos elementales (drawElementalMage + wrappers Verde/Azul)
     │   │   ├── dragonSprite.js         # Renderizado procedural del Guardián Druk y el Dragón alado (Santuario, HUD y Flappy Dragon)
     │   │   ├── classEmblems.js         # Emblemas procedurales de las 4 clases RPG + Modo Omnisciente para la Dungeon
     │   │   └── arcadeSprites.js        # Sprites procedurales para Bug Slasher (héroe, onda de espada, bugs, gemas) y Snake CRT
     │   └── sanctuary/
     │       ├── celestialSystem.js      # Ciclo Noche -> Atardecer -> Día, arco parabólico al horizonte y Sol/Luna pixel-art
+    │       ├── cloudSystem.js          # Motor procedural de nubes parallax de 3 capas (far, mid, near) y estado climático
+    │       ├── cloudPanelUI.js         # Controlador DOM del Grimorio Atmosférico (#cloudPanel), sliders, climas y exclusión mutua
     │       ├── constellations.js       # Planos, rotación 2D, caché de zonas y renderizado de las 5 constelaciones (Astrolabio Solar de día)
     │       ├── environmentRenderer.js  # Renderizado de cielo/montañas/laguna interpolados, Árbol Antiguo, Portal Dungeon y Consola CRT
     │       ├── floraSystem.js          # Motor matemático y generación procedural del pasto (dispersión, cúmulos y sombreado por profundidad)
@@ -76,13 +78,15 @@ portfolio/
    - Ejecuta el bucle principal `requestAnimationFrame` (`mainLoop`) pausando automáticamente `updateAndDrawSanctuary()` cuando los modales de pantalla completa están abiertos y ejecutando `updateAndDrawGame()` exclusivamente en la vista `slasher`.
 2. **Motor de Sprites Procedurales (`js/graphics/sprites/*`):**
    - Centraliza todas las primitivas de dibujo pixel-art (`canvasUtils.js`) y estandariza cada entidad visual mediante funciones procedurales basadas en `drawRect` consumiendo colores desde `js/config/palettes.js`:
-     - `greenMageSprite.js` dibuja al **Mago Verde** sincronizado con la paleta del bioma activo sin acoplamiento al DOM.
+     - `mageSprite.js` centraliza la geometría de los magos en `drawElementalMage` y expone los wrappers `drawGreenMage` (**Mago Verde**, paleta del bioma activo) y `drawBlueMage` (**Mago Azul / Aeromante**, levitando sobre su nube-pedestal reactiva al clima y al ciclo celeste).
      - `dragonSprite.js` renderiza al Guardián en el Santuario, las vistas previas estáticas y el dragón en vuelo de `flappyDragon.js`.
      - `classEmblems.js` traza los emblemas pixel-art de las 4 clases RPG (`backend`, `algorithms`, `gamedev`, `fullstack`) y del Modo Omnisciente.
      - `arcadeSprites.js` provee los sprites procedurales para `bugSlasher.js` y `snakeGame.js`.
 3. **Escenario del Santuario (`js/graphics/sanctuary.js` + `js/graphics/sanctuary/*`):**
    - `sanctuary.js` actúa como controlador de estado e input del canvas `#sanctuaryCanvas` y delega responsabilidades en `js/graphics/sanctuary/`:
      - `celestialSystem.js` gestiona el ciclo **Noche -> Atardecer Dorado -> Día** (`druk_celestial_mode`), la trayectoria parabólica del astro hacia el horizonte y el renderizado pixel-art de la Luna y el Sol.
+     - `cloudSystem.js` genera y anima las nubes procedurales en 3 capas parallax (`far`, `mid`, `near`) detrás de las constelaciones (`druk_cloud_config`).
+     - `cloudPanelUI.js` controla exclusivamente el DOM y eventos del Grimorio Atmosférico (`#cloudPanel`) con exclusión mutua respecto a `#floraPanel`.
      - `layoutZones.js` calcula y memoiza las coordenadas relativas al viewport y actualiza el hitbox dinámico del astro en tiempo real.
      - `environmentRenderer.js` dibuja el cielo, montañas y laguna con interpolación cromática (`getInterpolatedScenePalette`), el Árbol Antiguo, el Portal de la Dungeon (`DUNGEON // ENTER`) y la consola reliquia `DrukSystem`.
      - `floraSystem.js` gestiona exclusivamente el motor matemático y la generación procedural del pasto (`seed`, `density`, `clumping`, `grassLength` y sombreado por profundidad).

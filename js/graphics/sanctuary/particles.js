@@ -6,6 +6,7 @@ import {
     DRUK_CORE_PALETTE,
     SANCTUARY_SCENE_PALETTE,
     getActiveBiomePalette,
+    getActiveCloudPalette,
     interpolateHexColor
 } from '../../config/palettes.js';
 import { snapToPixel, drawRect } from '../sprites/index.js';
@@ -186,6 +187,50 @@ export function spawnMageFloraWave(mageZone, horizonY, width, includeMeadowBurst
                 size: Math.random() > 0.5 ? 4 : 2,
                 life: 0.95,
                 color: spellColors[index % spellColors.length]
+            });
+        }
+    }
+}
+
+export function spawnBlueMageWindWave(blueMageZone, horizonY, width, includeSkyGust = false) {
+    if (!blueMageZone) return;
+    const cloudPalette = getActiveCloudPalette(getCelestialProgress());
+    const windColors = [
+        cloudPalette.light,
+        cloudPalette.accent,
+        cloudPalette.mid,
+        DRUK_CORE_PALETTE.steelLight
+    ];
+    const staffOriginX = blueMageZone.centerX + 14;
+    const staffOriginY = blueMageZone.baseY - 44;
+
+    for (let index = 0; index < 24; index++) {
+        const angle = (index / 24) * Math.PI * 2;
+        const speed = 1.2 + Math.random() * 2.5;
+        particles.push({
+            x: staffOriginX,
+            y: staffOriginY,
+            velocityX: Math.cos(angle) * speed,
+            velocityY: Math.sin(angle) * speed * 0.65,
+            isLeaf: false,
+            size: index % 2 === 0 ? 4 : 3,
+            life: 0.95,
+            color: windColors[index % windColors.length]
+        });
+    }
+
+    if (includeSkyGust) {
+        const maxGustY = Math.max(120, horizonY - 60);
+        for (let index = 0; index < 30; index++) {
+            particles.push({
+                x: Math.random() * width,
+                y: 64 + Math.random() * (maxGustY - 64),
+                velocityX: 1.6 + Math.random() * 2.4,
+                velocityY: (Math.random() - 0.5) * 0.6,
+                isLeaf: false,
+                size: index % 3 === 0 ? 4 : 2,
+                life: 0.95,
+                color: windColors[index % windColors.length]
             });
         }
     }

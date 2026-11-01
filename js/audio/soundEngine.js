@@ -137,6 +137,15 @@ const SOUND_PRESETS = {
         ],
         gainVolume: 0.07,
         duration: 0.42
+    },
+    windSpell: {
+        waveType: 'sine',
+        startFrequency: 280,
+        endFrequency: 920,
+        rampType: 'exponential',
+        chordFrequencies: [440, 587.33, 880],
+        gainVolume: 0.08,
+        duration: 0.28
     }
 };
 
@@ -223,6 +232,10 @@ export function floraSpell() {
     playSound('floraSpell');
 }
 
+export function windSpell() {
+    playSound('windSpell');
+}
+
 export function celestialShift() {
     playSound('celestialShift');
 }
@@ -239,6 +252,7 @@ export const SoundEngine = {
     initAudio,
     playSound,
     floraSpell,
+    windSpell,
     celestialShift,
     toggleSound,
     isSoundEnabled

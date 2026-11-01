@@ -140,6 +140,89 @@ export const BIOME_PALETTES = Object.freeze({
     })
 });
 
+export const CLOUD_PALETTES = Object.freeze({
+    ethereal: Object.freeze({
+        night: Object.freeze({
+            light: '#56616E',
+            mid: '#2B3138',
+            shadow: '#141116',
+            accent: '#D8E2EB'
+        }),
+        sunset: Object.freeze({
+            light: '#F3D5B5',
+            mid: '#D4957A',
+            shadow: '#7A1F73',
+            accent: '#FFB000'
+        }),
+        day: Object.freeze({
+            light: '#F4F8FB',
+            mid: '#D8E2EB',
+            shadow: '#9BA7B4',
+            accent: '#7AD7F0'
+        })
+    }),
+    storm: Object.freeze({
+        night: Object.freeze({
+            light: '#00E5FF',
+            mid: '#2B3138',
+            shadow: '#3D1247',
+            accent: '#B92B92'
+        }),
+        sunset: Object.freeze({
+            light: '#B92B92',
+            mid: '#3D1247',
+            shadow: '#1A0F24',
+            accent: '#00E5FF'
+        }),
+        day: Object.freeze({
+            light: '#7AD7F0',
+            mid: '#2B3138',
+            shadow: '#3D1247',
+            accent: '#00E5FF'
+        })
+    }),
+    aurora: Object.freeze({
+        night: Object.freeze({
+            light: '#00F5D4',
+            mid: '#1F4E6B',
+            shadow: '#0E2233',
+            accent: '#7AD7F0'
+        }),
+        sunset: Object.freeze({
+            light: '#7AD7F0',
+            mid: '#1F4E6B',
+            shadow: '#0E2233',
+            accent: '#00F5D4'
+        }),
+        day: Object.freeze({
+            light: '#A8F9EE',
+            mid: '#1F4E6B',
+            shadow: '#0E2233',
+            accent: '#00F5D4'
+        })
+    }),
+    crimson: Object.freeze({
+        night: Object.freeze({
+            light: '#D4957A',
+            mid: '#B92B92',
+            shadow: '#3D1247',
+            accent: '#F3D5B5'
+        }),
+        sunset: Object.freeze({
+            light: '#F3D5B5',
+            mid: '#D4957A',
+            shadow: '#3D1247',
+            accent: '#FFB000'
+        }),
+        day: Object.freeze({
+            light: '#F3D5B5',
+            mid: '#D4957A',
+            shadow: '#7A1F73',
+            accent: '#B92B92'
+        })
+    })
+});
+
 export const TERMINAL_PALETTES = Object.freeze({
     matrix: Object.freeze({
         bg: '#030803',
@@ -200,6 +283,22 @@ export const SPRITE_PALETTES = Object.freeze({
         staffWoodLight: SANCTUARY_SCENE_PALETTE.trunkLight,
         staffCastHalo: 'rgba(243, 213, 181, 0.25)'
     }),
+    blueMage: Object.freeze({
+        shadowOutline: DRUK_CORE_PALETTE.abyss,
+        robeDark: '#1A3347',
+        robeMid: '#2C5E7A',
+        robeLight: '#7AD7F0',
+        hatBand: DRUK_CORE_PALETTE.steelLight,
+        bootLeather: '#1A3347',
+        handBronze: DRUK_CORE_PALETTE.bronzeWarm,
+        faceShadow: DRUK_CORE_PALETTE.obsidianLabelBg,
+        eyeGlow: '#7AD7F0',
+        beardLight: DRUK_CORE_PALETTE.steelLight,
+        beardTip: DRUK_CORE_PALETTE.steelMuted,
+        staffWoodDark: DRUK_CORE_PALETTE.steelDark,
+        staffWoodLight: DRUK_CORE_PALETTE.steelMuted,
+        staffCastHalo: 'rgba(122, 215, 240, 0.28)'
+    }),
     slasher: Object.freeze({
         bgSkyTop: DRUK_CORE_PALETTE.abyss,
         bgSkyBottom: DRUK_CORE_PALETTE.darkEarth,
@@ -217,6 +316,7 @@ export const SPRITE_PALETTES = Object.freeze({
 });
 
 let activeBiomeKey = 'emerald';
+let activeWeatherKey = 'ethereal';
 let activeTerminalColorMode = 'matrix';
 
 export function getActiveBiomeKey() {
@@ -232,6 +332,38 @@ export function setActiveBiomeKey(biomeKey) {
 
 export function getActiveBiomePalette() {
     return BIOME_PALETTES[activeBiomeKey] || BIOME_PALETTES.emerald;
+}
+
+export function getActiveWeatherKey() {
+    return activeWeatherKey;
+}
+
+export function setActiveWeatherKey(weatherKey) {
+    if (CLOUD_PALETTES[weatherKey]) {
+        activeWeatherKey = weatherKey;
+    }
+    return activeWeatherKey;
+}
+
+export function getActiveCloudPalette(celestialProgress = 0) {
+    const weatherStages = CLOUD_PALETTES[activeWeatherKey] || CLOUD_PALETTES.ethereal;
+    const clampedProgress = Math.max(0, Math.min(1, Number.isFinite(celestialProgress) ? celestialProgress : 0));
+
+    if (clampedProgress === 0) return weatherStages.night;
+    if (clampedProgress === 0.5) return weatherStages.sunset;
+    if (clampedProgress === 1) return weatherStages.day;
+
+    const isFirstHalf = clampedProgress < 0.5;
+    const fromStage = isFirstHalf ? weatherStages.night : weatherStages.sunset;
+    const toStage = isFirstHalf ? weatherStages.sunset : weatherStages.day;
+    const stageFactor = isFirstHalf ? clampedProgress / 0.5 : (clampedProgress - 0.5) / 0.5;
+
+    return {
+        light: interpolateHexColor(fromStage.light, toStage.light, stageFactor),
+        mid: interpolateHexColor(fromStage.mid, toStage.mid, stageFactor),
+        shadow: interpolateHexColor(fromStage.shadow, toStage.shadow, stageFactor),
+        accent: interpolateHexColor(fromStage.accent, toStage.accent, stageFactor)
+    };
 }
 
 export function getActiveTerminalColorMode() {

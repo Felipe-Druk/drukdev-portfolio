@@ -12,7 +12,11 @@ export {
     copyTextToClipboard
 } from './canvasUtils.js';
 
-export { drawGreenMage } from './greenMageSprite.js';
+export {
+    drawElementalMage,
+    drawGreenMage,
+    drawBlueMage
+} from './mageSprite.js';
 
 export {
     drawDragonKnightGuardian,

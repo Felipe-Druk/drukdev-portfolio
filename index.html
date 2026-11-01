@@ -195,6 +195,118 @@
     </aside>
 
     <!-- ===================================================================
+         ATMOSPHERIC GRIMOIRE FLOATING PANEL (BLUE MAGE WEATHER CONTROLLER)
+         =================================================================== -->
+    <aside
+        id="cloudPanel"
+        data-cloud-weather="ethereal"
+        class="hidden cloud-panel fixed z-30 w-64 p-3 text-xs"
+    >
+        <div class="cloud-panel-header flex items-center justify-between pb-2 mb-2.5">
+            <span class="cloud-panel-title font-gothic-pixel text-[10px] tracking-wide" data-i18n="cloud.panelTitle">
+                ☁️ GRIMORIO ATMOSFÉRICO
+            </span>
+            <button
+                id="cloudCloseBtn"
+                type="button"
+                class="cloud-weather-btn px-2 py-0.5 font-gothic-pixel text-[9px]"
+            >
+                [X]
+            </button>
+        </div>
+
+        <div class="space-y-2.5">
+            <!-- Cloud Density Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="cloudDensitySlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="cloud.densityLabel">
+                        CANTIDAD
+                    </label>
+                    <span id="cloudDensityVal" class="cloud-val-badge font-bold">65%</span>
+                </div>
+                <input
+                    id="cloudDensitySlider"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value="65"
+                    class="cloud-slider w-full"
+                >
+            </div>
+
+            <!-- Wind Speed Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="cloudWindSlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="cloud.windLabel">
+                        VIENTO
+                    </label>
+                    <span id="cloudWindVal" class="cloud-val-badge font-bold">+0.8x</span>
+                </div>
+                <input
+                    id="cloudWindSlider"
+                    type="range"
+                    min="-200"
+                    max="200"
+                    step="10"
+                    value="80"
+                    class="cloud-slider w-full"
+                >
+            </div>
+
+            <!-- Cloud Scale Slider -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label for="cloudScaleSlider" class="font-gothic-pixel text-[9px] text-steel" data-i18n="cloud.scaleLabel">
+                        TAMAÑO
+                    </label>
+                    <span id="cloudScaleVal" class="cloud-val-badge font-bold">1.0x</span>
+                </div>
+                <input
+                    id="cloudScaleSlider"
+                    type="range"
+                    min="50"
+                    max="180"
+                    step="10"
+                    value="100"
+                    class="cloud-slider w-full"
+                >
+            </div>
+
+            <!-- Weather Selector -->
+            <div>
+                <span class="block font-gothic-pixel text-[9px] text-steel mb-1.5" data-i18n="cloud.weatherLabel">
+                    CLIMA
+                </span>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button type="button" data-cloud-weather="ethereal" class="cloud-weather-btn active py-1 text-[10px] font-bold" data-i18n="cloud.weathers.ethereal">
+                        ETÉREO
+                    </button>
+                    <button type="button" data-cloud-weather="storm" class="cloud-weather-btn py-1 text-[10px] font-bold" data-i18n="cloud.weathers.storm">
+                        TORMENTA
+                    </button>
+                    <button type="button" data-cloud-weather="aurora" class="cloud-weather-btn py-1 text-[10px] font-bold" data-i18n="cloud.weathers.aurora">
+                        AURORA
+                    </button>
+                    <button type="button" data-cloud-weather="crimson" class="cloud-weather-btn py-1 text-[10px] font-bold" data-i18n="cloud.weathers.crimson">
+                        CARMESÍ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reseed Action -->
+            <button
+                id="cloudReseedBtn"
+                type="button"
+                class="cloud-reseed-btn w-full py-2 font-gothic-pixel text-[9px] tracking-wider"
+                data-i18n="cloud.reseedBtn"
+            >
+                [INVOCAR RÁFAGA / SEED]
+            </button>
+        </div>
+    </aside>
+
+    <!-- ===================================================================
          THE ARTIFACT: DRUKSYSTEM OS CRT MONITOR MODAL
          =================================================================== -->
     <div
