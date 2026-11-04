@@ -221,6 +221,10 @@ export function initSnakeControls() {
         const btn = document.getElementById(id);
         if (!btn) return;
         btn.addEventListener('click', () => setSnakeDirection(dx, dy));
+        btn.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            setSnakeDirection(dx, dy);
+        }, { passive: false });
     };
 
     bindDirBtn('snakeUpBtn', 0, -1);

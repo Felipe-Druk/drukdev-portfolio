@@ -8,6 +8,7 @@ import {
     SANCTUARY_SCENE_PALETTE
 } from '../../config/palettes.js';
 import { drawRect, drawFloatingPixelLabel } from '../sprites/index.js';
+import { isPortraitAspectRatio } from '../../utils/mathUtils.js';
 import { loadItem, saveItem } from '../../utils/safeStorage.js';
 
 export const CELESTIAL_STORAGE_KEY = 'druk_celestial_mode';
@@ -107,8 +108,11 @@ export function getCelestialBodyZone(canvasWidth, canvasHeight, horizonY) {
         ? horizonY
         : Math.floor(canvasHeight * 0.66);
 
-    const zenithX = Math.floor(canvasWidth * (canvasWidth < 640 ? 0.85 : 0.83));
-    const zenithY = Math.max(58, Math.floor(canvasHeight * 0.11));
+    const isPortrait = isPortraitAspectRatio(canvasWidth, canvasHeight);
+    const zenithX = Math.floor(canvasWidth * (isPortrait ? 0.83 : (canvasWidth < 640 ? 0.85 : 0.83)));
+    const zenithY = isPortrait
+        ? Math.max(108, Math.floor(canvasHeight * 0.16))
+        : Math.max(58, Math.floor(canvasHeight * 0.11));
 
     const maxHorizontalArcOffset = Math.min(76, Math.max(24, canvasWidth - zenithX - 20));
     const mountainRidgeY = Math.floor(canvasHeight * 0.50);

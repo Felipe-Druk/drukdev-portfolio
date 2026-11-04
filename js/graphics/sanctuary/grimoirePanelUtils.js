@@ -34,6 +34,19 @@ export function updateSliderAndBadge(sliderId, badgeId, rawValue, formattedText)
     }
 }
 
+export function projectZoneToViewport(zone, viewportWidth, viewportHeight) {
+    if (!zone) return null;
+    const canvas = document.getElementById('sanctuaryCanvas');
+    const scaleX = canvas && canvas.width > 0 ? viewportWidth / canvas.width : 1;
+    const scaleY = canvas && canvas.height > 0 ? viewportHeight / canvas.height : 1;
+
+    return {
+        ...zone,
+        centerX: Math.round(zone.centerX * scaleX),
+        baseY: Math.round(zone.baseY * scaleY)
+    };
+}
+
 export function createGrimoirePanel(config) {
     const {
         panelId,

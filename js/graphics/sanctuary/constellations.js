@@ -9,6 +9,7 @@ import {
     SANCTUARY_SCENE_PALETTE,
     getInterpolatedScenePalette
 } from '../../config/palettes.js';
+import { clamp, isPortraitAspectRatio } from '../../utils/mathUtils.js';
 import { drawRect, drawPixelLine, drawFloatingPixelLabel } from '../sprites/index.js';
 import { getCelestialProgress } from './celestialSystem.js';
 
@@ -20,6 +21,8 @@ export const CONSTELLATION_BLUEPRINTS = [
         type: 'social',
         relativeX: 0.14,
         relativeY: 0.22,
+        portraitRelativeX: 0.20,
+        portraitRelativeY: 0.17,
         rotationAngle: -0.18,
         nodes: [
             [-22, -16], [-38, 0], [-22, 16],
@@ -37,6 +40,8 @@ export const CONSTELLATION_BLUEPRINTS = [
         type: 'social',
         relativeX: 0.29,
         relativeY: 0.15,
+        portraitRelativeX: 0.52,
+        portraitRelativeY: 0.15,
         rotationAngle: 0.14,
         nodes: [
             [-36, -20], [36, -20], [36, 20], [-36, 20],
@@ -52,6 +57,8 @@ export const CONSTELLATION_BLUEPRINTS = [
         type: 'social',
         relativeX: 0.44,
         relativeY: 0.17,
+        portraitRelativeX: 0.20,
+        portraitRelativeY: 0.30,
         rotationAngle: -0.13,
         nodes: [
             [-22, -18], [-22, -4], [-22, 18],
@@ -67,6 +74,8 @@ export const CONSTELLATION_BLUEPRINTS = [
         type: 'email',
         relativeX: 0.59,
         relativeY: 0.23,
+        portraitRelativeX: 0.50,
+        portraitRelativeY: 0.32,
         rotationAngle: 0.19,
         nodes: [
             [-36, -20], [36, -20], [36, 20], [-36, 20],
@@ -82,6 +91,8 @@ export const CONSTELLATION_BLUEPRINTS = [
         type: 'cv',
         relativeX: 0.74,
         relativeY: 0.18,
+        portraitRelativeX: 0.80,
+        portraitRelativeY: 0.29,
         rotationAngle: -0.15,
         nodes: [
             [-22, -22], [10, -22], [22, -10], [22, 22], [-22, 22],
@@ -140,17 +151,28 @@ export function buildConstellationZones(width, height, horizonY) {
         return cachedConstellationState.zones;
     }
 
-    const scale = Math.max(0.85, Math.min(1.35, Math.min(width / 1180, height / 720)));
-    const minSkyY = width < 640 ? 122 : 104;
-    const maxSkyY = Math.max(minSkyY + 24, horizonY - 250);
+    const isPortrait = isPortraitAspectRatio(width, height);
+    const scale = isPortrait
+        ? clamp(width / 620, 0.76, 1.12)
+        : clamp(Math.min(width / 1180, height / 720), 0.78, 1.35);
+    const minSkyY = isPortrait ? 112 : (width < 640 ? 114 : 104);
+    const horizonClearance = isPortrait ? 170 : 250;
+    const maxSkyY = Math.max(minSkyY + 24, horizonY - horizonClearance);
 
     const activeConstellations = [];
     CONSTELLATION_BLUEPRINTS.forEach((blueprint) => {
         const targetValue = getConstellationTargetValue(blueprint, activeLanguage);
         if (!targetValue) return;
 
-        const centerX = Math.floor(width * blueprint.relativeX);
-        const centerY = Math.max(minSkyY, Math.min(maxSkyY, Math.floor(height * blueprint.relativeY)));
+        const activeRelativeX = isPortrait && typeof blueprint.portraitRelativeX === 'number'
+            ? blueprint.portraitRelativeX
+            : blueprint.relativeX;
+        const activeRelativeY = isPortrait && typeof blueprint.portraitRelativeY === 'number'
+            ? blueprint.portraitRelativeY
+            : blueprint.relativeY;
+
+        const centerX = Math.floor(width * activeRelativeX);
+        const centerY = clamp(Math.floor(height * activeRelativeY), minSkyY, maxSkyY);
         const halfWidth = Math.floor(56 * scale);
         const topPadding = Math.floor(34 * scale);
         const bottomPadding = Math.floor(48 * scale);

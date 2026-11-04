@@ -13,7 +13,11 @@ import {
     drawDragonKnightGuardian
 } from './sprites/index.js';
 import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
-import { getLayoutZones, detectHoveredZone } from './sanctuary/layoutZones.js';
+import {
+    getLayoutZones,
+    detectHoveredZone,
+    computeCanvasLogicalDimensions
+} from './sanctuary/layoutZones.js';
 import {
     getCelestialProgress,
     toggleCelestialCycle,
@@ -75,39 +79,36 @@ const sanctuaryState = {
     heroJumping: false
 };
 
-export function resizeSanctuary() {
-    if (!sanctuaryCanvas) return;
-    sanctuaryCanvas.width = window.innerWidth;
-    sanctuaryCanvas.height = window.innerHeight;
-    initAmbientFireflies(sanctuaryCanvas.width, sanctuaryCanvas.height);
-
-    const zones = getLayoutZones(
+function getCurrentSanctuaryZones() {
+    return getLayoutZones(
         sanctuaryCanvas.width,
         sanctuaryCanvas.height,
         sanctuaryState.heroOffsetY
     );
-    positionFloraPanelAboveMage(zones.mage, sanctuaryCanvas.width, sanctuaryCanvas.height);
-    positionCloudPanelNearBlueMage(zones.blueMage, sanctuaryCanvas.width, sanctuaryCanvas.height);
+}
+
+export function resizeSanctuary() {
+    if (!sanctuaryCanvas) return;
+    const logicalDimensions = computeCanvasLogicalDimensions(window.innerWidth, window.innerHeight);
+    sanctuaryCanvas.width = logicalDimensions.width;
+    sanctuaryCanvas.height = logicalDimensions.height;
+    initAmbientFireflies(sanctuaryCanvas.width, sanctuaryCanvas.height);
+
+    const zones = getCurrentSanctuaryZones();
+    positionFloraPanelAboveMage(zones.mage, window.innerWidth, window.innerHeight);
+    positionCloudPanelNearBlueMage(zones.blueMage, window.innerWidth, window.innerHeight);
 }
 
 function triggerMageCastEffect(includeMeadowBurst = false) {
     if (!sanctuaryCanvas) return;
-    const zones = getLayoutZones(
-        sanctuaryCanvas.width,
-        sanctuaryCanvas.height,
-        sanctuaryState.heroOffsetY
-    );
+    const zones = getCurrentSanctuaryZones();
     sanctuaryState.mageCastTimer = 32;
     spawnMageFloraWave(zones.mage, zones.horizonY, sanctuaryCanvas.width, includeMeadowBurst);
 }
 
 function triggerBlueMageCastEffect(includeSkyGust = false) {
     if (!sanctuaryCanvas) return;
-    const zones = getLayoutZones(
-        sanctuaryCanvas.width,
-        sanctuaryCanvas.height,
-        sanctuaryState.heroOffsetY
-    );
+    const zones = getCurrentSanctuaryZones();
     sanctuaryState.blueMageCastTimer = 32;
     spawnBlueMageWindWave(zones.blueMage, zones.horizonY, sanctuaryCanvas.width, includeSkyGust);
 }
@@ -175,13 +176,37 @@ const ZONE_CLICK_HANDLERS = {
     }
 };
 
+function mapClientPointToCanvas(clientX, clientY) {
+    if (!sanctuaryCanvas) return { x: 0, y: 0 };
+    const rect = sanctuaryCanvas.getBoundingClientRect();
+    const scaleX = sanctuaryCanvas.width / Math.max(1, rect.width);
+    const scaleY = sanctuaryCanvas.height / Math.max(1, rect.height);
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
+}
+
+function updatePointerHoverState(canvasX, canvasY) {
+    pointerState.x = canvasX;
+    pointerState.y = canvasY;
+    const zones = getCurrentSanctuaryZones();
+    const nextHoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
+
+    if (nextHoveredZone !== pointerState.hoveredZone && isConstellationZone(nextHoveredZone)) {
+        playSound('starHover');
+    }
+
+    pointerState.hoveredZone = nextHoveredZone;
+    sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
+}
+
 function handleSanctuaryClick(clickX, clickY) {
-    const zones = getLayoutZones(
-        sanctuaryCanvas.width,
-        sanctuaryCanvas.height,
-        sanctuaryState.heroOffsetY
-    );
+    pointerState.x = clickX;
+    pointerState.y = clickY;
+    const zones = getCurrentSanctuaryZones();
     const hitZone = detectHoveredZone(clickX, clickY, zones);
+    pointerState.hoveredZone = hitZone;
     if (!hitZone) return;
 
     if (isConstellationZone(hitZone)) {
@@ -210,29 +235,20 @@ export function initSanctuary(onOpenTerminal, onOpenDungeon) {
     initCloudPanelUI(triggerBlueMageCastEffect);
 
     sanctuaryCanvas.addEventListener('mousemove', (event) => {
-        const rect = sanctuaryCanvas.getBoundingClientRect();
-        pointerState.x = event.clientX - rect.left;
-        pointerState.y = event.clientY - rect.top;
-        const zones = getLayoutZones(
-            sanctuaryCanvas.width,
-            sanctuaryCanvas.height,
-            sanctuaryState.heroOffsetY
-        );
-        const nextHoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
-
-        if (nextHoveredZone !== pointerState.hoveredZone && isConstellationZone(nextHoveredZone)) {
-            playSound('starHover');
-        }
-
-        pointerState.hoveredZone = nextHoveredZone;
-        sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
+        const canvasPoint = mapClientPointToCanvas(event.clientX, event.clientY);
+        updatePointerHoverState(canvasPoint.x, canvasPoint.y);
     });
 
+    sanctuaryCanvas.addEventListener('touchmove', (event) => {
+        if (!event.touches || event.touches.length === 0) return;
+        const primaryTouch = event.touches[0];
+        const canvasPoint = mapClientPointToCanvas(primaryTouch.clientX, primaryTouch.clientY);
+        updatePointerHoverState(canvasPoint.x, canvasPoint.y);
+    }, { passive: true });
+
     sanctuaryCanvas.addEventListener('click', (event) => {
-        const rect = sanctuaryCanvas.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const clickY = event.clientY - rect.top;
-        handleSanctuaryClick(clickX, clickY);
+        const canvasPoint = mapClientPointToCanvas(event.clientX, event.clientY);
+        handleSanctuaryClick(canvasPoint.x, canvasPoint.y);
     });
 }
 

@@ -7,21 +7,23 @@ import { clamp } from '../../utils/mathUtils.js';
 import { getFloraConfig, updateFloraConfig } from './floraSystem.js';
 import {
     createGrimoirePanel,
-    updateSliderAndBadge
+    updateSliderAndBadge,
+    projectZoneToViewport
 } from './grimoirePanelUtils.js';
 
 export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHeight) {
     const panelElement = document.getElementById('floraPanel');
     if (!panelElement || !isFloraPanelOpen() || !mageZone) return;
 
+    const projectedMageZone = projectZoneToViewport(mageZone, viewportWidth, viewportHeight);
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 290;
     const screenMargin = 12;
 
-    const idealLeft = Math.round(mageZone.centerX - panelWidth / 2);
+    const idealLeft = Math.round(projectedMageZone.centerX - panelWidth / 2);
     const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
 
-    const idealTop = Math.round(mageZone.baseY - 68 - panelHeight);
+    const idealTop = Math.round(projectedMageZone.baseY - 68 - panelHeight);
     const minTop = 76;
     const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
     const clampedTop = clamp(idealTop, minTop, maxTop);
@@ -31,7 +33,7 @@ export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHei
 
     const arrowElement = document.getElementById('floraPanelArrow');
     if (arrowElement) {
-        const arrowLocalX = clamp(mageZone.centerX - clampedLeft, 18, panelWidth - 18);
+        const arrowLocalX = clamp(projectedMageZone.centerX - clampedLeft, 18, panelWidth - 18);
         arrowElement.style.left = `${arrowLocalX}px`;
     }
 }

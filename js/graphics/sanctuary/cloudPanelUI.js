@@ -7,30 +7,32 @@ import { clamp } from '../../utils/mathUtils.js';
 import { getCloudConfig, updateCloudConfig } from './cloudSystem.js';
 import {
     createGrimoirePanel,
-    updateSliderAndBadge
+    updateSliderAndBadge,
+    projectZoneToViewport
 } from './grimoirePanelUtils.js';
 
 export function positionCloudPanelNearBlueMage(blueMageZone, viewportWidth, viewportHeight) {
     const panelElement = document.getElementById('cloudPanel');
     if (!panelElement || !isCloudPanelOpen() || !blueMageZone) return;
 
+    const projectedBlueMageZone = projectZoneToViewport(blueMageZone, viewportWidth, viewportHeight);
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 296;
     const screenMargin = 12;
 
-    const rightCandidateLeft = blueMageZone.centerX + 46;
-    const leftCandidateLeft = blueMageZone.centerX - 46 - panelWidth;
+    const rightCandidateLeft = projectedBlueMageZone.centerX + 46;
+    const leftCandidateLeft = projectedBlueMageZone.centerX - 46 - panelWidth;
     let idealLeft = rightCandidateLeft;
 
     if (rightCandidateLeft + panelWidth + screenMargin > viewportWidth) {
         idealLeft = leftCandidateLeft >= screenMargin
             ? leftCandidateLeft
-            : Math.round(blueMageZone.centerX - panelWidth / 2);
+            : Math.round(projectedBlueMageZone.centerX - panelWidth / 2);
     }
 
     const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
 
-    const idealTop = Math.round(blueMageZone.baseY - panelHeight / 2 - 18);
+    const idealTop = Math.round(projectedBlueMageZone.baseY - panelHeight / 2 - 18);
     const minTop = 76;
     const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
     const clampedTop = clamp(idealTop, minTop, maxTop);

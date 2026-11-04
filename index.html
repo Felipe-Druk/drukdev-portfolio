@@ -30,10 +30,10 @@
     <!-- ===================================================================
          MINIMAL TOP HUD (BRAND AVATAR, TERMINAL SHORTCUT, ES|EN, MUTE)
          =================================================================== -->
-    <header class="fixed top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-4 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
+    <header class="fixed top-0 left-0 right-0 z-20 max-w-7xl mx-auto px-2.5 pt-2.5 pb-1 sm:px-4 sm:pt-4 sm:pb-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3 pointer-events-none">
         <!-- Brand Logo with Circular Forged Steel Avatar -->
-        <div class="flex items-center gap-3 bg-[#0D0D0F]/85 px-3.5 py-2 border-2 border-[#56616E] shadow-[4px_4px_0_#0D0D0F] pointer-events-auto">
-            <div class="avatar-steel-ring w-11 h-11 flex items-center justify-center shrink-0">
+        <div class="flex items-center gap-2 sm:gap-3 bg-[#0D0D0F]/85 px-2.5 py-1.5 sm:px-3.5 sm:py-2 border-2 border-[#56616E] shadow-[4px_4px_0_#0D0D0F] pointer-events-auto">
+            <div class="avatar-steel-ring w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
                 <img
                     id="brandLogoImg"
                     src="./assets/img/logo-drukdev.png"
@@ -41,31 +41,31 @@
                     class="w-full h-full object-cover"
                     onerror="this.classList.add('hidden'); document.getElementById('logoSpriteCanvas').classList.remove('hidden');"
                 >
-                <canvas id="logoSpriteCanvas" width="44" height="44" class="w-10 h-10 hidden"></canvas>
+                <canvas id="logoSpriteCanvas" width="44" height="44" class="w-7 h-7 sm:w-10 sm:h-10 hidden"></canvas>
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="font-gothic-pixel text-sm sm:text-base tracking-wider text-steel">DRUK<span id="brandSuffix" class="text-bronze">.DEV</span></span>
-                    <span class="text-[9px] font-gothic-pixel px-2 py-0.5 bg-[#7A1F73]/50 border border-[#B92B92] text-[#D4957A]" id="statusBadge">SANCTUARY</span>
+                    <span class="font-gothic-pixel text-xs sm:text-base tracking-wider text-steel">DRUK<span id="brandSuffix" class="text-bronze">.DEV</span></span>
+                    <span class="hidden sm:inline-block text-[9px] font-gothic-pixel px-2 py-0.5 bg-[#7A1F73]/50 border border-[#B92B92] text-[#D4957A]" id="statusBadge">SANCTUARY</span>
                 </div>
-                <p class="text-[11px] opacity-80" id="themeSubtitle" data-i18n="nav.subtitle">Santuario Pixel-Art & Consola Interactiva</p>
+                <p class="hidden sm:block text-[11px] opacity-80" id="themeSubtitle" data-i18n="nav.subtitle">Santuario Pixel-Art & Consola Interactiva</p>
             </div>
         </div>
 
         <!-- Minimal Controls: Open DrukSystem OS, Language (ES | EN) & Audio (MUTE) -->
-        <div class="flex flex-wrap items-center gap-2.5 pointer-events-auto">
-            <button id="btnOpenTerminal" type="button" class="pixel-btn px-3 py-2 text-xs font-gothic-pixel flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2.5 pointer-events-auto">
+            <button id="btnOpenTerminal" type="button" class="pixel-btn px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-gothic-pixel flex items-center gap-1.5 sm:gap-2">
                 <i class="fa-solid fa-terminal text-[#00FF41]"></i>
                 <span data-i18n="nav.openTerminalBtn">DRUKSYSTEM OS</span>
             </button>
 
-            <button id="lang-toggle" type="button" class="px-3 py-2 text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.langTitle" title="Cambiar idioma (ES / EN)">
+            <button id="lang-toggle" type="button" class="px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-gothic-pixel flex items-center gap-1 sm:gap-1.5" data-i18n-title="nav.langTitle" title="Cambiar idioma (ES / EN)">
                 <span id="langEsOption" class="lang-option active">ES</span>
                 <span class="opacity-40">|</span>
                 <span id="langEnOption" class="lang-option">EN</span>
             </button>
 
-            <button id="btnSound" type="button" class="pixel-btn px-3 py-2 text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
+            <button id="btnSound" type="button" class="pixel-btn px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
                 <i id="soundIcon" class="fa-solid fa-volume-high text-bronze"></i>
                 <span id="soundLabel" class="hidden sm:inline">SFX ON</span>
             </button>
@@ -73,8 +73,8 @@
     </header>
 
     <!-- Bottom Sanctuary Exploration Hint -->
-    <footer class="fixed bottom-3 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
-        <div class="bg-[#0D0D0F]/85 border-2 border-[#56616E] px-4 py-1.5 text-xs text-bronze shadow-[4px_4px_0_#0D0D0F] text-center" data-i18n="sanctuary.hint">
+    <footer class="fixed bottom-2 sm:bottom-3 left-0 right-0 z-20 flex justify-center px-2.5 sm:px-4 pointer-events-none">
+        <div class="bg-[#0D0D0F]/85 border-2 border-[#56616E] px-2.5 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-xs text-bronze shadow-[4px_4px_0_#0D0D0F] text-center" data-i18n="sanctuary.hint">
             ✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem
         </div>
     </footer>
@@ -373,8 +373,8 @@
                         </div>
                     </div>
 
-                    <div class="my-auto flex flex-col items-center">
-                        <canvas id="snakeCanvas" class="block"></canvas>
+                    <div class="my-auto w-full flex flex-col items-center">
+                        <canvas id="snakeCanvas" class="block max-w-full h-auto"></canvas>
                         <p id="snakeStatusMsg" class="text-[11px] mt-2 text-center opacity-90" data-i18n="snake.controlsHint">
                             Controles: WASD / Flechas | [ESPACIO] Reiniciar | [ESC / Q] Salir al prompt
                         </p>
@@ -403,8 +403,8 @@
                         </div>
                     </div>
 
-                    <div class="my-auto flex flex-col items-center">
-                        <canvas id="flappyCanvas" class="block cursor-pointer"></canvas>
+                    <div class="my-auto w-full flex flex-col items-center">
+                        <canvas id="flappyCanvas" class="block max-w-full h-auto cursor-pointer"></canvas>
                         <p id="flappyStatusMsg" class="text-[11px] mt-2 text-center opacity-90" data-i18n="flappy.controlsHint">
                             [ESPACIO / CLICK] Aletear • [ESC] Salir
                         </p>
