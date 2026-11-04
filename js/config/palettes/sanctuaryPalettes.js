@@ -30,8 +30,8 @@ export const SANCTUARY_SCENE_PALETTE = Object.freeze({
     trunkDark: '#3D271E',
     trunkLight: '#5C3A2B',
     abyssSoilShadow: '#080D0A',
-    constellationMutedLabel: '#8E8582',
-    constellationHoverBg: 'rgba(13, 13, 15, 0.85)',
+    constellationMutedLabel: '#E6D7EE',
+    constellationHoverBg: 'rgba(13, 13, 15, 0.88)',
     crtAmbientGlowHover: 'rgba(0, 255, 65, 0.28)',
     crtAmbientGlowIdle: 'rgba(0, 255, 65, 0.12)'
 });
@@ -48,10 +48,10 @@ export const CELESTIAL_STAGES = Object.freeze({
         waterInner: SANCTUARY_SCENE_PALETTE.waterMid,
         waterRim: SANCTUARY_SCENE_PALETTE.waterBank,
         waterHighlight: SANCTUARY_SCENE_PALETTE.waterHighlight,
-        constellationEdgeIdle: DRUK_CORE_PALETTE.dragonBase,
-        constellationEdgeHover: DRUK_CORE_PALETTE.dragonLight,
-        constellationStarBright: DRUK_CORE_PALETTE.steelLight,
-        constellationStarDim: DRUK_CORE_PALETTE.bronzeWarm,
+        constellationEdgeIdle: '#D946B8',
+        constellationEdgeHover: '#FFF5D6',
+        constellationStarBright: '#FFFFFF',
+        constellationStarDim: '#F3D5B5',
         constellationLabel: SANCTUARY_SCENE_PALETTE.constellationMutedLabel
     }),
     sunset: Object.freeze({
@@ -65,11 +65,11 @@ export const CELESTIAL_STAGES = Object.freeze({
         waterInner: '#8A4E3B',
         waterRim: '#3E2434',
         waterHighlight: '#D4957A',
-        constellationEdgeIdle: '#A84A5C',
-        constellationEdgeHover: '#FFF5D6',
-        constellationStarBright: '#FFF5D6',
-        constellationStarDim: '#FFB000',
-        constellationLabel: '#F3D5B5'
+        constellationEdgeIdle: '#FFBC6E',
+        constellationEdgeHover: '#FFFFFF',
+        constellationStarBright: '#FFFFFF',
+        constellationStarDim: '#FFE082',
+        constellationLabel: '#FFF5D6'
     }),
     day: Object.freeze({
         skyTop: '#1B334B',
@@ -82,11 +82,11 @@ export const CELESTIAL_STAGES = Object.freeze({
         waterInner: '#2B688A',
         waterRim: '#2C5E7A',
         waterHighlight: '#4A89A8',
-        constellationEdgeIdle: '#8A4E3B',
-        constellationEdgeHover: '#FFB000',
-        constellationStarBright: '#FFF5D6',
-        constellationStarDim: '#FFB000',
-        constellationLabel: '#F3D5B5'
+        constellationEdgeIdle: '#FFE066',
+        constellationEdgeHover: '#FFFFFF',
+        constellationStarBright: '#FFFFFF',
+        constellationStarDim: '#FFF5D6',
+        constellationLabel: '#FFFFFF'
     })
 });
 

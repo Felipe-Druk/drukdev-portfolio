@@ -15,6 +15,11 @@ import { getCelestialProgress } from './celestialSystem.js';
 
 export const CONSTELLATION_ZONE_PREFIX = 'constellation:';
 
+const ATTENTION_TARGET_CONSTELLATION_ID = 'cv';
+const ATTENTION_BLINK_FREQUENCY = 0.16;
+const DAYTIME_CONTRAST_THRESHOLD = 0.35;
+const MAIL_COPIED_DURATION_TICKS = 115;
+
 export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'github',
@@ -53,10 +58,30 @@ export const CONSTELLATION_BLUEPRINTS = [
         ]
     },
     {
-        id: 'linkedin',
-        type: 'social',
+        id: 'cv',
+        type: 'cv',
         relativeX: 0.44,
         relativeY: 0.17,
+        portraitRelativeX: 0.50,
+        portraitRelativeY: 0.30,
+        rotationAngle: -0.10,
+        nodes: [
+            [-22, -22], [10, -22], [22, -10], [22, 22], [-22, 22],
+            [10, -10],
+            [-12, -2], [10, -2],
+            [-12, 10], [12, 10]
+        ],
+        edges: [
+            [0, 1], [1, 2], [2, 3], [3, 4], [4, 0],
+            [1, 5], [5, 2],
+            [6, 7], [8, 9]
+        ]
+    },
+    {
+        id: 'linkedin',
+        type: 'social',
+        relativeX: 0.59,
+        relativeY: 0.22,
         portraitRelativeX: 0.20,
         portraitRelativeY: 0.30,
         rotationAngle: -0.13,
@@ -72,11 +97,11 @@ export const CONSTELLATION_BLUEPRINTS = [
     {
         id: 'mail',
         type: 'email',
-        relativeX: 0.59,
-        relativeY: 0.23,
-        portraitRelativeX: 0.50,
-        portraitRelativeY: 0.32,
-        rotationAngle: 0.19,
+        relativeX: 0.74,
+        relativeY: 0.18,
+        portraitRelativeX: 0.80,
+        portraitRelativeY: 0.31,
+        rotationAngle: 0.16,
         nodes: [
             [-36, -20], [36, -20], [36, 20], [-36, 20],
             [0, 5]
@@ -85,26 +110,6 @@ export const CONSTELLATION_BLUEPRINTS = [
             [0, 1], [1, 2], [2, 3], [3, 0],
             [0, 4], [1, 4]
         ]
-    },
-    {
-        id: 'cv',
-        type: 'cv',
-        relativeX: 0.74,
-        relativeY: 0.18,
-        portraitRelativeX: 0.80,
-        portraitRelativeY: 0.29,
-        rotationAngle: -0.15,
-        nodes: [
-            [-22, -22], [10, -22], [22, -10], [22, 22], [-22, 22],
-            [10, -10],
-            [-12, -2], [10, -2],
-            [-12, 10], [12, 10]
-        ],
-        edges: [
-            [0, 1], [1, 2], [2, 3], [3, 4], [4, 0],
-            [1, 5], [5, 2],
-            [6, 7], [8, 9]
-        ]
     }
 ];
 
@@ -112,6 +117,19 @@ let cachedConstellationState = {
     cacheKey: '',
     zones: []
 };
+
+let hasHighlightedAnyConstellation = false;
+
+export function dismissConstellationAttentionBlink() {
+    hasHighlightedAnyConstellation = true;
+}
+
+function shouldHighlightConstellationForAttention(constellationId, sanctuaryTick) {
+    if (hasHighlightedAnyConstellation || constellationId !== ATTENTION_TARGET_CONSTELLATION_ID) {
+        return false;
+    }
+    return Math.sin(sanctuaryTick * ATTENTION_BLINK_FREQUENCY) > 0;
+}
 
 export function isConstellationZone(zoneKey) {
     return typeof zoneKey === 'string' && zoneKey.startsWith(CONSTELLATION_ZONE_PREFIX);
@@ -207,21 +225,30 @@ export function buildConstellationZones(width, height, horizonY) {
     return activeConstellations;
 }
 
-function drawConstellationEdges(context, constellation, isHovered, scenePalette, celestialProgress) {
-    const idleAlpha = 0.52 + 0.34 * celestialProgress;
+function drawConstellationEdges(context, constellation, isHighlighted, scenePalette, celestialProgress) {
+    const isDaytimeSky = celestialProgress >= DAYTIME_CONTRAST_THRESHOLD;
+    const idleCoreAlpha = 0.86 + 0.12 * celestialProgress;
+    const idleUnderlayColor = isDaytimeSky
+        ? DRUK_CORE_PALETTE.abyss
+        : scenePalette.constellationEdgeIdle;
+    const idleUnderlayAlpha = isDaytimeSky
+        ? 0.28 + 0.16 * celestialProgress
+        : 0.28;
 
     constellation.edges.forEach(([fromNodeIndex, toNodeIndex]) => {
         const fromNode = constellation.nodes[fromNodeIndex];
         const toNode = constellation.nodes[toNodeIndex];
         if (!fromNode || !toNode) return;
 
-        if (isHovered) {
-            context.globalAlpha = 0.30;
-            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeHover, 4);
+        if (isHighlighted) {
+            context.globalAlpha = 0.38;
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeHover, 6);
             context.globalAlpha = 1.0;
             drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeHover, 2);
         } else {
-            context.globalAlpha = idleAlpha;
+            context.globalAlpha = idleUnderlayAlpha;
+            drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, idleUnderlayColor, 4);
+            context.globalAlpha = idleCoreAlpha;
             drawPixelLine(context, fromNode.x, fromNode.y, toNode.x, toNode.y, scenePalette.constellationEdgeIdle, 2);
             context.globalAlpha = 1.0;
         }
@@ -232,18 +259,18 @@ function drawConstellationStars(
     context,
     constellation,
     constellationIndex,
-    isHovered,
+    isHighlighted,
     sanctuaryTick,
     scenePalette,
     celestialProgress
 ) {
-    const isAstrolabeDay = celestialProgress >= 0.45;
+    const isDaytimeSky = celestialProgress >= DAYTIME_CONTRAST_THRESHOLD;
 
     constellation.nodes.forEach((node, nodeIndex) => {
-        if (isHovered) {
-            drawRect(context, node.x - 5, node.y - 1, 10, 2, scenePalette.constellationEdgeHover);
-            drawRect(context, node.x - 1, node.y - 5, 2, 10, scenePalette.constellationEdgeHover);
-            drawRect(context, node.x - 2, node.y - 2, 4, 4, scenePalette.constellationStarBright);
+        if (isHighlighted) {
+            drawRect(context, node.x - 6, node.y - 1, 12, 2, scenePalette.constellationEdgeHover);
+            drawRect(context, node.x - 1, node.y - 6, 2, 12, scenePalette.constellationEdgeHover);
+            drawRect(context, node.x - 3, node.y - 3, 6, 6, scenePalette.constellationStarBright);
             drawRect(context, node.x - 1, node.y - 1, 2, 2, DRUK_CORE_PALETTE.steelLight);
             return;
         }
@@ -253,26 +280,56 @@ function drawConstellationStars(
             ? scenePalette.constellationStarBright
             : scenePalette.constellationStarDim;
         const starSize = (nodeIndex % 2 === 0 || isBrightPhase) ? 4 : 2;
+        const halfStarSize = starSize / 2;
 
-        if (isAstrolabeDay) {
+        if (isDaytimeSky) {
             drawRect(
                 context,
-                node.x - starSize / 2 - 1,
-                node.y - starSize / 2 - 1,
+                node.x - halfStarSize - 1,
+                node.y - halfStarSize - 1,
                 starSize + 2,
                 starSize + 2,
-                DRUK_CORE_PALETTE.darkEarth
+                DRUK_CORE_PALETTE.abyss
             );
+        } else {
+            context.globalAlpha = 0.34;
+            drawRect(
+                context,
+                node.x - halfStarSize - 1,
+                node.y - halfStarSize - 1,
+                starSize + 2,
+                starSize + 2,
+                scenePalette.constellationEdgeIdle
+            );
+            context.globalAlpha = 1.0;
+        }
+
+        if (isBrightPhase) {
+            context.globalAlpha = isDaytimeSky ? 0.75 : 0.60;
+            drawRect(context, node.x - 4, node.y - 1, 8, 2, scenePalette.constellationEdgeIdle);
+            drawRect(context, node.x - 1, node.y - 4, 2, 8, scenePalette.constellationEdgeIdle);
+            context.globalAlpha = 1.0;
         }
 
         drawRect(
             context,
-            node.x - starSize / 2,
-            node.y - starSize / 2,
+            node.x - halfStarSize,
+            node.y - halfStarSize,
             starSize,
             starSize,
             starColor
         );
+
+        if (starSize >= 4) {
+            drawRect(
+                context,
+                node.x - 1,
+                node.y - 1,
+                2,
+                2,
+                scenePalette.constellationStarBright
+            );
+        }
     });
 }
 
@@ -281,18 +338,19 @@ function drawConstellationLabel(
     constellation,
     translationEntry,
     isHovered,
+    isAttentionBlinkActive,
     mailCopiedTimer,
-    scenePalette,
-    celestialProgress
+    scenePalette
 ) {
     if (!translationEntry) return;
 
     const labelText = isHovered ? translationEntry.hover : translationEntry.label;
+    const isLabelHighlighted = isHovered || isAttentionBlinkActive;
     const labelY = constellation.centerY + Math.floor(38 * constellation.scale);
     context.font = '8px "Press Start 2P", monospace';
     context.textAlign = 'center';
 
-    if (isHovered) {
+    if (isLabelHighlighted) {
         const labelWidth = Math.ceil(context.measureText(labelText).width + 12);
         drawRect(
             context,
@@ -307,16 +365,19 @@ function drawConstellationLabel(
             : scenePalette.constellationEdgeHover;
         context.fillText(labelText, constellation.centerX, labelY);
     } else {
-        if (celestialProgress > 0.25) {
-            context.fillStyle = DRUK_CORE_PALETTE.abyss;
-            context.fillText(labelText, constellation.centerX + 1, labelY + 1);
-        }
+        context.fillStyle = DRUK_CORE_PALETTE.abyss;
+        context.fillText(labelText, constellation.centerX - 1, labelY);
+        context.fillText(labelText, constellation.centerX + 1, labelY);
+        context.fillText(labelText, constellation.centerX, labelY - 1);
+        context.fillText(labelText, constellation.centerX, labelY + 1);
+        context.fillText(labelText, constellation.centerX + 1, labelY + 1);
+
         context.fillStyle = scenePalette.constellationLabel;
         context.fillText(labelText, constellation.centerX, labelY);
     }
 
     if (constellation.id === 'mail' && mailCopiedTimer > 0 && translationEntry.copied) {
-        const animationProgress = 1 - mailCopiedTimer / 115;
+        const animationProgress = 1 - mailCopiedTimer / MAIL_COPIED_DURATION_TICKS;
         const floatRiseOffset = Math.floor(animationProgress * 18);
         drawFloatingPixelLabel(
             context,
@@ -337,6 +398,10 @@ export function drawSkyConstellations(
     passedScenePalette = null,
     passedCelestialProgress = null
 ) {
+    if (isConstellationZone(hoveredZone)) {
+        dismissConstellationAttentionBlink();
+    }
+
     const activeLangConstellations = TRANSLATIONS[getCurrentLanguage()].sanctuary.constellations;
     const celestialProgress = passedCelestialProgress !== null
         ? passedCelestialProgress
@@ -345,14 +410,19 @@ export function drawSkyConstellations(
 
     constellations.forEach((constellation, constellationIndex) => {
         const isHovered = hoveredZone === constellation.zoneKey;
+        const isAttentionBlinkActive = shouldHighlightConstellationForAttention(
+            constellation.id,
+            sanctuaryTick
+        );
+        const isHighlighted = isHovered || isAttentionBlinkActive;
         const translationEntry = activeLangConstellations[constellation.id];
 
-        drawConstellationEdges(context, constellation, isHovered, scenePalette, celestialProgress);
+        drawConstellationEdges(context, constellation, isHighlighted, scenePalette, celestialProgress);
         drawConstellationStars(
             context,
             constellation,
             constellationIndex,
-            isHovered,
+            isHighlighted,
             sanctuaryTick,
             scenePalette,
             celestialProgress
@@ -362,9 +432,9 @@ export function drawSkyConstellations(
             constellation,
             translationEntry,
             isHovered,
+            isAttentionBlinkActive,
             mailCopiedTimer,
-            scenePalette,
-            celestialProgress
+            scenePalette
         );
     });
 }

@@ -12,7 +12,11 @@ import {
     drawBlueMage,
     drawDragonKnightGuardian
 } from './sprites/index.js';
-import { drawSkyConstellations, isConstellationZone } from './sanctuary/constellations.js';
+import {
+    drawSkyConstellations,
+    isConstellationZone,
+    dismissConstellationAttentionBlink
+} from './sanctuary/constellations.js';
 import {
     getLayoutZones,
     detectHoveredZone,
@@ -116,6 +120,7 @@ function triggerBlueMageCastEffect(includeSkyGust = false) {
 }
 
 function activateConstellation(constellation) {
+    dismissConstellationAttentionBlink();
     playSound('constellation');
     spawnConstellationStarfall(constellation);
 
@@ -199,8 +204,11 @@ function updatePointerHoverState(canvasX, canvasY) {
     const zones = getCurrentSanctuaryZones();
     const nextHoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
 
-    if (nextHoveredZone !== pointerState.hoveredZone && isConstellationZone(nextHoveredZone)) {
-        playSound('starHover');
+    if (isConstellationZone(nextHoveredZone)) {
+        dismissConstellationAttentionBlink();
+        if (nextHoveredZone !== pointerState.hoveredZone) {
+            playSound('starHover');
+        }
     }
 
     pointerState.hoveredZone = nextHoveredZone;
