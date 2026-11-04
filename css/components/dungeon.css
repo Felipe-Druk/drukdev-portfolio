@@ -1,0 +1,170 @@
+/* ==========================================================================
+   INTERACTIVE DUNGEON ARCHIVE (#dungeonModal — css/components/dungeon.css)
+   ========================================================================== */
+
+.dungeon-modal-frame {
+    background: var(--bg-panel);
+    border: 4px solid var(--steel-base);
+    outline: 3px solid var(--bg-primary);
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 3px var(--steel-dark),
+        10px 10px 0px var(--bg-primary);
+}
+
+.dungeon-scroll-area {
+    user-select: text;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-main) var(--bg-primary);
+}
+
+.dungeon-scroll-area::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dungeon-scroll-area::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.dungeon-scroll-area::-webkit-scrollbar-thumb {
+    background: var(--accent-main);
+    border: 1px solid var(--bg-primary);
+}
+
+.dungeon-class-card {
+    background: var(--bg-card-deep);
+    border: 3px solid var(--steel-base);
+    outline: 2px solid var(--bg-primary);
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px var(--steel-dark),
+        5px 5px 0px var(--bg-primary);
+    transition: transform 0.1s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.dungeon-class-card:hover,
+.dungeon-class-card-active {
+    background: var(--bg-panel);
+    border-color: var(--accent-main);
+    transform: translate(-2px, -2px);
+    box-shadow:
+        inset 0 0 0 2px var(--accent-secondary),
+        7px 7px 0px var(--bg-primary);
+}
+
+.dungeon-card-cta {
+    background: var(--bg-primary);
+    border: 2px solid var(--steel-base);
+    color: var(--steel-light);
+    border-radius: 0;
+}
+
+.dungeon-class-card:hover .dungeon-card-cta,
+.dungeon-class-card-active .dungeon-card-cta {
+    background: var(--accent-secondary);
+    border-color: var(--accent-warm);
+    color: var(--accent-warm);
+}
+
+.dungeon-stat-track {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-primary);
+    border: 1px solid var(--steel-base);
+    border-radius: 0;
+}
+
+.dungeon-stat-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-secondary) 0%, var(--accent-main) 65%, var(--accent-warm) 100%);
+    border-radius: 0;
+}
+
+.dungeon-omniscient-btn {
+    background: var(--accent-secondary);
+    border: 3px solid var(--accent-warm);
+    outline: 2px solid var(--bg-primary);
+    border-radius: 0;
+    color: var(--steel-light);
+    box-shadow:
+        inset 0 0 0 2px var(--accent-main),
+        6px 6px 0px var(--bg-primary);
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.dungeon-omniscient-btn:hover {
+    background: var(--accent-main);
+    border-color: var(--steel-light);
+    color: var(--bg-primary);
+    transform: translate(-2px, -2px);
+    box-shadow:
+        inset 0 0 0 2px var(--accent-warm),
+        8px 8px 0px var(--bg-primary);
+}
+
+.dungeon-omniscient-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--bg-primary);
+}
+
+.dungeon-tab-btn {
+    background: var(--bg-primary);
+    border: 2px solid var(--steel-base);
+    outline: 1px solid var(--bg-primary);
+    border-radius: 0;
+    color: var(--steel-light);
+    box-shadow: 3px 3px 0px var(--bg-primary);
+    cursor: pointer;
+    transition: border-color 0.1s ease, background-color 0.1s ease, color 0.1s ease;
+}
+
+.dungeon-tab-btn:hover {
+    border-color: var(--accent-main);
+    color: var(--accent-warm);
+}
+
+.dungeon-tab-btn.active {
+    background: var(--accent-secondary);
+    border-color: var(--accent-warm);
+    color: var(--accent-warm);
+}
+
+.dungeon-section-box {
+    background: var(--bg-card-deep);
+    border: 3px solid var(--steel-base);
+    outline: 2px solid var(--bg-primary);
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px var(--steel-dark),
+        5px 5px 0px var(--bg-primary);
+}
+
+.dungeon-item-card {
+    background: var(--bg-panel);
+    border: 2px solid var(--steel-base);
+    border-radius: 0;
+    box-shadow: 4px 4px 0px var(--bg-primary);
+}
+
+.dungeon-weapon-chip {
+    background: var(--bg-primary);
+    border: 2px solid var(--accent-main);
+    border-radius: 0;
+    color: var(--accent-warm);
+    box-shadow: 3px 3px 0px var(--bg-primary);
+}
+
+.dungeon-inline-link {
+    background: var(--bg-primary);
+    border: 1px solid var(--accent-main);
+    border-radius: 0;
+    color: var(--accent-warm);
+    padding: 0.2rem 0.45rem;
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+.dungeon-inline-link:hover {
+    background: var(--accent-main);
+    color: var(--bg-primary);
+}

@@ -3,6 +3,9 @@
  **************************************************************/
 
 import { DRUK_CORE_PALETTE } from '../../config/palettes.js';
+import { copyTextToClipboard } from '../../utils/clipboard.js';
+
+export { copyTextToClipboard };
 
 export const PIXEL_UNIT = 4;
 
@@ -72,23 +75,4 @@ export function drawFloatingPixelLabel(context, centerX, topY, text, borderColor
     context.fillStyle = borderColor;
     context.textAlign = 'center';
     context.fillText(text, centerX, boxY + LABEL_TEXT_BASELINE_OFFSET);
-}
-
-function fallbackCopyTextToClipboard(textValue) {
-    const clipboardTextarea = document.createElement('textarea');
-    clipboardTextarea.value = textValue;
-    document.body.appendChild(clipboardTextarea);
-    clipboardTextarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(clipboardTextarea);
-}
-
-export function copyTextToClipboard(textValue) {
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(textValue).catch(() => {
-            fallbackCopyTextToClipboard(textValue);
-        });
-        return;
-    }
-    fallbackCopyTextToClipboard(textValue);
 }

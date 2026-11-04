@@ -139,11 +139,20 @@ export function initDrukSystem(onCopyEmail, onOpenDungeon) {
         });
     });
 
-    const closeSlasherButton = document.getElementById('slasherExitBtn');
+        const closeSlasherButton = document.getElementById('slasherExitBtn');
     if (closeSlasherButton) {
         closeSlasherButton.addEventListener('click', () => {
             playSound('click');
             returnToTerminalPrompt();
+        });
+    }
+
+    const modalElement = getModalElement();
+    if (modalElement) {
+        modalElement.addEventListener('click', (event) => {
+            if (event.target === modalElement) {
+                closeDrukSystem();
+            }
         });
     }
 }

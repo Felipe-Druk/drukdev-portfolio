@@ -337,5 +337,14 @@ export function initDungeonUI() {
         });
     });
 
+    const modalElement = getDungeonModal();
+    if (modalElement) {
+        modalElement.addEventListener('click', (event) => {
+            if (event.target === modalElement) {
+                closeDungeonModal();
+            }
+        });
+    }
+
     window.addEventListener('keydown', handleDungeonKeydown);
 }

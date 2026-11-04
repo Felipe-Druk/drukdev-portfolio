@@ -6,9 +6,13 @@ import { windSpell } from '../../audio/soundEngine.js';
 import { clamp } from '../../utils/mathUtils.js';
 import { getCloudConfig, updateCloudConfig } from './cloudSystem.js';
 import {
+    GRIMOIRE_SCREEN_MARGIN,
     createGrimoirePanel,
     updateSliderAndBadge,
-    projectZoneToViewport
+    projectZoneToViewport,
+    clampGrimoireVerticalPosition,
+    bindNormalizedRangeSlider,
+    bindGrimoireOptionButtons
 } from './grimoirePanelUtils.js';
 
 export function positionCloudPanelNearBlueMage(blueMageZone, viewportWidth, viewportHeight) {
@@ -18,24 +22,25 @@ export function positionCloudPanelNearBlueMage(blueMageZone, viewportWidth, view
     const projectedBlueMageZone = projectZoneToViewport(blueMageZone, viewportWidth, viewportHeight);
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 296;
-    const screenMargin = 12;
 
     const rightCandidateLeft = projectedBlueMageZone.centerX + 46;
     const leftCandidateLeft = projectedBlueMageZone.centerX - 46 - panelWidth;
     let idealLeft = rightCandidateLeft;
 
-    if (rightCandidateLeft + panelWidth + screenMargin > viewportWidth) {
-        idealLeft = leftCandidateLeft >= screenMargin
+    if (rightCandidateLeft + panelWidth + GRIMOIRE_SCREEN_MARGIN > viewportWidth) {
+        idealLeft = leftCandidateLeft >= GRIMOIRE_SCREEN_MARGIN
             ? leftCandidateLeft
             : Math.round(projectedBlueMageZone.centerX - panelWidth / 2);
     }
 
-    const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
+    const clampedLeft = clamp(
+        idealLeft,
+        GRIMOIRE_SCREEN_MARGIN,
+        viewportWidth - panelWidth - GRIMOIRE_SCREEN_MARGIN
+    );
 
     const idealTop = Math.round(projectedBlueMageZone.baseY - panelHeight / 2 - 18);
-    const minTop = 76;
-    const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
-    const clampedTop = clamp(idealTop, minTop, maxTop);
+    const clampedTop = clampGrimoireVerticalPosition(idealTop, panelHeight, viewportHeight);
 
     panelElement.style.left = `${clampedLeft}px`;
     panelElement.style.top = `${clampedTop}px`;
@@ -85,32 +90,19 @@ const grimoire = createGrimoirePanel({
 export const isCloudPanelOpen = grimoire.isOpen;
 export const toggleCloudPanel = grimoire.toggle;
 
-function bindNormalizedSlider(sliderId, configProperty) {
-    const sliderElement = document.getElementById(sliderId);
-    if (!sliderElement) return;
-
-    sliderElement.addEventListener('input', (event) => {
-        const normalizedValue = parseFloat(event.target.value) / 100;
-        updateCloudConfig({ [configProperty]: normalizedValue });
-        syncCloudPanelUI();
-    });
-}
-
 export function initCloudPanelUI(onBlueMageSpellCast) {
-    bindNormalizedSlider('cloudDensitySlider', 'density');
-    bindNormalizedSlider('cloudWindSlider', 'windSpeed');
-    bindNormalizedSlider('cloudScaleSlider', 'cloudScale');
+    bindNormalizedRangeSlider('cloudDensitySlider', 'density', updateCloudConfig, syncCloudPanelUI);
+    bindNormalizedRangeSlider('cloudWindSlider', 'windSpeed', updateCloudConfig, syncCloudPanelUI);
+    bindNormalizedRangeSlider('cloudScaleSlider', 'cloudScale', updateCloudConfig, syncCloudPanelUI);
 
-    document.querySelectorAll('.cloud-weather-btn[data-cloud-weather]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const selectedWeather = button.getAttribute('data-cloud-weather');
-            updateCloudConfig({ weather: selectedWeather });
-            syncCloudPanelUI();
-            windSpell();
-            if (typeof onBlueMageSpellCast === 'function') {
-                onBlueMageSpellCast(false);
-            }
-        });
+    bindGrimoireOptionButtons({
+        selector: '.cloud-weather-btn[data-cloud-weather]',
+        dataAttribute: 'data-cloud-weather',
+        configProperty: 'weather',
+        updateConfigFn: updateCloudConfig,
+        syncUIFn: syncCloudPanelUI,
+        playSpellFn: windSpell,
+        onSpellCast: onBlueMageSpellCast
     });
 
     grimoire.init(onBlueMageSpellCast, windSpell);

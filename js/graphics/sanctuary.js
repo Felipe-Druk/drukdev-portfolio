@@ -5,9 +5,9 @@
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SANCTUARY_SCENE_PALETTE, getInterpolatedScenePalette } from '../config/palettes.js';
 import { playSound, floraSpell, windSpell, celestialShift } from '../audio/soundEngine.js';
+import { copyTextToClipboard } from '../utils/clipboard.js';
 import {
     drawFloatingPixelLabel,
-    copyTextToClipboard,
     drawGreenMage,
     drawBlueMage,
     drawDragonKnightGuardian
@@ -23,6 +23,7 @@ import {
     toggleCelestialCycle,
     updateCelestialCycle
 } from './sanctuary/celestialSystem.js';
+import { closeAllGrimoires } from './sanctuary/grimoirePanelUtils.js';
 import {
     isFloraPanelOpen,
     initFloraPanelUI,
@@ -60,6 +61,7 @@ let sanctuaryContext = null;
 let sanctuaryTick = 0;
 let openTerminalCallback = null;
 let openDungeonCallback = null;
+let copyEmailCallback = null;
 
 const pointerState = {
     x: -1,
@@ -120,7 +122,11 @@ function activateConstellation(constellation) {
     if (constellation.type === 'social' || constellation.type === 'cv') {
         window.open(constellation.targetValue, '_blank', 'noopener,noreferrer');
     } else if (constellation.type === 'email') {
-        copyTextToClipboard(constellation.targetValue);
+        if (typeof copyEmailCallback === 'function') {
+            copyEmailCallback();
+        } else {
+            copyTextToClipboard(constellation.targetValue);
+        }
         sanctuaryState.mailCopiedTimer = 115;
     }
 }
@@ -207,6 +213,10 @@ function handleSanctuaryClick(clickX, clickY) {
     const zones = getCurrentSanctuaryZones();
     const hitZone = detectHoveredZone(clickX, clickY, zones);
     pointerState.hoveredZone = hitZone;
+
+    if (hitZone !== 'mage' && hitZone !== 'blueMage') {
+        closeAllGrimoires();
+    }
     if (!hitZone) return;
 
     if (isConstellationZone(hitZone)) {
@@ -223,9 +233,10 @@ function handleSanctuaryClick(clickX, clickY) {
     }
 }
 
-export function initSanctuary(onOpenTerminal, onOpenDungeon) {
+export function initSanctuary(onOpenTerminal, onOpenDungeon, onCopyEmail = null) {
     openTerminalCallback = onOpenTerminal;
     openDungeonCallback = onOpenDungeon;
+    copyEmailCallback = onCopyEmail;
     sanctuaryCanvas = document.getElementById('sanctuaryCanvas');
     if (!sanctuaryCanvas) return;
     sanctuaryContext = sanctuaryCanvas.getContext('2d');

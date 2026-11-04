@@ -4,6 +4,11 @@
  **************************************************************/
 
 import { playSound } from '../../audio/soundEngine.js';
+import { clamp } from '../../utils/mathUtils.js';
+
+export const GRIMOIRE_SCREEN_MARGIN = 12;
+const GRIMOIRE_MIN_TOP_PX = 76;
+const GRIMOIRE_BOTTOM_CLEARANCE_PX = 48;
 
 const registeredPanels = new Map();
 
@@ -21,6 +26,54 @@ export function closeOtherGrimoires(activePanelId) {
             closeFn();
         }
     }
+}
+
+export function closeAllGrimoires() {
+    for (const closeFn of registeredPanels.values()) {
+        if (typeof closeFn === 'function') {
+            closeFn();
+        }
+    }
+}
+
+export function clampGrimoireVerticalPosition(idealTop, panelHeight, viewportHeight) {
+    const maxTop = Math.max(GRIMOIRE_MIN_TOP_PX, viewportHeight - panelHeight - GRIMOIRE_BOTTOM_CLEARANCE_PX);
+    return clamp(idealTop, GRIMOIRE_MIN_TOP_PX, maxTop);
+}
+
+export function bindNormalizedRangeSlider(sliderId, configProperty, updateConfigFn, syncUIFn) {
+    const sliderElement = document.getElementById(sliderId);
+    if (!sliderElement) return;
+
+    sliderElement.addEventListener('input', (event) => {
+        const normalizedValue = parseFloat(event.target.value) / 100;
+        updateConfigFn({ [configProperty]: normalizedValue });
+        syncUIFn();
+    });
+}
+
+export function bindGrimoireOptionButtons(config) {
+    const {
+        selector,
+        dataAttribute,
+        configProperty,
+        updateConfigFn,
+        syncUIFn,
+        playSpellFn,
+        onSpellCast
+    } = config;
+
+    document.querySelectorAll(selector).forEach((button) => {
+        button.addEventListener('click', () => {
+            const selectedOption = button.getAttribute(dataAttribute);
+            updateConfigFn({ [configProperty]: selectedOption });
+            syncUIFn();
+            if (typeof playSpellFn === 'function') playSpellFn();
+            if (typeof onSpellCast === 'function') {
+                onSpellCast(false);
+            }
+        });
+    });
 }
 
 export function updateSliderAndBadge(sliderId, badgeId, rawValue, formattedText) {

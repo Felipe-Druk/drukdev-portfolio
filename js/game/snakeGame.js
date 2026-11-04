@@ -5,6 +5,7 @@
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { getActiveTerminalPalette } from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
+import { loadItem, saveItem } from '../utils/safeStorage.js';
 import { drawSnakeFoodNode, drawSnakeSegment } from '../graphics/sprites/index.js';
 
 const SNAKE_HISCORE_KEY = 'druk_snake_hiscore';
@@ -25,7 +26,7 @@ let direction = { x: 1, y: 0 };
 let nextDirection = { x: 1, y: 0 };
 let foodPosition = { x: 12, y: 8 };
 let snakeScore = 0;
-let snakeHiScore = parseInt(localStorage.getItem(SNAKE_HISCORE_KEY) || '0', 10);
+let snakeHiScore = parseInt(loadItem(SNAKE_HISCORE_KEY, '0') || '0', 10);
 
 function updateSnakeHud() {
     const scoreEl = document.getElementById('snakeScoreVal');
@@ -103,7 +104,7 @@ function stepSnakeGame() {
         snakeScore += 10;
         if (snakeScore > snakeHiScore) {
             snakeHiScore = snakeScore;
-            localStorage.setItem(SNAKE_HISCORE_KEY, String(snakeHiScore));
+            saveItem(SNAKE_HISCORE_KEY, String(snakeHiScore));
         }
         playSound('coin');
         spawnFood();

@@ -1,0 +1,120 @@
+/* ==========================================================================
+   FORGED STEEL FRAMES, AVATAR RING & HUD CONTROLS (css/components/hud.css)
+   ========================================================================== */
+
+.pixel-box,
+.canvas-frame {
+    background: var(--bg-panel);
+    border: 3px solid var(--steel-base);
+    outline: 2px solid var(--bg-primary);
+    border-radius: 0;
+    box-shadow:
+        inset 0 0 0 2px var(--steel-dark),
+        6px 6px 0px var(--bg-primary);
+    position: relative;
+}
+
+.pixel-box-active {
+    border-color: var(--border-highlight);
+    box-shadow:
+        inset 0 0 0 2px var(--steel-dark),
+        6px 6px 0px var(--bg-primary),
+        0 0 22px var(--accent-glow);
+}
+
+.avatar-steel-ring {
+    background-color: var(--bg-panel);
+    border: 3px solid var(--steel-base);
+    outline: 2px solid var(--bg-primary);
+    box-shadow:
+        inset 0 0 0 2px var(--steel-dark),
+        0 0 0 1px var(--steel-light),
+        4px 4px 0px var(--bg-primary);
+    border-radius: 9999px;
+    image-rendering: pixelated;
+    overflow: hidden;
+}
+
+.avatar-steel-ring img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.text-bronze {
+    color: var(--accent-warm);
+}
+
+.text-dragon {
+    color: var(--accent-main);
+}
+
+.text-steel {
+    color: var(--steel-light);
+}
+
+.pixel-btn {
+    background: linear-gradient(180deg, var(--accent-main) 0%, var(--accent-secondary) 100%);
+    border: 2px solid var(--steel-base);
+    outline: 1px solid var(--bg-primary);
+    border-radius: 0;
+    color: var(--steel-light);
+    box-shadow:
+        inset 0 1px 0 rgba(216, 226, 235, 0.25),
+        4px 4px 0px var(--bg-primary);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pixel-btn:hover {
+    background: linear-gradient(180deg, var(--accent-main-bright) 0%, var(--accent-main) 100%);
+    border-color: var(--steel-light);
+    transform: translate(-1px, -1px);
+    box-shadow:
+        inset 0 1px 0 rgba(216, 226, 235, 0.45),
+        5px 5px 0px var(--bg-primary),
+        0 0 14px var(--accent-glow);
+}
+
+.pixel-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px var(--bg-primary);
+}
+
+#lang-toggle {
+    background: var(--bg-panel);
+    border: 2px solid var(--steel-base);
+    outline: 1px solid var(--bg-primary);
+    border-radius: 0;
+    color: var(--text-muted);
+    box-shadow:
+        inset 0 0 0 1px var(--steel-dark),
+        4px 4px 0px var(--bg-primary);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+#lang-toggle:hover {
+    border-color: var(--border-highlight);
+    transform: translate(-1px, -1px);
+    box-shadow:
+        inset 0 0 0 1px var(--steel-dark),
+        5px 5px 0px var(--bg-primary),
+        0 0 12px var(--accent-glow);
+}
+
+#lang-toggle:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px var(--bg-primary);
+}
+
+#lang-toggle .lang-option {
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+#lang-toggle .lang-option.active {
+    color: var(--accent-warm);
+    font-weight: 800;
+    text-shadow: 0 0 8px var(--accent-glow);
+}

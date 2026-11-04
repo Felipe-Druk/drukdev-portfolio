@@ -7,6 +7,7 @@ import {
     setActiveTerminalColorMode
 } from '../../config/palettes.js';
 import { playSound } from '../../audio/soundEngine.js';
+import { loadItem, saveItem } from '../../utils/safeStorage.js';
 import { drawSnakeFrame } from '../../game/snakeGame.js';
 import { drawFlappyFrame } from '../../game/flappyDragon.js';
 import { getActiveTerminalTexts, getModalElement, appendLine } from '../terminalDom.js';
@@ -16,8 +17,8 @@ const FONT_MODES = ['ibm', 'vt323', 'gothic'];
 const TERM_COLOR_STORAGE_KEY = 'druk_term_color';
 const TERM_FONT_STORAGE_KEY = 'druk_term_font';
 
-let currentColorMode = localStorage.getItem(TERM_COLOR_STORAGE_KEY) || 'matrix';
-let currentFontMode = localStorage.getItem(TERM_FONT_STORAGE_KEY) || 'ibm';
+let currentColorMode = loadItem(TERM_COLOR_STORAGE_KEY, 'matrix') || 'matrix';
+let currentFontMode = loadItem(TERM_FONT_STORAGE_KEY, 'ibm') || 'ibm';
 
 function resolveNextCycleOption(optionsList, currentOption, requestedOption) {
     if (optionsList.includes(requestedOption)) {
@@ -30,7 +31,7 @@ function resolveNextCycleOption(optionsList, currentOption, requestedOption) {
 export function setTerminalColor(mode) {
     const normalizedMode = COLOR_MODES.includes(mode) ? mode : 'matrix';
     currentColorMode = setActiveTerminalColorMode(normalizedMode);
-    localStorage.setItem(TERM_COLOR_STORAGE_KEY, currentColorMode);
+    saveItem(TERM_COLOR_STORAGE_KEY, currentColorMode);
 
     const modalElement = getModalElement();
     if (modalElement) {
@@ -44,7 +45,7 @@ export function setTerminalColor(mode) {
 export function setTerminalFont(font) {
     const normalizedFont = FONT_MODES.includes(font) ? font : 'ibm';
     currentFontMode = normalizedFont;
-    localStorage.setItem(TERM_FONT_STORAGE_KEY, normalizedFont);
+    saveItem(TERM_FONT_STORAGE_KEY, normalizedFont);
 
     const modalElement = getModalElement();
     if (modalElement) {

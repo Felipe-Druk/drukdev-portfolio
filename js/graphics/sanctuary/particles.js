@@ -9,6 +9,7 @@ import {
     getActiveCloudPalette,
     interpolateHexColor
 } from '../../config/palettes.js';
+import { removeItemSwapAndPop } from '../../utils/mathUtils.js';
 import { snapToPixel, drawRect } from '../sprites/index.js';
 import { getCelestialProgress } from './celestialSystem.js';
 
@@ -276,10 +277,7 @@ export function updateAndDrawPondRipples(context) {
         ripple.life -= 0.022;
 
         if (ripple.life <= 0) {
-            const last = pondRipples.pop();
-            if (index < pondRipples.length) {
-                pondRipples[index] = last;
-            }
+            removeItemSwapAndPop(pondRipples, index);
         } else {
             context.strokeStyle = `rgba(${SANCTUARY_SCENE_PALETTE.rippleStrokeRgb}, ${ripple.life * 0.7})`;
             context.lineWidth = 2;
@@ -340,10 +338,7 @@ function updateAndDrawInteractiveParticles(context, sanctuaryTick) {
         }
 
         if (particle.life <= 0) {
-            const last = particles.pop();
-            if (index < particles.length) {
-                particles[index] = last;
-            }
+            removeItemSwapAndPop(particles, index);
         } else {
             context.globalAlpha = Math.min(1, particle.life);
             drawRect(context, particle.x, particle.y, particle.size, particle.size, particle.color);

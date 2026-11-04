@@ -20,36 +20,45 @@ portfolio/
 │       └── logo-drukdev.png            # Avatar / emblema oficial del dragón DrukDev en el HUD superior
 ├── css/
 │   ├── variables.css                   # Tokens CSS, @font-face, paleta ADN DrukDev y modos de fósforo CRT
-│   ├── base.css                        # Reset global, tipografías (--font-gothic-pixel, --font-terminal, --font-vt) y scanlines
-│   └── components.css                  # Biselado de Acero Forjado, Dungeon RPG UI, monitor CRT DrukSystem OS y botones pixel-art
+│   ├── base.css                        # Reset global (100dvh), tipografías, scanlines y soporte prefers-reduced-motion
+│   ├── components.css                  # Archivo barril CSS (@import) que centraliza los estilos modulares de componentes
+│   └── components/
+│       ├── hud.css                     # Marcos biselados de Acero Forjado, anillo de avatar, botones arcade y selector ES|EN
+│       ├── terminal.css                # Monitor CRT DrukSystem OS, pantalla de fósforo, chips de comando e inputs CLI
+│       ├── grimoires.css               # Estilos unificados DRY (--grimoire-ui-*) para #floraPanel y #cloudPanel
+│       └── dungeon.css                 # Modal de la Dungeon Interactiva, cartas de clase RPG, barras de stats y reliquias
 └── js/
-    ├── main.js                         # Punto de entrada: inicializa Santuario, Dungeon, DrukSystem OS, minijuegos, i18n, audio y RAF
+    ├── main.js                         # Punto de entrada: inicializa módulos, bucle RAF normalizado a 60Hz y eventos UI
     ├── audio/
     │   └── soundEngine.js              # Sintetizador 8-bit procedural (Web Audio API) sin archivos de audio externos
     ├── utils/
+    │   ├── clipboard.js                # Utilidad desacoplada copyTextToClipboard con fallback seguro para portapapeles
     │   ├── colorMath.js                # Primitivas puras de color: parseHexColorToRgb, interpolateHexColor y shadeHexColorByDepth
     │   ├── seededRandom.js             # Generador pseudo-aleatorio determinista LCG (createSeededRandom) con hashing 32-bit
-    │   ├── mathUtils.js                # Helpers matemáticos puros: clamp numérico
+    │   ├── mathUtils.js                # Helpers matemáticos: clamp, isPortraitAspectRatio, areRectsIntersecting y removeItemSwapAndPop
     │   └── safeStorage.js              # Wrapper seguro con try/catch para localStorage (loadJson, saveJson, loadItem, saveItem)
     ├── config/
     │   ├── dungeonData.js              # Datos puros de dominio RPG: las 4 clases, proyectos, experiencia, FIUBA y Boot.dev
-    │   ├── i18n.js                     # Diccionarios ES / EN y persistencia de idioma en localStorage
+    │   ├── i18n.js                     # Archivo barril y gestor de estado de internacionalización (ES / EN)
+    │   ├── i18n/
+    │   │   ├── es.js                   # Diccionario completo de textos en español (ES_TRANSLATIONS)
+    │   │   └── en.js                   # Diccionario completo de textos en inglés (EN_TRANSLATIONS)
     │   ├── links.js                    # Fuente única de verdad para correo electrónico, redes sociales y rutas de CV por idioma
     │   ├── palettes.js                 # Archivo barril centralizado que re-exporta todas las paletas sin dependencias circulares
     │   └── palettes/
     │       ├── corePalette.js          # ADN DrukDev: DRUK_CORE_PALETTE, tonos de marca, metales y acentos
     │       ├── sanctuaryPalettes.js    # SANCTUARY_SCENE_PALETTE, CELESTIAL_STAGES, CLOUD_PALETTES e interpolación cromática
-    │       ├── biomePalettes.js        # BIOME_PALETTES (emerald, autumn, cherry, arctic) y getActiveBiomePalette
-    │       ├── terminalPalettes.js     # TERMINAL_PALETTES (fósforos verde, ámbar, cian, magenta, blanco)
+    │       ├── biomePalettes.js        # BIOME_PALETTES (emerald, druk, autumn, matrix) y getActiveBiomePalette
+    │       ├── terminalPalettes.js     # TERMINAL_PALETTES (fósforos matrix, amber, druk, cyan)
     │       └── spritePalettes.js       # SPRITE_PALETTES (dragón, héroe, magos elementales, arcade)
     ├── dungeon/
-    │   ├── dungeonUI.js                # Orquestador del modal de la Dungeon, estado de vista y navegación híbrida Mouse/Teclado
+    │   ├── dungeonUI.js                # Orquestador del modal de la Dungeon, cierre por backdrop y navegación híbrida Mouse/Teclado
     │   └── chamberRenderer.js          # Renderizador DOM puro para Armas, Reliquias (Proyectos), Crónicas (Experiencia) y Sellos
     ├── graphics/
-    │   ├── sanctuary.js                # Controlador principal del Santuario: estado, eventos de puntero/click y orquestación de frame
+    │   ├── sanctuary.js                # Controlador principal del Santuario: resolución virtual, touch/mouse, auto-cierre de grimorios y frame
     │   ├── sprites/
     │   │   ├── index.js                # Archivo barril de primitivas Canvas y renderizadores procedurales de sprites
-    │   │   ├── canvasUtils.js          # Primitivas pixel-art (drawRect, drawPixelLine, etiquetas flotantes, colisión y portapapeles)
+    │   │   ├── canvasUtils.js          # Primitivas pixel-art (drawRect, drawPixelLine, etiquetas flotantes y detección de punto)
     │   │   ├── mageSprite.js           # Renderizador unificado de magos elementales (drawElementalMage + wrappers Verde/Azul)
     │   │   ├── dragonSprite.js         # Renderizado procedural del Guardián Druk y el Dragón alado (Santuario, HUD y Flappy Dragon)
     │   │   ├── classEmblems.js         # Emblemas procedurales de las 4 clases RPG + Modo Omnisciente para la Dungeon
@@ -57,28 +66,28 @@ portfolio/
     │   └── sanctuary/
     │       ├── celestialSystem.js      # Ciclo Noche -> Atardecer -> Día, arco parabólico al horizonte y Sol/Luna pixel-art
     │       ├── cloudSystem.js          # Motor procedural de nubes parallax de 3 capas (far, mid, near) y estado climático
-    │       ├── cloudPanelUI.js         # Controlador DOM del Grimorio Atmosférico (#cloudPanel), sliders, climas y exclusión mutua
-    │       ├── constellations.js       # Planos, rotación 2D, caché de zonas y renderizado de las 5 constelaciones (Astrolabio Solar de día)
+    │       ├── cloudPanelUI.js         # Controlador DOM del Grimorio Atmosférico (#cloudPanel) apoyado en grimoirePanelUtils
+    │       ├── constellations.js       # Planos, grilla escalonada en portrait, rotación 2D y renderizado de las 5 constelaciones
     │       ├── environmentRenderer.js  # Renderizado de cielo/montañas/laguna interpolados, Árbol Antiguo, Portal Dungeon y Consola CRT
     │       ├── floraSystem.js          # Motor matemático y generación procedural del pasto (dispersión, cúmulos y sombreado por profundidad)
-    │       ├── floraPanelUI.js         # Controlador DOM del Grimorio Botánico (#floraPanel), sliders, biomas y posicionamiento sobre el Mago
-    │       ├── layoutZones.js          # Cálculo responsivo con memoización de hitboxes/zonas interactivas y detección de hover
-    │       ├── grimoirePanelUtils.js   # Fábrica común createGrimoirePanel, registro de exclusión mutua y sincronización de sliders/badges
-    │       └── particles.js            # Sistema de partículas con swap-and-pop O(1): luciérnagas, polen, ondas, chispas y lluvia estelar
+    │       ├── floraPanelUI.js         # Controlador DOM del Grimorio Botánico (#floraPanel) apoyado en grimoirePanelUtils
+    │       ├── layoutZones.js          # Resolución lógica dinámica (min 560x520) y cálculo de zonas por relación de aspecto (portrait/landscape)
+    │       ├── grimoirePanelUtils.js   # Fábrica createGrimoirePanel, proyección canvas->viewport, sliders/botones DRY y closeAllGrimoires
+    │       └── particles.js            # Sistema de partículas con removeItemSwapAndPop O(1): luciérnagas, polen, ondas, chispas y lluvia estelar
     ├── terminal/
-    │   ├── drukSystem.js               # Controlador principal del monitor CRT: ciclo de vida del modal, historial y eventos de entrada
+    │   ├── drukSystem.js               # Controlador principal del monitor CRT: ciclo de vida del modal, cierre por backdrop, historial e input
     │   ├── terminalDom.js              # Helpers DOM de la terminal, salida de texto y conmutador de sub-vistas CRT (CLI y cartuchos)
     │   └── commands/
     │       ├── index.js                # Registro y despachador central de comandos (Command Pattern) y alias CLI
     │       ├── systemCommands.js       # Comandos de sistema y directorio virtual (help, ls, dungeon, clear y banner de arranque)
     │       ├── cvCommand.js            # Comando cv / resume: apertura y enlace de descarga directa del PDF según idioma activo
     │       ├── contactCommand.js       # Comando contacto / links: listado de redes sociales y copia de email al portapapeles
-    │       ├── appearanceCommands.js   # Comandos color y font: persistencia y cambio en vivo de fósforo CRT y tipografía
+    │       ├── appearanceCommands.js   # Comandos color y font: persistencia con safeStorage y cambio en vivo de fósforo CRT y tipografía
     │       └── playCommand.js          # Comando play y lanzador de cartuchos arcade (snake, flappy, slasher)
     └── game/
-        ├── snakeGame.js                # Minijuego Druk Snake renderizado con el color de fósforo activo del monitor CRT
-        ├── flappyDragon.js             # Minijuego Flappy Dragon entre pilares de mazmorra dentro del monitor CRT
-        └── bugSlasher.js               # Minijuego arcade runner 2D (Druk's Bug Slasher)
+        ├── snakeGame.js                # Minijuego Druk Snake con controles de teclado y pad táctil responsivo
+        ├── flappyDragon.js             # Minijuego Flappy Dragon normalizado a 60Hz con colisión AABB y swap-and-pop O(1)
+        └── bugSlasher.js               # Minijuego arcade runner 2D (Druk's Bug Slasher) con colisión AABB y swap-and-pop O(1)
 ```
 
 ---

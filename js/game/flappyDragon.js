@@ -8,9 +8,12 @@ import {
     getActiveTerminalPalette
 } from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
+import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
+import { loadItem, saveItem } from '../utils/safeStorage.js';
 import { drawFlyingDragon } from '../graphics/sprites/index.js';
 
 const FLAPPY_HISCORE_KEY = 'druk_flappy_hiscore';
+const TARGET_FRAME_DURATION_MS = 1000 / 60;
 const CANVAS_WIDTH = 416;
 const CANVAS_HEIGHT = 272;
 const GRAVITY = 0.27;
@@ -28,10 +31,11 @@ let flappyRunning = false;
 let flappyGameOver = false;
 let gameOverCooldown = 0;
 let flappyTick = 0;
+let lastFlappyFrameTimestamp = 0;
 let onExitFlappyCallback = null;
 
 let flappyScore = 0;
-let flappyHiScore = parseInt(localStorage.getItem(FLAPPY_HISCORE_KEY) || '0', 10);
+let flappyHiScore = parseInt(loadItem(FLAPPY_HISCORE_KEY, '0') || '0', 10);
 
 const dragon = {
     x: 78,
@@ -160,13 +164,17 @@ function checkPillarCollision(pillar) {
         w: dragon.w - 10,
         h: dragon.h - 8
     };
-
-    const overlapsX = hitbox.x < pillar.x + pillar.w && hitbox.x + hitbox.w > pillar.x;
-    if (!overlapsX) return false;
-
-    const hitsTop = hitbox.y < pillar.topHeight;
-    const hitsBottom = hitbox.y + hitbox.h > pillar.bottomY;
-    return hitsTop || hitsBottom;
+    const topPillarRect = { x: pillar.x, y: 0, w: pillar.w, h: pillar.topHeight };
+    const bottomPillarRect = {
+        x: pillar.x,
+        y: pillar.bottomY,
+        w: pillar.w,
+        h: CANVAS_HEIGHT - pillar.bottomY
+    };
+    return (
+        areRectsIntersecting(hitbox, topPillarRect) ||
+        areRectsIntersecting(hitbox, bottomPillarRect)
+    );
 }
 
 function updateFlappyPhysics() {
@@ -213,7 +221,7 @@ function updateFlappyPhysics() {
             flappyScore += 1;
             if (flappyScore > flappyHiScore) {
                 flappyHiScore = flappyScore;
-                localStorage.setItem(FLAPPY_HISCORE_KEY, String(flappyHiScore));
+                saveItem(FLAPPY_HISCORE_KEY, String(flappyHiScore));
             }
             playSound('coin');
             updateFlappyHud();
@@ -288,7 +296,7 @@ export function drawFlappyFrame() {
         p.y += p.vy;
         p.life -= 0.045;
         if (p.life <= 0) {
-            flapParticles.splice(index, 1);
+            removeItemSwapAndPop(flapParticles, index);
         } else {
             flappyContext.globalAlpha = Math.max(0, p.life);
             flappyContext.fillStyle = p.color;
@@ -313,10 +321,14 @@ export function drawFlappyFrame() {
     flappyContext.strokeRect(1, 1, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 2);
 }
 
-function flappyLoop() {
+function flappyLoop(currentTimestamp = performance.now()) {
     if (!flappyRunning) return;
-    updateFlappyPhysics();
-    drawFlappyFrame();
+
+    if (currentTimestamp - lastFlappyFrameTimestamp >= TARGET_FRAME_DURATION_MS - 1) {
+        lastFlappyFrameTimestamp = currentTimestamp;
+        updateFlappyPhysics();
+        drawFlappyFrame();
+    }
     flappyAnimId = requestAnimationFrame(flappyLoop);
 }
 
@@ -331,7 +343,9 @@ export function startFlappyDragonGame(onExitCallback) {
 
     stopFlappyDragonGame();
     flappyRunning = true;
+    lastFlappyFrameTimestamp = performance.now();
     resetFlappyMatch();
+    drawFlappyFrame();
     flappyAnimId = requestAnimationFrame(flappyLoop);
 }
 

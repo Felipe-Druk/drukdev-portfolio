@@ -6,9 +6,13 @@ import { floraSpell } from '../../audio/soundEngine.js';
 import { clamp } from '../../utils/mathUtils.js';
 import { getFloraConfig, updateFloraConfig } from './floraSystem.js';
 import {
+    GRIMOIRE_SCREEN_MARGIN,
     createGrimoirePanel,
     updateSliderAndBadge,
-    projectZoneToViewport
+    projectZoneToViewport,
+    clampGrimoireVerticalPosition,
+    bindNormalizedRangeSlider,
+    bindGrimoireOptionButtons
 } from './grimoirePanelUtils.js';
 
 export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHeight) {
@@ -18,15 +22,16 @@ export function positionFloraPanelAboveMage(mageZone, viewportWidth, viewportHei
     const projectedMageZone = projectZoneToViewport(mageZone, viewportWidth, viewportHeight);
     const panelWidth = panelElement.offsetWidth || 256;
     const panelHeight = panelElement.offsetHeight || 290;
-    const screenMargin = 12;
 
     const idealLeft = Math.round(projectedMageZone.centerX - panelWidth / 2);
-    const clampedLeft = clamp(idealLeft, screenMargin, viewportWidth - panelWidth - screenMargin);
+    const clampedLeft = clamp(
+        idealLeft,
+        GRIMOIRE_SCREEN_MARGIN,
+        viewportWidth - panelWidth - GRIMOIRE_SCREEN_MARGIN
+    );
 
     const idealTop = Math.round(projectedMageZone.baseY - 68 - panelHeight);
-    const minTop = 76;
-    const maxTop = Math.max(minTop, viewportHeight - panelHeight - 48);
-    const clampedTop = clamp(idealTop, minTop, maxTop);
+    const clampedTop = clampGrimoireVerticalPosition(idealTop, panelHeight, viewportHeight);
 
     panelElement.style.left = `${clampedLeft}px`;
     panelElement.style.top = `${clampedTop}px`;
@@ -71,32 +76,19 @@ const grimoire = createGrimoirePanel({
 export const isFloraPanelOpen = grimoire.isOpen;
 export const toggleFloraPanel = grimoire.toggle;
 
-function bindPercentageSlider(sliderId, configProperty) {
-    const sliderElement = document.getElementById(sliderId);
-    if (!sliderElement) return;
-
-    sliderElement.addEventListener('input', (event) => {
-        const normalizedValue = parseInt(event.target.value, 10) / 100;
-        updateFloraConfig({ [configProperty]: normalizedValue });
-        syncFloraPanelUI();
-    });
-}
-
 export function initFloraPanelUI(onMageSpellCast) {
-    bindPercentageSlider('floraDensitySlider', 'density');
-    bindPercentageSlider('floraClumpingSlider', 'clumping');
-    bindPercentageSlider('floraLengthSlider', 'grassLength');
+    bindNormalizedRangeSlider('floraDensitySlider', 'density', updateFloraConfig, syncFloraPanelUI);
+    bindNormalizedRangeSlider('floraClumpingSlider', 'clumping', updateFloraConfig, syncFloraPanelUI);
+    bindNormalizedRangeSlider('floraLengthSlider', 'grassLength', updateFloraConfig, syncFloraPanelUI);
 
-    document.querySelectorAll('.flora-biome-btn[data-flora-biome]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const selectedBiome = button.getAttribute('data-flora-biome');
-            updateFloraConfig({ biome: selectedBiome });
-            syncFloraPanelUI();
-            floraSpell();
-            if (typeof onMageSpellCast === 'function') {
-                onMageSpellCast(false);
-            }
-        });
+    bindGrimoireOptionButtons({
+        selector: '.flora-biome-btn[data-flora-biome]',
+        dataAttribute: 'data-flora-biome',
+        configProperty: 'biome',
+        updateConfigFn: updateFloraConfig,
+        syncUIFn: syncFloraPanelUI,
+        playSpellFn: floraSpell,
+        onSpellCast: onMageSpellCast
     });
 
     grimoire.init(onMageSpellCast, floraSpell);

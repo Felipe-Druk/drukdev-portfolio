@@ -5,6 +5,8 @@
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SPRITE_PALETTES } from '../config/palettes.js';
 import { playSound } from '../audio/soundEngine.js';
+import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
+import { loadItem, saveItem } from '../utils/safeStorage.js';
 import {
     drawSlasherHero,
     drawSlasherSwordWave,
@@ -29,7 +31,7 @@ let gameContext = null;
 let gameRunning = false;
 let isGameOverState = false;
 let score = 0;
-let hiScore = parseInt(localStorage.getItem(HISCORE_STORAGE_KEY) || '0', 10);
+let hiScore = parseInt(loadItem(HISCORE_STORAGE_KEY, '0') || '0', 10);
 
 const player = {
     x: 48,
@@ -45,15 +47,6 @@ let entities = [];
 let gameParticles = [];
 let spawnTimer = 0;
 let gameSpeed = INITIAL_GAME_SPEED;
-
-function rectIntersect(rectA, rectB) {
-    return (
-        rectA.x < rectB.x + rectB.w &&
-        rectA.x + rectA.w > rectB.x &&
-        rectA.y < rectB.y + rectB.h &&
-        rectA.y + rectB.h > rectB.y
-    );
-}
 
 function getPlayerSlashHitbox() {
     return {
@@ -147,7 +140,7 @@ export function gameOver() {
 
     if (score > hiScore) {
         hiScore = score;
-        localStorage.setItem(HISCORE_STORAGE_KEY, String(hiScore));
+        saveItem(HISCORE_STORAGE_KEY, String(hiScore));
     }
     updateScoreUI();
 
@@ -178,7 +171,7 @@ export function triggerAttack(event) {
 
     for (let index = entities.length - 1; index >= 0; index--) {
         const entity = entities[index];
-        if (entity.type === 'bug' && rectIntersect(slashHitbox, entity)) {
+        if (entity.type === 'bug' && areRectsIntersecting(slashHitbox, entity)) {
             destroyBugEntity(index, SLASHER_PALETTE.slashColor, 16);
         }
     }
@@ -273,13 +266,13 @@ function updateGameEntities(palette) {
         entity.x -= gameSpeed;
 
         // Destroy bugs inside active slash wave
-        if (player.attackTimer > 4 && entity.type === 'bug' && rectIntersect(slashHitbox, entity)) {
+        if (player.attackTimer > 4 && entity.type === 'bug' && areRectsIntersecting(slashHitbox, entity)) {
             destroyBugEntity(index, palette.slashColor, 14);
             continue;
         }
 
         // Check collision with player body
-        if (rectIntersect(playerHitbox, entity)) {
+        if (areRectsIntersecting(playerHitbox, entity)) {
             if (entity.type === 'gem') {
                 score += 25;
                 playSound('coin');
@@ -350,7 +343,7 @@ function updateAndDrawGameParticles() {
         particle.life -= 0.05;
 
         if (particle.life <= 0) {
-            gameParticles.splice(index, 1);
+            removeItemSwapAndPop(gameParticles, index);
         } else {
             gameContext.fillStyle = particle.color;
             gameContext.globalAlpha = Math.max(0, particle.life);

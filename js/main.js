@@ -10,10 +10,9 @@ import {
     getTranslationByKey
 } from './config/i18n.js';
 import { playSound, toggleSound, isSoundEnabled } from './audio/soundEngine.js';
-import {
-    renderStaticPreviews,
-    copyTextToClipboard
-} from './graphics/sprites/index.js';
+import { copyTextToClipboard } from './utils/clipboard.js';
+import { renderStaticPreviews } from './graphics/sprites/index.js';
+import { closeAllGrimoires } from './graphics/sanctuary/grimoirePanelUtils.js';
 import {
     initSanctuary,
     resizeSanctuary,
@@ -41,7 +40,9 @@ import {
     updateAndDrawGame
 } from './game/bugSlasher.js';
 
+const TARGET_FRAME_DURATION_MS = 1000 / 60;
 let toastTimeout = null;
+let lastMainFrameTimestamp = 0;
 
 function setElementText(elementId, textValue) {
     const element = document.getElementById(elementId);
@@ -150,7 +151,12 @@ function bindUIEvents() {
     const langToggleBtn = document.getElementById('lang-toggle');
     const btnSound = document.getElementById('btnSound');
 
-    if (btnOpenTerminal) btnOpenTerminal.addEventListener('click', openDrukSystem);
+    if (btnOpenTerminal) {
+        btnOpenTerminal.addEventListener('click', () => {
+            closeAllGrimoires();
+            openDrukSystem();
+        });
+    }
     if (langToggleBtn) langToggleBtn.addEventListener('click', toggleLanguage);
     if (btnSound) btnSound.addEventListener('click', handleToggleSound);
 
@@ -159,19 +165,29 @@ function bindUIEvents() {
     });
 }
 
-function mainLoop() {
-    if (!isDungeonModalOpen() && !isTerminalModalOpen()) {
-        updateAndDrawSanctuary();
-    }
-    if (isSlasherViewActive()) {
-        updateAndDrawGame();
+function mainLoop(currentTimestamp = performance.now()) {
+    if (currentTimestamp - lastMainFrameTimestamp >= TARGET_FRAME_DURATION_MS - 1) {
+        lastMainFrameTimestamp = currentTimestamp;
+        if (!isDungeonModalOpen() && !isTerminalModalOpen()) {
+            updateAndDrawSanctuary();
+        }
+        if (isSlasherViewActive()) {
+            updateAndDrawGame();
+        }
     }
     requestAnimationFrame(mainLoop);
 }
 
 function initApp() {
-    const openDefaultDungeon = () => openDungeonModal('select');
-    initSanctuary(openDrukSystem, openDefaultDungeon);
+    const handleOpenTerminal = () => {
+        closeAllGrimoires();
+        openDrukSystem();
+    };
+    const openDefaultDungeon = () => {
+        closeAllGrimoires();
+        openDungeonModal('select');
+    };
+    initSanctuary(handleOpenTerminal, openDefaultDungeon, copyEmail);
     initDrukSystem(copyEmail, openDefaultDungeon);
     initDungeonUI();
     initGame();
@@ -181,18 +197,6 @@ function initApp() {
     bindUIEvents();
     mainLoop();
 }
-
-Object.assign(window, {
-    setLanguage,
-    toggleLanguage,
-    toggleSound: handleToggleSound,
-    copyEmail,
-    openDrukSystem,
-    closeDrukSystem,
-    openDungeonModal,
-    closeDungeonModal,
-    executeTerminalCommand
-});
 
 if (document.readyState === 'loading') {
     window.addEventListener('DOMContentLoaded', initApp);
