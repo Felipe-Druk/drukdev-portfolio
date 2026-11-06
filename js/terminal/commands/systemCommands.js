@@ -4,6 +4,7 @@
 
 import { playSound } from '../../audio/soundEngine.js';
 import { triggerSystemCataclysm } from '../../effects/cataclysmEffect.js';
+import { resetConstellationAttentionBlink } from '../../graphics/sanctuary/constellations.js';
 import {
     getActiveTerminalTexts,
     appendLine,
@@ -38,6 +39,10 @@ export function runCataclysmCommand(context) {
         }
         renderSafeModeBanner();
         setTerminalInputDisabled(false);
+        resetConstellationAttentionBlink();
+        if (context && typeof context.closeTerminal === 'function') {
+            context.closeTerminal();
+        }
     });
 }
 

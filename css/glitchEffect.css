@@ -70,6 +70,16 @@
     }
 }
 
+@keyframes bios-cursor-blink {
+    0%, 49% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+}
+
+.system-glitch,
 .cataclysm-rumble {
     animation: screen-rumble 0.12s infinite linear !important;
 }
@@ -84,6 +94,7 @@
     justify-content: center;
     pointer-events: none;
     overflow: hidden;
+    opacity: 1;
 }
 
 .crt-power-off-beam {
@@ -92,4 +103,10 @@
     background-color: #ffffff;
     transform-origin: center center;
     animation: crt-power-off 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+}
+
+.cataclysm-boot-cursor {
+    display: inline-block;
+    margin-left: 2px;
+    animation: bios-cursor-blink 0.6s infinite step-end !important;
 }

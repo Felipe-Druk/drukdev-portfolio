@@ -124,6 +124,10 @@ export function dismissConstellationAttentionBlink() {
     hasHighlightedAnyConstellation = true;
 }
 
+export function resetConstellationAttentionBlink() {
+    hasHighlightedAnyConstellation = false;
+}
+
 function shouldHighlightConstellationForAttention(constellationId, sanctuaryTick) {
     if (hasHighlightedAnyConstellation || constellationId !== ATTENTION_TARGET_CONSTELLATION_ID) {
         return false;

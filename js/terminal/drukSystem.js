@@ -55,6 +55,7 @@ export function openDrukSystem() {
 
 export function closeDrukSystem() {
     if (isCataclysmRunning()) return;
+    const wasOpen = isTerminalModalOpen();
     stopSnakeGame();
     stopFlappyDragonGame();
     setTerminalModalOpenState(false);
@@ -63,7 +64,9 @@ export function closeDrukSystem() {
     if (modalElement) {
         modalElement.classList.add('hidden');
     }
-    playSound('click');
+    if (wasOpen) {
+        playSound('click');
+    }
 }
 
 function clearCommandHistory() {

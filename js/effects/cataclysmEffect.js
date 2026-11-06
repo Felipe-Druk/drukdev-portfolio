@@ -1,16 +1,31 @@
 /**************************************************************
- * CATACLYSM PROTOCOL — FULLSCREEN GLITCH, MATRIX & CRT COLLAPSE
+ * CATACLYSM PROTOCOL — FULLSCREEN GLITCH, MATRIX & BIOS REBOOT
  **************************************************************/
 
-import { playSound } from '../audio/soundEngine.js';
+import {
+    playCataclysmAlarm,
+    playCrtPowerOff,
+    playBiosBeep
+} from './cataclysmAudio.js';
+import { resetConstellationAttentionBlink } from '../graphics/sanctuary/constellations.js';
+import { getModalElement, setTerminalModalOpenState } from '../terminal/terminalDom.js';
 
-const RUMBLE_DURATION_MS = 1200;
-const MATRIX_DURATION_MS = 2500;
-const CRT_BLACKOUT_DURATION_MS = 1200;
+const MATRIX_START_MS = 1800;
+const CRT_COLLAPSE_START_MS = 4800;
+const BIOS_BOOT_TEXT_START_MS = 6200;
+const BIOS_OPEN_LINE_START_MS = 8500;
+const CURTAIN_FADE_START_MS = 9800;
+const CATACLYSM_COMPLETE_MS = 11300;
+const CURTAIN_FADE_DURATION_SEC = 1.5;
+
+const TYPEWRITER_CHAR_INTERVAL_MS = 75;
+const BOOT_LOADING_TEXT = 'LOADING sanctuary.....';
+const BOOT_OPEN_TEXT = 'OPEN....';
 
 const MATRIX_OVERLAY_ID = 'matrix-overlay';
 const CRT_BLACKOUT_OVERLAY_ID = 'crt-blackout-overlay';
-const RUMBLE_BODY_CLASS = 'cataclysm-rumble';
+const BIOS_BOOT_CONTAINER_ID = 'cataclysm-boot-log';
+const SYSTEM_GLITCH_CLASS = 'system-glitch';
 
 const MATRIX_FONT_SIZE = 16;
 const MATRIX_RUNE_GLYPHS = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ0123456789ABCDEF<>/{}[]*$#@!';
@@ -19,21 +34,27 @@ const MATRIX_CORRUPTION_FRAGMENTS = ['druk.ar', 'drukernel', 'segfault'];
 let cataclysmInProgress = false;
 let activeMatrixFrameId = null;
 let activeResizeListener = null;
+let activeTypewriterIntervalId = null;
 let activeTimeouts = [];
 
 export function isCataclysmRunning() {
     return cataclysmInProgress;
 }
 
-function registerTimeout(callback, delayMs) {
+function scheduleCataclysmStep(callback, delayMs) {
     const timeoutId = window.setTimeout(callback, delayMs);
     activeTimeouts.push(timeoutId);
     return timeoutId;
 }
 
-function clearAllCataclysmTimeouts() {
+function clearScheduledTimers() {
     activeTimeouts.forEach((timeoutId) => window.clearTimeout(timeoutId));
     activeTimeouts = [];
+
+    if (activeTypewriterIntervalId !== null) {
+        window.clearInterval(activeTypewriterIntervalId);
+        activeTypewriterIntervalId = null;
+    }
 }
 
 function removeDomElementById(elementId) {
@@ -55,10 +76,11 @@ function stopMatrixLoopAndListeners() {
 }
 
 export function cleanupCataclysmElements() {
-    clearAllCataclysmTimeouts();
+    clearScheduledTimers();
     stopMatrixLoopAndListeners();
-    document.body.classList.remove(RUMBLE_BODY_CLASS);
+    document.body.classList.remove(SYSTEM_GLITCH_CLASS, 'cataclysm-rumble');
     removeDomElementById(MATRIX_OVERLAY_ID);
+    removeDomElementById(BIOS_BOOT_CONTAINER_ID);
     removeDomElementById(CRT_BLACKOUT_OVERLAY_ID);
     cataclysmInProgress = false;
 }
@@ -70,7 +92,8 @@ function createMatrixOverlayCanvas() {
     canvasElement.id = MATRIX_OVERLAY_ID;
     canvasElement.width = window.innerWidth;
     canvasElement.height = window.innerHeight;
-    canvasElement.style.cssText = 'position: fixed; inset: 0; z-index: 99998; pointer-events: none;';
+    canvasElement.style.cssText =
+        'position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 99998; pointer-events: none;';
 
     document.body.appendChild(canvasElement);
     return canvasElement;
@@ -171,7 +194,8 @@ function createCrtBlackoutOverlay() {
     const blackoutOverlay = document.createElement('div');
     blackoutOverlay.id = CRT_BLACKOUT_OVERLAY_ID;
     blackoutOverlay.className = 'crt-blackout-overlay';
-    blackoutOverlay.style.cssText = 'position: fixed; inset: 0; z-index: 99999; background-color: #000000; pointer-events: none;';
+    blackoutOverlay.style.cssText =
+        'position: fixed; inset: 0; z-index: 99999; background-color: #000000; opacity: 1; pointer-events: none;';
 
     const powerOffBeam = document.createElement('div');
     powerOffBeam.className = 'crt-power-off-beam';
@@ -181,36 +205,106 @@ function createCrtBlackoutOverlay() {
     return blackoutOverlay;
 }
 
+function createBiosBootTypographyContainer(parentOverlay) {
+    removeDomElementById(BIOS_BOOT_CONTAINER_ID);
+
+    const bootContainer = document.createElement('div');
+    bootContainer.id = BIOS_BOOT_CONTAINER_ID;
+    bootContainer.style.cssText =
+        'position: fixed; bottom: 24px; left: 24px; color: #00ff66; font-family: monospace; font-size: 15px; line-height: 1.6; white-space: pre; text-shadow: 0 0 8px rgba(0, 255, 102, 0.65); z-index: 100000; pointer-events: none;';
+
+    const textSpan = document.createElement('span');
+    const cursorSpan = document.createElement('span');
+    cursorSpan.className = 'cataclysm-boot-cursor';
+    cursorSpan.textContent = '█';
+
+    bootContainer.appendChild(textSpan);
+    bootContainer.appendChild(cursorSpan);
+
+    (parentOverlay || document.body).appendChild(bootContainer);
+    return textSpan;
+}
+
+function startLoadingTypewriterEffect(textSpan) {
+    let charIndex = 0;
+
+    activeTypewriterIntervalId = window.setInterval(() => {
+        if (charIndex < BOOT_LOADING_TEXT.length) {
+            charIndex++;
+            textSpan.textContent = BOOT_LOADING_TEXT.slice(0, charIndex);
+        } else {
+            window.clearInterval(activeTypewriterIntervalId);
+            activeTypewriterIntervalId = null;
+        }
+    }, TYPEWRITER_CHAR_INTERVAL_MS);
+}
+
 export function triggerSystemCataclysm(onComplete) {
     if (cataclysmInProgress) return;
     cleanupCataclysmElements();
     cataclysmInProgress = true;
 
-    playSound('seal');
-    document.body.classList.add(RUMBLE_BODY_CLASS);
+    let blackoutOverlay = null;
+    let bootTextSpan = null;
 
-    registerTimeout(() => {
-        document.body.classList.remove(RUMBLE_BODY_CLASS);
-        playSound('hit');
+    // 1. T = 0.0s: Alarm + system glitch on body
+    playCataclysmAlarm();
+    document.body.classList.add(SYSTEM_GLITCH_CLASS);
 
+    // 2. T = 1.8s: Mount fullscreen Matrix code rain for 3.0s
+    scheduleCataclysmStep(() => {
+        document.body.classList.remove(SYSTEM_GLITCH_CLASS);
         const matrixCanvas = createMatrixOverlayCanvas();
         startMatrixRainCascade(matrixCanvas);
+    }, MATRIX_START_MS);
 
-        registerTimeout(() => {
-            stopMatrixLoopAndListeners();
-            removeDomElementById(MATRIX_OVERLAY_ID);
+    // 3. T = 4.8s: CRT power-off sound + collapse animation + total black curtain
+    scheduleCataclysmStep(() => {
+        stopMatrixLoopAndListeners();
+        removeDomElementById(MATRIX_OVERLAY_ID);
 
-            playSound('gameover');
-            createCrtBlackoutOverlay();
+        playCrtPowerOff();
+        blackoutOverlay = createCrtBlackoutOverlay();
+    }, CRT_COLLAPSE_START_MS);
 
-            registerTimeout(() => {
-                cleanupCataclysmElements();
-                playSound('terminal');
+    // 4. T = 6.2s: Bottom-left BIOS typography + beep + typewriter "LOADING sanctuary....."
+    scheduleCataclysmStep(() => {
+        playBiosBeep();
+        bootTextSpan = createBiosBootTypographyContainer(blackoutOverlay);
+        startLoadingTypewriterEffect(bootTextSpan);
+    }, BIOS_BOOT_TEXT_START_MS);
 
-                if (typeof onComplete === 'function') {
-                    onComplete();
-                }
-            }, CRT_BLACKOUT_DURATION_MS);
-        }, MATRIX_DURATION_MS);
-    }, RUMBLE_DURATION_MS);
+    // 5. T = 8.5s: Line break + "OPEN...." with blinking cursor for 1.2s
+    scheduleCataclysmStep(() => {
+        if (activeTypewriterIntervalId !== null) {
+            window.clearInterval(activeTypewriterIntervalId);
+            activeTypewriterIntervalId = null;
+        }
+        if (bootTextSpan) {
+            bootTextSpan.textContent = `${BOOT_LOADING_TEXT}\n${BOOT_OPEN_TEXT}`;
+        }
+    }, BIOS_OPEN_LINE_START_MS);
+
+    // 6. T = 9.8s: Fade black curtain opacity 1 -> 0 over 1.5s to reveal active Sanctuary
+    scheduleCataclysmStep(() => {
+        resetConstellationAttentionBlink();
+        setTerminalModalOpenState(false);
+        const modalElement = getModalElement();
+        if (modalElement) {
+            modalElement.classList.add('hidden');
+        }
+
+        if (blackoutOverlay) {
+            blackoutOverlay.style.transition = `opacity ${CURTAIN_FADE_DURATION_SEC}s ease-out`;
+            blackoutOverlay.style.opacity = '0';
+        }
+    }, CURTAIN_FADE_START_MS);
+
+    // 7. T = 11.3s: Destroy temporary DOM nodes and invoke onComplete()
+    scheduleCataclysmStep(() => {
+        cleanupCataclysmElements();
+        if (typeof onComplete === 'function') {
+            onComplete();
+        }
+    }, CATACLYSM_COMPLETE_MS);
 }

@@ -55,7 +55,7 @@ export function setTerminalInputDisabled(isDisabled) {
     inputElement.disabled = Boolean(isDisabled);
     if (isDisabled) {
         inputElement.blur();
-    } else {
+    } else if (terminalModalOpen) {
         inputElement.focus();
     }
 }

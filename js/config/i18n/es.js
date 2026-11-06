@@ -98,17 +98,15 @@ export const ES_TRANSLATIONS = {
         ],
         safeModeBanner: [
             '========================================================',
-            ' DRUKSYSTEM OS v2.4 — MODO DE RECUPERACIÓN / SAFE MODE',
-            ' NÚCLEO: DRUK-KERNEL 8-BIT RESTAURADO DESDE SNAPSHOT',
-            ' ESTADO: SANTUARIO RECONSTRUIDO // INTEGRIDAD 100%',
+            ' DRUKSYSTEM OS v2.4 [RECOVERY MODE]',
+            ' NÚCLEO: DRUK-KERNEL 8-BIT RESTAURADO // /var/spells OK',
             '========================================================',
             'Sistema recuperado tras colapso crítico. Escribe "help".'
         ],
         cataclysmLines: [
-            '[CRÍTICO] Eliminando /boot/drukernel y vectores de arranque...',
-            '[ALERTA] Colapsando el ciclo celeste y apagando las constelaciones...',
-            '[ALERTA] Desintegrando el pedestal de nubes del Mago Azul...',
-            '[FATAL] SEGMENTATION FAULT — PROTOCOLO CATACLISMO INICIADO...'
+            '[ALERTA] Purgando /boot/drukernel.bin y vectores de arranque...',
+            '[ALERTA] Eliminando grimorios en /var/spells y ciclo astral...',
+            '[FATAL] KERNEL PANIC — EJECUTANDO PROTOCOLO DE COLAPSO TOTAL...'
         ],
         helpLines: [
             'COMANDOS DISPONIBLES EN DRUKSYSTEM OS:',
