@@ -65,10 +65,8 @@ function getNormalizedContactEmail() {
 function updateSoundButtonLabel(language = getCurrentLanguage()) {
     const navTexts = TRANSLATIONS[language].nav;
     const enabled = !audio.isMuted();
-    setElementClass(
-        'soundIcon',
-        enabled ? 'fa-solid fa-volume-high text-bronze' : 'fa-solid fa-volume-xmark text-gray-400'
-    );
+    setElementText('soundIcon', enabled ? '[+]' : '[x]');
+    setElementClass('soundIcon', enabled ? 'text-bronze' : 'text-gray-400');
     setElementText('soundLabel', enabled ? navTexts.sfxOn : navTexts.sfxMute);
 }
 
@@ -144,7 +142,7 @@ export function copyEmail() {
 
     const activeLangTexts = TRANSLATIONS[getCurrentLanguage()];
     playSound('coin');
-    showToast('📜', activeLangTexts.toast.copiedTitle, activeLangTexts.toast.copiedMsg(emailAddress));
+    showToast('[OK]', activeLangTexts.toast.copiedTitle, activeLangTexts.toast.copiedMsg(emailAddress));
 }
 
 function bindUIEvents() {

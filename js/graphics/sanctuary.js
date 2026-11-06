@@ -204,15 +204,20 @@ function updatePointerHoverState(canvasX, canvasY) {
     const zones = getCurrentSanctuaryZones();
     const nextHoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
 
+    if (nextHoveredZone === pointerState.hoveredZone) return;
+
     if (isConstellationZone(nextHoveredZone)) {
         dismissConstellationAttentionBlink();
-        if (nextHoveredZone !== pointerState.hoveredZone) {
-            playSound('starHover');
-        }
+        playSound('starHover');
     }
 
+    const wasInteractive = Boolean(pointerState.hoveredZone);
+    const isInteractive = Boolean(nextHoveredZone);
     pointerState.hoveredZone = nextHoveredZone;
-    sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
+
+    if (wasInteractive !== isInteractive) {
+        sanctuaryCanvas.style.cursor = isInteractive ? 'pointer' : 'default';
+    }
 }
 
 function handleSanctuaryClick(clickX, clickY) {
@@ -303,11 +308,6 @@ export function updateAndDrawSanctuary() {
     const width = sanctuaryCanvas.width;
     const height = sanctuaryCanvas.height;
     const zones = getLayoutZones(width, height, sanctuaryState.heroOffsetY);
-
-    if (pointerState.x >= 0 && pointerState.y >= 0) {
-        pointerState.hoveredZone = detectHoveredZone(pointerState.x, pointerState.y, zones);
-        sanctuaryCanvas.style.cursor = pointerState.hoveredZone ? 'pointer' : 'default';
-    }
 
     updateSanctuaryState(zones);
 

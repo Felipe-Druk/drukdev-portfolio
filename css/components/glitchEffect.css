@@ -53,13 +53,13 @@
     0% {
         transform: scale(1, 1);
         background-color: #ffffff;
-        box-shadow: 0 0 32px #ffffff, 0 0 64px #00ff41;
+        box-shadow: 0 0 0 4px #00ff41;
         opacity: 1;
     }
     60% {
         transform: scale(1, 0.005);
         background-color: #ffffff;
-        box-shadow: 0 0 24px #ffffff, 0 0 48px #ffffff;
+        box-shadow: 0 0 0 2px #ffffff;
         opacity: 1;
     }
     100% {
@@ -102,7 +102,7 @@
     height: 100%;
     background-color: #ffffff;
     transform-origin: center center;
-    animation: crt-power-off 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+    animation: crt-power-off 0.55s steps(4, end) forwards !important;
 }
 
 .cataclysm-boot-cursor {

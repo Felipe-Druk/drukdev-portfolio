@@ -12,7 +12,7 @@ export const EN_TRANSLATIONS = {
         subtitle: 'Pixel-Art Sanctuary & Interactive Console'
     },
     sanctuary: {
-        hint: '✨ Interact with the Sanctuary: Constellations, Ancient Tree, Lagoon, Green Mage, Dungeon Gate, or DrukSystem Console',
+        hint: '[*] Interact with the Sanctuary: Constellations, Ancient Tree, Lagoon, Green Mage, Dungeon Gate, or DrukSystem Console',
         treeHover: '[ANCIENT TREE]',
         pondHover: '[LILYPAD LAGOON]',
         dungeonSign: 'DUNGEON // ENTER',
@@ -48,7 +48,7 @@ export const EN_TRANSLATIONS = {
         }
     },
     flora: {
-        panelTitle: '🌿 BOTANICAL GRIMOIRE',
+        panelTitle: '[+] BOTANICAL GRIMOIRE',
         densityLabel: 'DISPERSION',
         clumpingLabel: 'CLUMPING',
         lengthLabel: 'LENGTH',
@@ -62,7 +62,7 @@ export const EN_TRANSLATIONS = {
         }
     },
     cloud: {
-        panelTitle: '☁️ ATMOSPHERIC GRIMOIRE',
+        panelTitle: '[~] ATMOSPHERIC GRIMOIRE',
         densityLabel: 'DENSITY',
         windLabel: 'WIND',
         scaleLabel: 'SCALE',
@@ -137,8 +137,8 @@ export const EN_TRANSLATIONS = {
         contactTitle: '=== OFFICIAL CONTACT & SOCIAL NETWORK LINKS ===',
         copyEmailAction: '[COPY EMAIL]',
         copiedEmailAction: '[COPIED!]',
-        dungeonOpening: '🗡️ Opening the Interactive Dungeon Gate...',
-        cvOpening: '📄 Opening CV / Resume PDF (EN) in a new tab...',
+        dungeonOpening: '[>] Opening the Interactive Dungeon Gate...',
+        cvOpening: '[>] Opening CV / Resume PDF (EN) in a new tab...',
         cvDownloadLabel: '• DIRECT DOWNLOAD  ->',
         cvDownloadAction: '[DOWNLOAD CV PDF]',
         cvUnavailable: 'The CV file is not available for the active language.',
@@ -165,14 +165,14 @@ export const EN_TRANSLATIONS = {
         gameOver: (score, hiScore) => `PILLAR COLLISION! SCORE: ${score} (HI: ${hiScore}) — [SPACE / CLICK] Restart`,
         exitBtn: '[EXIT / ESC]',
         restartBtn: '[RESTART]',
-        flapBtn: '🐉 FLAP (SPACE / CLICK)'
+        flapBtn: '[>] FLAP (SPACE / CLICK)'
     },
     hero: {
         copyEmailBtn: 'Copy Email',
         copiedEmailBtn: 'Copied!'
     },
     game: {
-        eyebrow: '🕹️ ARCADE CARTRIDGE: BUG SLASHER',
+        eyebrow: '[>] ARCADE CARTRIDGE: BUG SLASHER',
         overlayTitle: 'DEFEND THE REPOSITORY!',
         overlayDescHtml: 'Jump over <span class="text-[#B92B92] font-bold">Bugs</span> or slash them with your attack and collect <span class="text-bronze font-bold">Commits</span>.',
         startBtn: 'INSERT COIN / PLAY',
@@ -186,10 +186,10 @@ export const EN_TRANSLATIONS = {
         copiedMsg: (email) => `${email} ready to paste.`
     },
     dungeon: {
-        headerTitle: '⚔️ DRUKDEV DUNGEON // CLASS & RELIC ARCHIVES',
+        headerTitle: '[//] DRUKDEV DUNGEON // CLASS & RELIC ARCHIVES',
         selectTitle: 'SELECT YOUR INSPECTION CLASS',
         selectSubtitle: 'Filter my experience, projects, and coursework by specialization, or unlock the full unfiltered archive.',
-        selectHint: '🖱️ Click a class card or use [◀ / ▶] + [ENTER] • [ESC] Return to Sanctuary',
+        selectHint: '[>] Click a class card or use [◀ / ▶] + [ENTER] • [ESC] Return to Sanctuary',
         enterClassBtn: '[INSPECT CLASS]',
         omniscientBtn: '[*] OMNISCIENT MODE // VIEW FULL UNFILTERED CV (RECRUITER MODE)',
         tabAll: '[*] ALL / OMNISCIENT',
@@ -202,10 +202,10 @@ export const EN_TRANSLATIONS = {
         closeBtn: '[X / EXIT TO SANCTUARY]',
         omniscientBannerTitle: 'OMNISCIENT MODE ACTIVE — COMPLETE UNFILTERED CV ARCHIVE',
         omniscientBannerDesc: 'Displaying all technologies, projects, teaching/industry roles, and certifications by Felipe Druk without filters.',
-        sectionWeapons: '⚔️ EQUIPPED WEAPONS // TECH STACK',
-        sectionRelics: '🏺 FORGED RELICS // FEATURED PROJECTS',
-        sectionChronicles: '📜 GUILD CHRONICLES // WORK & TEACHING EXPERIENCE',
-        sectionSeals: '🔮 ARCANE SEALS // FIUBA ENGINEERING & BOOT.DEV CERTIFICATIONS',
+        sectionWeapons: '[+] EQUIPPED WEAPONS // TECH STACK',
+        sectionRelics: '[*] FORGED RELICS // FEATURED PROJECTS',
+        sectionChronicles: '[//] GUILD CHRONICLES // WORK & TEACHING EXPERIENCE',
+        sectionSeals: '[o] ARCANE SEALS // FIUBA ENGINEERING & BOOT.DEV CERTIFICATIONS',
         fiubaCoursesLabel: 'Highlighted Core Coursework:',
         bootdevTitle: 'Boot.dev — Backend & Computer Science Path',
         repoLinkLabel: '[REPOSITORY ↗]',
@@ -216,14 +216,14 @@ export const EN_TRANSLATIONS = {
         fantasy: {
             themeSubtitle: 'Pixel-Art Sanctuary & Interactive Console',
             heroTitle: 'DRUKDEV SANCTUARY',
-            progressTask: '🐉 FORGING THE PORTFOLIO DUNGEON...',
+            progressTask: '[>] FORGING THE PORTFOLIO DUNGEON...',
             gameTitle: "DRUK'S BUG SLASHER",
             attackBtnLabel: 'SWORD SLASH (K / CLICK)'
         },
         cyber: {
             themeSubtitle: 'Synthwave Grid & Full-Stack Architecture',
             heroTitle: 'INITIALIZING DRUK.DEV SYSTEM',
-            progressTask: '⚡ LOADING NEON SHADERS & MINIJUEGOS...',
+            progressTask: '[>] LOADING NEON SHADERS & MINIJUEGOS...',
             gameTitle: 'CYBER BUG RUNNER 2099',
             attackBtnLabel: 'LASER PULSE (K / CLICK)'
         }

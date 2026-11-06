@@ -12,7 +12,7 @@ export const ES_TRANSLATIONS = {
         subtitle: 'Santuario Pixel-Art & Consola Interactiva'
     },
     sanctuary: {
-        hint: '✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem',
+        hint: '[*] Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem',
         treeHover: '[ÁRBOL ANTIGUO]',
         pondHover: '[LAGUNA DE NENÚFARES]',
         dungeonSign: 'DUNGEON // ENTER',
@@ -48,7 +48,7 @@ export const ES_TRANSLATIONS = {
         }
     },
     flora: {
-        panelTitle: '🌿 GRIMORIO BOTÁNICO',
+        panelTitle: '[+] GRIMORIO BOTÁNICO',
         densityLabel: 'DISPERSIÓN',
         clumpingLabel: 'CÚMULO',
         lengthLabel: 'LARGO',
@@ -62,7 +62,7 @@ export const ES_TRANSLATIONS = {
         }
     },
     cloud: {
-        panelTitle: '☁️ GRIMORIO ATMOSFÉRICO',
+        panelTitle: '[~] GRIMORIO ATMOSFÉRICO',
         densityLabel: 'CANTIDAD',
         windLabel: 'VIENTO',
         scaleLabel: 'TAMAÑO',
@@ -137,8 +137,8 @@ export const ES_TRANSLATIONS = {
         contactTitle: '=== ENLACES DE CONTACTO & REDES OFICIALES ===',
         copyEmailAction: '[COPIAR EMAIL]',
         copiedEmailAction: '[¡COPIADO!]',
-        dungeonOpening: '🗡️ Abriendo el Portal de la Dungeon Interactiva...',
-        cvOpening: '📄 Abriendo CV en PDF (ES) en una nueva pestaña...',
+        dungeonOpening: '[>] Abriendo el Portal de la Dungeon Interactiva...',
+        cvOpening: '[>] Abriendo CV en PDF (ES) en una nueva pestaña...',
         cvDownloadLabel: '• DESCARGA DIRECTA ->',
         cvDownloadAction: '[DESCARGAR CV PDF]',
         cvUnavailable: 'El archivo CV no está disponible para el idioma activo.',
@@ -165,14 +165,14 @@ export const ES_TRANSLATIONS = {
         gameOver: (score, hiScore) => `¡IMPACTO CONTRA PILAR! SCORE: ${score} (HI: ${hiScore}) — [ESPACIO / CLICK] Reiniciar`,
         exitBtn: '[SALIR / ESC]',
         restartBtn: '[REINICIAR]',
-        flapBtn: '🐉 ALETEAR (ESPACIO / CLICK)'
+        flapBtn: '[>] ALETEAR (ESPACIO / CLICK)'
     },
     hero: {
         copyEmailBtn: 'Copiar Email',
         copiedEmailBtn: '¡Copiado!'
     },
     game: {
-        eyebrow: '🕹️ CARTUCHO ARCADE: BUG SLASHER',
+        eyebrow: '[>] CARTUCHO ARCADE: BUG SLASHER',
         overlayTitle: '¡DEFIENDE EL REPOSITORIO!',
         overlayDescHtml: 'Salta los <span class="text-[#B92B92] font-bold">Bugs</span> o destrúyelos con tu ataque y recolecta <span class="text-bronze font-bold">Commits</span>.',
         startBtn: 'INSERT COIN / JUGAR',
@@ -186,10 +186,10 @@ export const ES_TRANSLATIONS = {
         copiedMsg: (email) => `${email} listo para pegar.`
     },
     dungeon: {
-        headerTitle: '⚔️ LA DUNGEON DE DRUKDEV // ARCHIVO DE CLASES Y RELIQUIAS',
+        headerTitle: '[//] LA DUNGEON DE DRUKDEV // ARCHIVO DE CLASES Y RELIQUIAS',
         selectTitle: 'ELIGE TU CLASE DE INSPECCIÓN',
         selectSubtitle: 'Filtra mi experiencia, proyectos y formación según el perfil que buscas, o desbloquea el archivo completo.',
-        selectHint: '🖱️ Haz clic en una carta o usa [◀ / ▶] + [ENTER] • [ESC] Salir al Santuario',
+        selectHint: '[>] Haz clic en una carta o usa [◀ / ▶] + [ENTER] • [ESC] Salir al Santuario',
         enterClassBtn: '[INSPECCIONAR CLASE]',
         omniscientBtn: '[*] MODO OMNISCIENTE // VER TODO EL CV SIN FILTROS (RECRUITER MODE)',
         tabAll: '[*] TODAS / OMNISCIENTE',
@@ -202,10 +202,10 @@ export const ES_TRANSLATIONS = {
         closeBtn: '[X / SALIR AL SANTUARIO]',
         omniscientBannerTitle: 'MODO OMNISCIENTE ACTIVO — ARCHIVO COMPLETO DEL CV',
         omniscientBannerDesc: 'Mostrando todas las tecnologías, proyectos, experiencia docente/laboral y certificaciones de Felipe Druk sin filtros.',
-        sectionWeapons: '⚔️ ARMAS EQUIPADAS // STACK TÉCNICO',
-        sectionRelics: '🏺 RELIQUIAS FORJADAS // PROYECTOS DESTACADOS',
-        sectionChronicles: '📜 CRÓNICAS DEL GREMIO // EXPERIENCIA LABORAL Y DOCENTE',
-        sectionSeals: '🔮 SELLOS ARCANOS // INGENIERÍA FIUBA & CERTIFICACIONES BOOT.DEV',
+        sectionWeapons: '[+] ARMAS EQUIPADAS // STACK TÉCNICO',
+        sectionRelics: '[*] RELIQUIAS FORJADAS // PROYECTOS DESTACADOS',
+        sectionChronicles: '[//] CRÓNICAS DEL GREMIO // EXPERIENCIA LABORAL Y DOCENTE',
+        sectionSeals: '[o] SELLOS ARCANOS // INGENIERÍA FIUBA & CERTIFICACIONES BOOT.DEV',
         fiubaCoursesLabel: 'Materias Clave Cursadas:',
         bootdevTitle: 'Boot.dev — Backend & Computer Science Path',
         repoLinkLabel: '[REPOSITORIO ↗]',
@@ -216,14 +216,14 @@ export const ES_TRANSLATIONS = {
         fantasy: {
             themeSubtitle: 'Santuario Pixel-Art & Consola Interactiva',
             heroTitle: 'SANTUARIO DE DRUKDEV',
-            progressTask: '🐉 FORJANDO LA DUNGEON DEL PORTAFOLIO...',
+            progressTask: '[>] FORJANDO LA DUNGEON DEL PORTAFOLIO...',
             gameTitle: "DRUK'S BUG SLASHER",
             attackBtnLabel: 'ESPADAZO (K / CLICK)'
         },
         cyber: {
             themeSubtitle: 'Synthwave Grid & Arquitectura Full-Stack',
             heroTitle: 'INICIALIZANDO EL SISTEMA DRUK.DEV',
-            progressTask: '⚡ CARGANDO NEON SHADERS & MINIJUEGOS...',
+            progressTask: '[>] CARGANDO NEON SHADERS & MINIJUEGOS...',
             gameTitle: 'CYBER BUG RUNNER 2099',
             attackBtnLabel: 'PULSO LÁSER (K / CLICK)'
         }

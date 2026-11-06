@@ -118,7 +118,24 @@ let cachedConstellationState = {
     zones: []
 };
 
+let labelMeasureContext = null;
 let hasHighlightedAnyConstellation = false;
+
+function computeCachedLabelBoxWidth(textValue) {
+    if (!textValue) return 0;
+    if (!labelMeasureContext && typeof document !== 'undefined') {
+        const offscreenCanvas = document.createElement('canvas');
+        labelMeasureContext = offscreenCanvas.getContext('2d');
+        if (labelMeasureContext) {
+            labelMeasureContext.font = '8px "Press Start 2P", monospace';
+        }
+    }
+    if (labelMeasureContext) {
+        labelMeasureContext.font = '8px "Press Start 2P", monospace';
+        return Math.ceil(labelMeasureContext.measureText(textValue).width + 12);
+    }
+    return textValue.length * 8 + 12;
+}
 
 export function dismissConstellationAttentionBlink() {
     hasHighlightedAnyConstellation = true;
@@ -182,9 +199,15 @@ export function buildConstellationZones(width, height, horizonY) {
     const maxSkyY = Math.max(minSkyY + 24, horizonY - horizonClearance);
 
     const activeConstellations = [];
+    const activeLangConstellations = TRANSLATIONS[activeLanguage].sanctuary.constellations;
+
     CONSTELLATION_BLUEPRINTS.forEach((blueprint) => {
         const targetValue = getConstellationTargetValue(blueprint, activeLanguage);
         if (!targetValue) return;
+
+        const translationEntry = activeLangConstellations[blueprint.id];
+        const labelBoxWidth = computeCachedLabelBoxWidth(translationEntry?.label || '');
+        const hoverBoxWidth = computeCachedLabelBoxWidth(translationEntry?.hover || '');
 
         const activeRelativeX = isPortrait && typeof blueprint.portraitRelativeX === 'number'
             ? blueprint.portraitRelativeX
@@ -216,6 +239,8 @@ export function buildConstellationZones(width, height, horizonY) {
             y: centerY - topPadding,
             w: halfWidth * 2,
             h: topPadding + bottomPadding,
+            labelBoxWidth,
+            hoverBoxWidth,
             nodes,
             edges: blueprint.edges
         });
@@ -355,7 +380,7 @@ function drawConstellationLabel(
     context.textAlign = 'center';
 
     if (isLabelHighlighted) {
-        const labelWidth = Math.ceil(context.measureText(labelText).width + 12);
+        const labelWidth = (isHovered ? constellation.hoverBoxWidth : constellation.labelBoxWidth) || (labelText.length * 8 + 12);
         drawRect(
             context,
             constellation.centerX - labelWidth / 2,

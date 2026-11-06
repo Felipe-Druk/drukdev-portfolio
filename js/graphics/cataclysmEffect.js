@@ -210,7 +210,7 @@ function createBiosBootTypographyContainer(parentOverlay) {
     const bootContainer = document.createElement('div');
     bootContainer.id = BIOS_BOOT_CONTAINER_ID;
     bootContainer.style.cssText =
-        'position: fixed; bottom: 24px; left: 24px; color: #00ff66; font-family: monospace; font-size: 15px; line-height: 1.6; white-space: pre; text-shadow: 0 0 8px rgba(0, 255, 102, 0.65); z-index: 100000; pointer-events: none;';
+        'position: fixed; bottom: 24px; left: 24px; color: #00ff66; font-family: monospace; font-size: 15px; line-height: 1.6; white-space: pre; text-shadow: 2px 2px 0px #000000; z-index: 100000; pointer-events: none;';
 
     const textSpan = document.createElement('span');
     const cursorSpan = document.createElement('span');
@@ -311,7 +311,7 @@ export function triggerSystemCataclysm(optionsOrCallback = {}) {
             onRevealSanctuary();
         }
         if (blackoutOverlay) {
-            blackoutOverlay.style.transition = `opacity ${CURTAIN_FADE_DURATION_SEC}s ease-out`;
+            blackoutOverlay.style.transition = `opacity ${CURTAIN_FADE_DURATION_SEC}s steps(4, end)`;
             blackoutOverlay.style.opacity = '0';
         }
     }, CURTAIN_FADE_START_MS);

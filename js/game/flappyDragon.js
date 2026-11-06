@@ -34,6 +34,12 @@ let flappyTick = 0;
 let lastFlappyFrameTimestamp = 0;
 let onExitFlappyCallback = null;
 
+const flappyHudDom = {
+    scoreEl: null,
+    hiScoreEl: null,
+    statusEl: null
+};
+
 let flappyScore = 0;
 let flappyHiScore = parseInt(loadItem(FLAPPY_HISCORE_KEY, '0') || '0', 10);
 
@@ -50,10 +56,23 @@ let pillars = [];
 let flapParticles = [];
 let spawnCounter = 0;
 
+function cacheFlappyDomReferences() {
+    if (!flappyCanvas) {
+        flappyCanvas = document.getElementById('flappyCanvas');
+    }
+    if (!flappyHudDom.scoreEl) {
+        flappyHudDom.scoreEl = document.getElementById('flappyScoreVal');
+    }
+    if (!flappyHudDom.hiScoreEl) {
+        flappyHudDom.hiScoreEl = document.getElementById('flappyHiScoreVal');
+    }
+    if (!flappyHudDom.statusEl) {
+        flappyHudDom.statusEl = document.getElementById('flappyStatusMsg');
+    }
+}
+
 function updateFlappyHud() {
-    const scoreEl = document.getElementById('flappyScoreVal');
-    const hiScoreEl = document.getElementById('flappyHiScoreVal');
-    const statusEl = document.getElementById('flappyStatusMsg');
+    const { scoreEl, hiScoreEl, statusEl } = flappyHudDom;
     const flappyTexts = TRANSLATIONS[getCurrentLanguage()].flappy;
 
     if (scoreEl) scoreEl.textContent = String(flappyScore);
@@ -334,7 +353,7 @@ function flappyLoop(currentTimestamp = performance.now()) {
 
 export function startFlappyDragonGame(onExitCallback) {
     onExitFlappyCallback = onExitCallback;
-    flappyCanvas = document.getElementById('flappyCanvas');
+    cacheFlappyDomReferences();
     if (!flappyCanvas) return;
 
     flappyCanvas.width = CANVAS_WIDTH;
@@ -358,6 +377,7 @@ export function stopFlappyDragonGame() {
 }
 
 export function initFlappyDragonControls() {
+    cacheFlappyDomReferences();
     window.addEventListener('keydown', (event) => {
         if (!flappyRunning) return;
 

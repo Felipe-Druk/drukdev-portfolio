@@ -48,15 +48,15 @@ canvas {
 /* Glitch / Glow Title Animation */
 @keyframes pulseGlow {
     0%, 100% {
-        text-shadow: 2px 2px 0px #0D0D0F, 0 0 14px var(--accent-glow);
+        text-shadow: 2px 2px 0px #0D0D0F;
     }
     50% {
-        text-shadow: 2px 2px 0px var(--accent-secondary), 0 0 22px var(--accent-main);
+        text-shadow: 2px 2px 0px var(--accent-secondary);
     }
 }
 
 .title-glow {
-    animation: pulseGlow 3s infinite ease-in-out;
+    animation: pulseGlow 3s infinite steps(2, end);
 }
 
 @media (prefers-reduced-motion: reduce) {

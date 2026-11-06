@@ -28,6 +28,15 @@ const MAX_GAME_SPEED = 7.2;
 let gameCanvas = null;
 let gameContext = null;
 
+const slasherDom = {
+    scoreEl: null,
+    hiScoreEl: null,
+    overlayEl: null,
+    overlayTitleEl: null,
+    overlayDescEl: null,
+    startBtnTextEl: null
+};
+
 let gameRunning = false;
 let isGameOverState = false;
 let score = 0;
@@ -92,33 +101,29 @@ function destroyBugEntity(entityIndex, slashColor, particleCount = 15) {
 }
 
 export function updateScoreUI() {
-    const scoreElement = document.getElementById('scoreDisplay');
-    const hiScoreElement = document.getElementById('hiScoreDisplay');
-    if (scoreElement) scoreElement.textContent = score;
-    if (hiScoreElement) hiScoreElement.textContent = hiScore;
+    const { scoreEl, hiScoreEl } = slasherDom;
+    if (scoreEl) scoreEl.textContent = score;
+    if (hiScoreEl) hiScoreEl.textContent = hiScore;
 }
 
 export function refreshGameOverlayLanguage() {
     const gameTexts = TRANSLATIONS[getCurrentLanguage()].game;
-    const overlayTitle = document.getElementById('overlayTitle');
-    const overlayDesc = document.getElementById('overlayDesc');
-    const startBtnText = document.getElementById('startBtnText');
+    const { overlayTitleEl, overlayDescEl, startBtnTextEl } = slasherDom;
 
     if (isGameOverState) {
-        if (overlayTitle) overlayTitle.textContent = gameTexts.gameOverTitle(score);
-        if (overlayDesc) overlayDesc.innerHTML = gameTexts.gameOverDescHtml(hiScore);
-        if (startBtnText) startBtnText.textContent = gameTexts.retryBtn;
+        if (overlayTitleEl) overlayTitleEl.textContent = gameTexts.gameOverTitle(score);
+        if (overlayDescEl) overlayDescEl.innerHTML = gameTexts.gameOverDescHtml(hiScore);
+        if (startBtnTextEl) startBtnTextEl.textContent = gameTexts.retryBtn;
     } else {
-        if (overlayTitle) overlayTitle.textContent = gameTexts.overlayTitle;
-        if (overlayDesc) overlayDesc.innerHTML = gameTexts.overlayDescHtml;
-        if (startBtnText) startBtnText.textContent = gameTexts.startBtn;
+        if (overlayTitleEl) overlayTitleEl.textContent = gameTexts.overlayTitle;
+        if (overlayDescEl) overlayDescEl.innerHTML = gameTexts.overlayDescHtml;
+        if (startBtnTextEl) startBtnTextEl.textContent = gameTexts.startBtn;
     }
 }
 
 export function startGame() {
     playSound('coin');
-    const overlayElement = document.getElementById('gameOverlay');
-    if (overlayElement) overlayElement.classList.add('hidden');
+    if (slasherDom.overlayEl) slasherDom.overlayEl.classList.add('hidden');
 
     score = 0;
     gameSpeed = INITIAL_GAME_SPEED;
@@ -144,8 +149,7 @@ export function gameOver() {
     }
     updateScoreUI();
 
-    const overlayElement = document.getElementById('gameOverlay');
-    if (overlayElement) overlayElement.classList.remove('hidden');
+    if (slasherDom.overlayEl) slasherDom.overlayEl.classList.remove('hidden');
 
     refreshGameOverlayLanguage();
 }
@@ -179,6 +183,13 @@ export function triggerAttack(event) {
 
 export function initGame() {
     gameCanvas = document.getElementById('gameCanvas');
+    slasherDom.scoreEl = document.getElementById('scoreDisplay');
+    slasherDom.hiScoreEl = document.getElementById('hiScoreDisplay');
+    slasherDom.overlayEl = document.getElementById('gameOverlay');
+    slasherDom.overlayTitleEl = document.getElementById('overlayTitle');
+    slasherDom.overlayDescEl = document.getElementById('overlayDesc');
+    slasherDom.startBtnTextEl = document.getElementById('startBtnText');
+
     if (!gameCanvas) return;
     gameContext = gameCanvas.getContext('2d');
 

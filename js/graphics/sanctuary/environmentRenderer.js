@@ -220,7 +220,7 @@ export function drawSealedDungeonPortal(
 
     if (dungeonMessageTimer > 0) {
         const sealMsg = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonSealMsg;
-        drawFloatingPixelLabel(context, centerX, baseY - 164, `⚔️ ${sealMsg}`, DRUK_CORE_PALETTE.dragonLight);
+        drawFloatingPixelLabel(context, centerX, baseY - 164, `[//] ${sealMsg}`, DRUK_CORE_PALETTE.dragonLight);
     } else if (isHovered) {
         const hoverLabel = TRANSLATIONS[getCurrentLanguage()].sanctuary.dungeonHover;
         drawFloatingPixelLabel(context, centerX, baseY - 160, hoverLabel, DRUK_CORE_PALETTE.bronzeWarm);

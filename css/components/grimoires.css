@@ -111,7 +111,7 @@
     color: var(--steel-light);
     box-shadow: 2px 2px 0px var(--bg-primary);
     cursor: pointer;
-    transition: border-color 0.1s ease, color 0.1s ease, background-color 0.1s ease;
+    transition: border-color 0.05s steps(2, end), color 0.05s steps(2, end), background-color 0.05s steps(2, end);
 }
 
 .flora-biome-btn:hover,
@@ -137,7 +137,7 @@
     box-shadow: 4px 4px 0px var(--bg-primary);
     cursor: pointer;
     user-select: none;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.15s ease;
+    transition: transform 0.05s steps(2, end), box-shadow 0.05s steps(2, end), border-color 0.05s steps(2, end);
 }
 
 .flora-reseed-btn:hover,

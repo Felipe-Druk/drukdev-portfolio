@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Modular CSS -->
     <link rel="stylesheet" href="./css/variables.css">
     <link rel="stylesheet" href="./css/base.css">
@@ -56,7 +54,7 @@
         <!-- Minimal Controls: Open DrukSystem OS, Language (ES | EN) & Audio (MUTE) -->
         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2.5 pointer-events-auto">
             <button id="btnOpenTerminal" type="button" class="pixel-btn px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-gothic-pixel flex items-center gap-1.5 sm:gap-2">
-                <i class="fa-solid fa-terminal text-[#00FF41]"></i>
+                <span class="text-[#00FF41]">[&gt;]</span>
                 <span data-i18n="nav.openTerminalBtn">DRUKSYSTEM OS</span>
             </button>
 
@@ -67,7 +65,7 @@
             </button>
 
             <button id="btnSound" type="button" class="pixel-btn px-2.5 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-gothic-pixel flex items-center gap-1.5" data-i18n-title="nav.soundTitle" title="Efectos de sonido 8-bit">
-                <i id="soundIcon" class="fa-solid fa-volume-high text-bronze"></i>
+                <span id="soundIcon" class="text-bronze">[+]</span>
                 <span id="soundLabel" class="hidden sm:inline">SFX ON</span>
             </button>
         </div>
@@ -76,7 +74,7 @@
     <!-- Bottom Sanctuary Exploration Hint -->
     <footer class="fixed bottom-2 sm:bottom-3 left-0 right-0 z-20 flex justify-center px-2.5 sm:px-4 pointer-events-none">
         <div class="bg-[#0D0D0F]/85 border-2 border-[#56616E] px-2.5 py-1 sm:px-4 sm:py-1.5 text-[10px] sm:text-xs text-bronze shadow-[4px_4px_0_#0D0D0F] text-center" data-i18n="sanctuary.hint">
-            ✨ Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem
+            [*] Interactúa con el Santuario: Constelaciones, Árbol Antiguo, Laguna, Mago Verde, Portal Dungeon o Consola DrukSystem
         </div>
     </footer>
 
@@ -90,7 +88,7 @@
     >
         <div class="flora-panel-header flex items-center justify-between pb-2 mb-2.5">
             <span class="flora-panel-title font-gothic-pixel text-[10px] tracking-wide" data-i18n="flora.panelTitle">
-                🌿 GRIMORIO BOTÁNICO
+                [+] GRIMORIO BOTÁNICO
             </span>
             <button
                 id="floraCloseBtn"
@@ -205,7 +203,7 @@
     >
         <div class="cloud-panel-header flex items-center justify-between pb-2 mb-2.5">
             <span class="cloud-panel-title font-gothic-pixel text-[10px] tracking-wide" data-i18n="cloud.panelTitle">
-                ☁️ GRIMORIO ATMOSFÉRICO
+                [~] GRIMORIO ATMOSFÉRICO
             </span>
             <button
                 id="cloudCloseBtn"
@@ -316,14 +314,14 @@
         aria-modal="true"
         data-terminal-color="matrix"
         data-terminal-font="ibm"
-        class="hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-[2px] flex items-center justify-center p-3 sm:p-6"
+        class="hidden fixed inset-0 z-40 bg-[#030803]/85 flex items-center justify-center p-3 sm:p-6"
     >
         <div class="crt-monitor-frame w-full max-w-4xl flex flex-col p-3 sm:p-5">
 
             <!-- Monitor Bezel Header -->
             <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b-2 border-[#56616E]">
                 <div class="flex items-center gap-2.5">
-                    <span class="w-3 h-3 inline-block bg-[#00FF41] shadow-[0_0_8px_#00FF41]"></span>
+                    <span class="w-3 h-3 inline-block bg-[#00FF41] border border-[#008F11]"></span>
                     <span class="font-gothic-pixel text-[10px] sm:text-xs text-steel tracking-wider" data-i18n="terminal.windowTitle">
                         DRUKSYSTEM OS v2.4 // MONITOR DE FÓSFORO
                     </span>
@@ -415,7 +413,7 @@
 
                     <div class="flex items-center justify-center w-full sm:hidden">
                         <button id="flappyFlapBtn" type="button" class="term-cmd-chip px-6 py-1.5 font-bold" data-i18n="flappy.flapBtn">
-                            🐉 ALETEAR (ESPACIO / CLICK)
+                            [&gt;] ALETEAR (ESPACIO / CLICK)
                         </button>
                     </div>
                 </div>
@@ -491,7 +489,7 @@
                 <div class="flex items-center gap-2.5">
                     <span class="w-3 h-3 inline-block bg-[#B92B92] border border-[#D4957A]"></span>
                     <span class="font-gothic-pixel text-[10px] sm:text-xs text-bronze tracking-wider" data-i18n="dungeon.headerTitle">
-                        ⚔️ LA DUNGEON DE DRUKDEV // ARCHIVO DE CLASES Y RELIQUIAS
+                        [//] LA DUNGEON DE DRUKDEV // ARCHIVO DE CLASES Y RELIQUIAS
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
@@ -545,7 +543,7 @@
                             [*] MODO OMNISCIENTE // VER TODO EL CV SIN FILTROS (RECRUITER MODE)
                         </button>
                         <p class="text-[11px] text-center text-steel/80 mt-2" data-i18n="dungeon.selectHint">
-                            🖱️ Haz clic en una carta o usa [◀ / ▶] + [ENTER] • [ESC] Salir al Santuario
+                            [&gt;] Haz clic en una carta o usa [◀ / ▶] + [ENTER] • [ESC] Salir al Santuario
                         </p>
                     </div>
                 </section>
@@ -613,7 +611,7 @@
                     <!-- 1. Equipped Weapons (Tech Stack) -->
                     <div class="dungeon-section-box p-3.5">
                         <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionWeapons">
-                            ⚔️ ARMAS EQUIPADAS // STACK TÉCNICO
+                            [+] ARMAS EQUIPADAS // STACK TÉCNICO
                         </h3>
                         <div id="dungeonWeaponsList" class="flex flex-wrap gap-2"></div>
                     </div>
@@ -621,7 +619,7 @@
                     <!-- 2. Forged Relics (Featured Projects) -->
                     <div class="dungeon-section-box p-3.5">
                         <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionRelics">
-                            🏺 RELIQUIAS FORJADAS // PROYECTOS DESTACADOS
+                            [*] RELIQUIAS FORJADAS // PROYECTOS DESTACADOS
                         </h3>
                         <div id="dungeonProjectsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                     </div>
@@ -629,7 +627,7 @@
                     <!-- 3. Guild Chronicles (Work & Teaching Experience) -->
                     <div class="dungeon-section-box p-3.5">
                         <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionChronicles">
-                            📜 CRÓNICAS DEL GREMIO // EXPERIENCIA LABORAL Y DOCENTE
+                            [//] CRÓNICAS DEL GREMIO // EXPERIENCIA LABORAL Y DOCENTE
                         </h3>
                         <div id="dungeonExperienceList" class="space-y-3"></div>
                     </div>
@@ -637,7 +635,7 @@
                     <!-- 4. Arcane Seals (FIUBA Engineering & Boot.dev Certifications) -->
                     <div class="dungeon-section-box p-3.5">
                         <h3 class="font-gothic-pixel text-[10px] sm:text-xs text-bronze pb-2 mb-3 border-b border-[#56616E]" data-i18n="dungeon.sectionSeals">
-                            🔮 SELLOS ARCANOS // INGENIERÍA FIUBA & CERTIFICACIONES BOOT.DEV
+                            [o] SELLOS ARCANOS // INGENIERÍA FIUBA &amp; CERTIFICACIONES BOOT.DEV
                         </h3>
                         <div id="dungeonSealsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                     </div>
@@ -647,9 +645,9 @@
     </div>
 
     <!-- Toast Notification for Copy Email -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-none pointer-events-none">
         <div class="pixel-box pixel-box-active px-4 py-3 flex items-center gap-3 bg-[#0D0D0F]/95">
-            <span class="text-xl" id="toastIcon">📜</span>
+            <span class="font-gothic-pixel text-xs text-bronze" id="toastIcon">[OK]</span>
             <div>
                 <p class="font-gothic-pixel text-[10px] text-bronze" id="toastTitle" data-i18n="toast.copiedTitle">¡EMAIL COPIADO!</p>
                 <p class="text-xs text-steel" id="toastMsg">fedalto@fi.uba.ar listo para pegar.</p>

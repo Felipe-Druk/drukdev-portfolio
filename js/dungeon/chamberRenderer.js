@@ -203,7 +203,7 @@ function createBootdevSealsCard(classId, language, dungeonTexts) {
 
         const certName = document.createElement('span');
         certName.className = 'text-xs font-bold text-steel';
-        certName.textContent = `📜 ${certificate.title[language]}`;
+        certName.textContent = `[+] ${certificate.title[language]}`;
         certRow.appendChild(certName);
 
         if (certificate.url && certificate.url.trim() !== '') {
