@@ -8,12 +8,16 @@ import {
     runHelpCommand,
     runLsCommand,
     runClearCommand,
-    runDungeonCommand
+    runDungeonCommand,
+    runCataclysmCommand
 } from './systemCommands.js';
 import { runCvCommand } from './cvCommand.js';
 import { runContactCommand } from './contactCommand.js';
 import { runColorCommand, runFontCommand } from './appearanceCommands.js';
 import { runPlayCommand } from './playCommand.js';
+
+const DESTRUCTIVE_COMMAND_PREFIXES = ['rm -rf', 'sudo rm', 'format c:'];
+const FORK_BOMB_SIGNATURES = [':(){ :|:& };:', ':(){:|:&};:'];
 
 const COMMAND_HANDLERS = {
     help: runHelpCommand,
@@ -41,7 +45,27 @@ const COMMAND_HANDLERS = {
     quit: (_, context) => context.closeTerminal()
 };
 
+export function isDestructiveCommand(rawCommand) {
+    const normalizedCommand = (rawCommand || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (!normalizedCommand) return false;
+
+    const matchesPrefix = DESTRUCTIVE_COMMAND_PREFIXES.some(
+        (prefix) =>
+            normalizedCommand === prefix ||
+            normalizedCommand.startsWith(`${prefix} `) ||
+            normalizedCommand.startsWith(`${prefix}/`)
+    );
+    if (matchesPrefix) return true;
+
+    return FORK_BOMB_SIGNATURES.some((signature) => normalizedCommand.includes(signature));
+}
+
 export function dispatchTerminalCommand(rawCommand, context) {
+    if (isDestructiveCommand(rawCommand)) {
+        runCataclysmCommand(context);
+        return;
+    }
+
     const commandTokens = rawCommand.toLowerCase().split(/\s+/);
     const commandName = commandTokens[0];
     const commandArgument = commandTokens[1] || '';

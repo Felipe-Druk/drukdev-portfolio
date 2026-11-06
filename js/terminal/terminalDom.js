@@ -48,6 +48,18 @@ export function getTerminalInput() {
     return document.getElementById('terminalInput');
 }
 
+export function setTerminalInputDisabled(isDisabled) {
+    const inputElement = getTerminalInput();
+    if (!inputElement) return;
+
+    inputElement.disabled = Boolean(isDisabled);
+    if (isDisabled) {
+        inputElement.blur();
+    } else {
+        inputElement.focus();
+    }
+}
+
 export function scrollToBottom() {
     const output = getOutputContainer();
     if (output) {

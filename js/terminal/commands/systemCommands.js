@@ -3,17 +3,42 @@
  **************************************************************/
 
 import { playSound } from '../../audio/soundEngine.js';
+import { triggerSystemCataclysm } from '../../effects/cataclysmEffect.js';
 import {
     getActiveTerminalTexts,
     appendLine,
     appendBlockLines,
-    clearOutputContainer
+    clearOutputContainer,
+    setTerminalInputDisabled
 } from '../terminalDom.js';
 
 export function renderBootBanner() {
     clearOutputContainer();
     appendBlockLines(getActiveTerminalTexts().bootBanner);
     appendLine('');
+}
+
+export function renderSafeModeBanner() {
+    clearOutputContainer();
+    appendBlockLines(getActiveTerminalTexts().safeModeBanner);
+    appendLine('');
+}
+
+export function runCataclysmCommand(context) {
+    setTerminalInputDisabled(true);
+
+    const cataclysmLines = getActiveTerminalTexts().cataclysmLines;
+    cataclysmLines.forEach((lineText) => {
+        appendLine(lineText, 'font-bold');
+    });
+
+    triggerSystemCataclysm(() => {
+        if (context && typeof context.clearHistory === 'function') {
+            context.clearHistory();
+        }
+        renderSafeModeBanner();
+        setTerminalInputDisabled(false);
+    });
 }
 
 export function runHelpCommand() {

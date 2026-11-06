@@ -3,6 +3,7 @@
  **************************************************************/
 
 import { playSound } from '../audio/soundEngine.js';
+import { isCataclysmRunning } from '../effects/cataclysmEffect.js';
 import { stopSnakeGame, initSnakeControls } from '../game/snakeGame.js';
 import { stopFlappyDragonGame, initFlappyDragonControls } from '../game/flappyDragon.js';
 import {
@@ -53,6 +54,7 @@ export function openDrukSystem() {
 }
 
 export function closeDrukSystem() {
+    if (isCataclysmRunning()) return;
     stopSnakeGame();
     stopFlappyDragonGame();
     setTerminalModalOpenState(false);
@@ -64,7 +66,13 @@ export function closeDrukSystem() {
     playSound('click');
 }
 
+function clearCommandHistory() {
+    commandHistory = [];
+    historyIndex = -1;
+}
+
 export function executeTerminalCommand(rawCommand) {
+    if (isCataclysmRunning()) return;
     const trimmedCommand = (rawCommand || '').trim();
     if (!trimmedCommand) return;
 
@@ -77,7 +85,8 @@ export function executeTerminalCommand(rawCommand) {
     dispatchTerminalCommand(trimmedCommand, {
         executeCommand: executeTerminalCommand,
         closeTerminal: closeDrukSystem,
-        openDungeon: openDungeonHandler
+        openDungeon: openDungeonHandler,
+        clearHistory: clearCommandHistory
     });
 }
 

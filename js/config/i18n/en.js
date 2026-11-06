@@ -96,6 +96,20 @@ export const EN_TRANSLATIONS = {
             '========================================================',
             'Type "help" or click the command buttons below to navigate.'
         ],
+        safeModeBanner: [
+            '========================================================',
+            ' DRUKSYSTEM OS v2.4 — MODO DE RECUPERACIÓN / SAFE MODE',
+            ' KERNEL: DRUK-KERNEL 8-BIT RESTORED FROM SNAPSHOT',
+            ' STATUS: SANCTUARY REBUILT // INTEGRITY 100%',
+            '========================================================',
+            'System recovered from critical collapse. Type "help".'
+        ],
+        cataclysmLines: [
+            '[CRITICAL] Deleting /boot/drukernel and boot vectors...',
+            '[WARNING] Collapsing celestial cycle and extinguishing constellations...',
+            '[WARNING] Disintegrating the Blue Mage cloud pedestal...',
+            '[FATAL] SEGMENTATION FAULT — CATACLYSM PROTOCOL INITIATED...'
+        ],
         helpLines: [
             'AVAILABLE COMMANDS IN DRUKSYSTEM OS:',
             '  help                       Show this command reference',
