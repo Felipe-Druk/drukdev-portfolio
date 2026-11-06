@@ -5,6 +5,7 @@
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SPRITE_PALETTES } from '../config/palettes.js';
 import { playSound } from '../audio/index.js';
+import { bindImmediatePressAction } from '../utils/inputBindings.js';
 import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
 import { loadItem, saveItem } from '../utils/safeStorage.js';
 import {
@@ -94,7 +95,7 @@ function destroyBugEntity(entityIndex, slashColor, particleCount = 15) {
     if (!targetBug) return;
 
     spawnGameParticles(targetBug.x + 12, targetBug.y + 12, particleCount, slashColor);
-    entities.splice(entityIndex, 1);
+    removeItemSwapAndPop(entities, entityIndex);
     score += 15;
     playSound('hit');
     updateScoreUI();
@@ -203,17 +204,8 @@ export function initGame() {
         btnStartGame.addEventListener('click', startGame);
     }
 
-    const btnJump = document.getElementById('btnJump');
-    if (btnJump) {
-        btnJump.addEventListener('mousedown', () => triggerJump());
-        btnJump.addEventListener('touchstart', (event) => triggerJump(event), { passive: false });
-    }
-
-    const btnAttack = document.getElementById('btnAttack');
-    if (btnAttack) {
-        btnAttack.addEventListener('mousedown', () => triggerAttack());
-        btnAttack.addEventListener('touchstart', (event) => triggerAttack(event), { passive: false });
-    }
+    bindImmediatePressAction('btnJump', triggerJump);
+    bindImmediatePressAction('btnAttack', triggerAttack);
 
     window.addEventListener('keydown', (event) => {
         if (!gameRunning) return;
@@ -288,7 +280,7 @@ function updateGameEntities(palette) {
                 score += 25;
                 playSound('coin');
                 spawnGameParticles(entity.x + 10, entity.y + 10, 12, palette.warmBronze);
-                entities.splice(index, 1);
+                removeItemSwapAndPop(entities, index);
                 updateScoreUI();
                 continue;
             }
@@ -303,7 +295,7 @@ function updateGameEntities(palette) {
                 score += 5;
                 updateScoreUI();
             }
-            entities.splice(index, 1);
+            removeItemSwapAndPop(entities, index);
         }
     }
 }

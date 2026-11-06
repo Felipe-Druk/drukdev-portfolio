@@ -47,6 +47,7 @@ portfolio/
     ├── utils/
     │   ├── clipboard.js                # Utilidad desacoplada copyTextToClipboard con fallback seguro para portapapeles
     │   ├── colorMath.js                # Primitivas puras de color: parseHexColorToRgb, interpolateHexColor y shadeHexColorByDepth
+    │   ├── inputBindings.js            # Helper DRY bindImmediatePressAction para eventos mousedown + touchstart sin latencia
     │   ├── seededRandom.js             # Generador pseudo-aleatorio determinista LCG (createSeededRandom) con hashing 32-bit
     │   ├── mathUtils.js                # Helpers matemáticos: clamp, isPortraitAspectRatio, areRectsIntersecting y removeItemSwapAndPop
     │   └── safeStorage.js              # Wrapper seguro con try/catch para localStorage (loadJson, saveJson, loadItem, saveItem)
@@ -81,7 +82,8 @@ portfolio/
     │       ├── celestialSystem.js      # Ciclo Noche -> Atardecer -> Día, arco parabólico al horizonte y Sol/Luna pixel-art
     │       ├── cloudSystem.js          # Motor procedural de nubes parallax de 3 capas (far, mid, near) y estado climático
     │       ├── cloudPanelUI.js         # Controlador DOM del Grimorio Atmosférico (#cloudPanel) apoyado en grimoirePanelUtils
-    │       ├── constellations.js       # Planos, grilla escalonada en portrait, rotación 2D y renderizado de las 5 constelaciones
+    │       ├── constellationBlueprints.js # Definición de planos geométricos (nodos y aristas) de las 5 constelaciones
+    │       ├── constellations.js       # Cálculo de layout, proyección 2D, caché de métricas y renderizado de constelaciones
     │       ├── environmentRenderer.js  # Renderizado de cielo/montañas/laguna interpolados, Árbol Antiguo, Portal Dungeon y Consola CRT
     │       ├── floraSystem.js          # Motor matemático y generación procedural del pasto (dispersión, cúmulos y sombreado por profundidad)
     │       ├── floraPanelUI.js         # Controlador DOM del Grimorio Botánico (#floraPanel) apoyado en grimoirePanelUtils

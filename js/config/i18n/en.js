@@ -167,10 +167,6 @@ export const EN_TRANSLATIONS = {
         restartBtn: '[RESTART]',
         flapBtn: '[>] FLAP (SPACE / CLICK)'
     },
-    hero: {
-        copyEmailBtn: 'Copy Email',
-        copiedEmailBtn: 'Copied!'
-    },
     game: {
         eyebrow: '[>] ARCADE CARTRIDGE: BUG SLASHER',
         overlayTitle: 'DEFEND THE REPOSITORY!',
@@ -211,21 +207,5 @@ export const EN_TRANSLATIONS = {
         repoLinkLabel: '[REPOSITORY ↗]',
         certVerifyLabel: '[VERIFY ↗]',
         certVerifiedBadge: '[COMPLETED]'
-    },
-    themes: {
-        fantasy: {
-            themeSubtitle: 'Pixel-Art Sanctuary & Interactive Console',
-            heroTitle: 'DRUKDEV SANCTUARY',
-            progressTask: '[>] FORGING THE PORTFOLIO DUNGEON...',
-            gameTitle: "DRUK'S BUG SLASHER",
-            attackBtnLabel: 'SWORD SLASH (K / CLICK)'
-        },
-        cyber: {
-            themeSubtitle: 'Synthwave Grid & Full-Stack Architecture',
-            heroTitle: 'INITIALIZING DRUK.DEV SYSTEM',
-            progressTask: '[>] LOADING NEON SHADERS & MINIJUEGOS...',
-            gameTitle: 'CYBER BUG RUNNER 2099',
-            attackBtnLabel: 'LASER PULSE (K / CLICK)'
-        }
     }
 };

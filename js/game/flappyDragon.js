@@ -8,6 +8,7 @@ import {
     getActiveTerminalPalette
 } from '../config/palettes.js';
 import { playSound } from '../audio/index.js';
+import { bindImmediatePressAction } from '../utils/inputBindings.js';
 import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
 import { loadItem, saveItem } from '../utils/safeStorage.js';
 import { drawFlyingDragon } from '../graphics/sprites/index.js';
@@ -247,7 +248,7 @@ function updateFlappyPhysics() {
         }
 
         if (pillar.x + pillar.w < -10) {
-            pillars.splice(index, 1);
+            removeItemSwapAndPop(pillars, index);
         }
     }
 }
@@ -396,29 +397,8 @@ export function initFlappyDragonControls() {
         }
     });
 
-    const canvasEl = document.getElementById('flappyCanvas');
-    if (canvasEl) {
-        canvasEl.addEventListener('mousedown', (event) => {
-            event.preventDefault();
-            triggerDragonFlap();
-        });
-        canvasEl.addEventListener('touchstart', (event) => {
-            event.preventDefault();
-            triggerDragonFlap();
-        }, { passive: false });
-    }
-
-    const flapBtn = document.getElementById('flappyFlapBtn');
-    if (flapBtn) {
-        flapBtn.addEventListener('mousedown', (event) => {
-            event.preventDefault();
-            triggerDragonFlap();
-        });
-        flapBtn.addEventListener('touchstart', (event) => {
-            event.preventDefault();
-            triggerDragonFlap();
-        }, { passive: false });
-    }
+    bindImmediatePressAction(flappyCanvas, triggerDragonFlap);
+    bindImmediatePressAction('flappyFlapBtn', triggerDragonFlap);
 
     const restartBtn = document.getElementById('flappyRestartBtn');
     if (restartBtn) {
