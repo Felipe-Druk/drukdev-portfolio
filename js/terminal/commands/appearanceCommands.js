@@ -6,7 +6,7 @@ import {
     TERMINAL_PALETTES,
     setActiveTerminalColorMode
 } from '../../config/palettes.js';
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import { loadItem, saveItem } from '../../utils/safeStorage.js';
 import { drawSnakeFrame } from '../../game/snakeGame.js';
 import { drawFlappyFrame } from '../../game/flappyDragon.js';

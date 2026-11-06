@@ -1,14 +1,13 @@
 /**************************************************************
  * CATACLYSM PROTOCOL — FULLSCREEN GLITCH, MATRIX & BIOS REBOOT
+ * (js/graphics/cataclysmEffect.js)
  **************************************************************/
 
 import {
     playCataclysmAlarm,
     playCrtPowerOff,
     playBiosBeep
-} from './cataclysmAudio.js';
-import { resetConstellationAttentionBlink } from '../graphics/sanctuary/constellations.js';
-import { getModalElement, setTerminalModalOpenState } from '../terminal/terminalDom.js';
+} from '../audio/index.js';
 
 const MATRIX_START_MS = 1800;
 const CRT_COLLAPSE_START_MS = 4800;
@@ -239,11 +238,29 @@ function startLoadingTypewriterEffect(textSpan) {
     }, TYPEWRITER_CHAR_INTERVAL_MS);
 }
 
-export function triggerSystemCataclysm(onComplete) {
+function normalizeCataclysmCallbacks(optionsOrCallback) {
+    if (typeof optionsOrCallback === 'function') {
+        return {
+            onMuteAudio: null,
+            onRevealSanctuary: null,
+            onComplete: optionsOrCallback
+        };
+    }
+
+    const options = optionsOrCallback || {};
+    return {
+        onMuteAudio: typeof options.onMuteAudio === 'function' ? options.onMuteAudio : null,
+        onRevealSanctuary: typeof options.onRevealSanctuary === 'function' ? options.onRevealSanctuary : null,
+        onComplete: typeof options.onComplete === 'function' ? options.onComplete : null
+    };
+}
+
+export function triggerSystemCataclysm(optionsOrCallback = {}) {
     if (cataclysmInProgress) return;
     cleanupCataclysmElements();
     cataclysmInProgress = true;
 
+    const { onMuteAudio, onRevealSanctuary, onComplete } = normalizeCataclysmCallbacks(optionsOrCallback);
     let blackoutOverlay = null;
     let bootTextSpan = null;
 
@@ -263,6 +280,9 @@ export function triggerSystemCataclysm(onComplete) {
         stopMatrixLoopAndListeners();
         removeDomElementById(MATRIX_OVERLAY_ID);
 
+        if (onMuteAudio) {
+            onMuteAudio();
+        }
         playCrtPowerOff();
         blackoutOverlay = createCrtBlackoutOverlay();
     }, CRT_COLLAPSE_START_MS);
@@ -287,13 +307,9 @@ export function triggerSystemCataclysm(onComplete) {
 
     // 6. T = 9.8s: Fade black curtain opacity 1 -> 0 over 1.5s to reveal active Sanctuary
     scheduleCataclysmStep(() => {
-        resetConstellationAttentionBlink();
-        setTerminalModalOpenState(false);
-        const modalElement = getModalElement();
-        if (modalElement) {
-            modalElement.classList.add('hidden');
+        if (onRevealSanctuary) {
+            onRevealSanctuary();
         }
-
         if (blackoutOverlay) {
             blackoutOverlay.style.transition = `opacity ${CURTAIN_FADE_DURATION_SEC}s ease-out`;
             blackoutOverlay.style.opacity = '0';
@@ -303,7 +319,7 @@ export function triggerSystemCataclysm(onComplete) {
     // 7. T = 11.3s: Destroy temporary DOM nodes and invoke onComplete()
     scheduleCataclysmStep(() => {
         cleanupCataclysmElements();
-        if (typeof onComplete === 'function') {
+        if (onComplete) {
             onComplete();
         }
     }, CATACLYSM_COMPLETE_MS);

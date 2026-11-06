@@ -9,7 +9,7 @@ import {
     setCurrentLanguage,
     getTranslationByKey
 } from './config/i18n.js';
-import { playSound, toggleSound, isSoundEnabled } from './audio/soundEngine.js';
+import { audio, playSound } from './audio/index.js';
 import { copyTextToClipboard } from './utils/clipboard.js';
 import { renderStaticPreviews } from './graphics/sprites/index.js';
 import { closeAllGrimoires } from './graphics/sanctuary/grimoirePanelUtils.js';
@@ -64,7 +64,12 @@ function getNormalizedContactEmail() {
 
 function updateSoundButtonLabel(language = getCurrentLanguage()) {
     const navTexts = TRANSLATIONS[language].nav;
-    setElementText('soundLabel', isSoundEnabled() ? navTexts.sfxOn : navTexts.sfxMute);
+    const enabled = !audio.isMuted();
+    setElementClass(
+        'soundIcon',
+        enabled ? 'fa-solid fa-volume-high text-bronze' : 'fa-solid fa-volume-xmark text-gray-400'
+    );
+    setElementText('soundLabel', enabled ? navTexts.sfxOn : navTexts.sfxMute);
 }
 
 function applyTranslationsByAttribute(attributeName, activeLanguage, applyValueCallback) {
@@ -112,11 +117,7 @@ export function toggleLanguage() {
 }
 
 export function handleToggleSound() {
-    const enabled = toggleSound();
-    setElementClass(
-        'soundIcon',
-        enabled ? 'fa-solid fa-volume-high text-bronze' : 'fa-solid fa-volume-xmark text-gray-400'
-    );
+    audio.toggleMute();
     updateSoundButtonLabel();
 }
 

@@ -2,8 +2,8 @@
  * DRUKSYSTEM OS — CRT TERMINAL CONTROLLER & LIFECYCLE
  **************************************************************/
 
-import { playSound } from '../audio/soundEngine.js';
-import { isCataclysmRunning } from '../effects/cataclysmEffect.js';
+import { playSound } from '../audio/index.js';
+import { isCataclysmRunning } from '../graphics/cataclysmEffect.js';
 import { stopSnakeGame, initSnakeControls } from '../game/snakeGame.js';
 import { stopFlappyDragonGame, initFlappyDragonControls } from '../game/flappyDragon.js';
 import {

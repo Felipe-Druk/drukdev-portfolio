@@ -2,7 +2,7 @@
  * DRUKSYSTEM OS — ARCADE CARTRIDGE LAUNCHER COMMAND (play)
  **************************************************************/
 
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import { startSnakeGame } from '../../game/snakeGame.js';
 import { startFlappyDragonGame } from '../../game/flappyDragon.js';
 import { startGame as startBugSlasherGame } from '../../game/bugSlasher.js';

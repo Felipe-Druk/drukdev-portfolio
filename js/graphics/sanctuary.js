@@ -4,7 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SANCTUARY_SCENE_PALETTE, getInterpolatedScenePalette } from '../config/palettes.js';
-import { playSound, floraSpell, windSpell, celestialShift } from '../audio/soundEngine.js';
+import { playSound, floraSpell, windSpell, celestialShift } from '../audio/index.js';
 import { copyTextToClipboard } from '../utils/clipboard.js';
 import {
     drawFloatingPixelLabel,

@@ -3,7 +3,7 @@
  * (js/graphics/sanctuary/grimoirePanelUtils.js)
  **************************************************************/
 
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import { clamp } from '../../utils/mathUtils.js';
 
 export const GRIMOIRE_SCREEN_MARGIN = 12;

@@ -6,7 +6,7 @@ import { OMNISCIENT_CLASS_ID, DUNGEON_CLASSES } from '../config/dungeonData.js';
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { getLocalizedCvPath } from '../config/links.js';
 import { paintClassEmblemOnCanvas } from '../graphics/sprites/index.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound } from '../audio/index.js';
 import { renderChamberViewContent } from './chamberRenderer.js';
 
 const EMBLEM_CANVAS_SIZE = 48;

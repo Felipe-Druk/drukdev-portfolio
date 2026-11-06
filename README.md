@@ -26,11 +26,24 @@ portfolio/
 │       ├── hud.css                     # Marcos biselados de Acero Forjado, anillo de avatar, botones arcade y selector ES|EN
 │       ├── terminal.css                # Monitor CRT DrukSystem OS, pantalla de fósforo, chips de comando e inputs CLI
 │       ├── grimoires.css               # Estilos unificados DRY (--grimoire-ui-*) para #floraPanel y #cloudPanel
-│       └── dungeon.css                 # Modal de la Dungeon Interactiva, cartas de clase RPG, barras de stats y reliquias
+│       ├── dungeon.css                 # Modal de la Dungeon Interactiva, cartas de clase RPG, barras de stats y reliquias
+│       └── glitchEffect.css            # Animaciones globales del Protocolo Cataclismo (screen-rumble, crt-power-off y cursor BIOS)
 └── js/
     ├── main.js                         # Punto de entrada: inicializa módulos, bucle RAF normalizado a 60Hz y eventos UI
     ├── audio/
-    │   └── soundEngine.js              # Sintetizador 8-bit procedural (Web Audio API) sin archivos de audio externos
+    │   ├── index.js                    # Fachada pública del bus de audio (audio.play, audio.toggleMute, audio.isMuted y aliases)
+    │   ├── core/
+    │   │   ├── audioContext.js         # Singleton AudioContext con desbloqueo diferido en el primer gesto de usuario
+    │   │   └── audioBus.js             # Grafo de ganancia (sfxGain -> masterGain -> destination) y persistencia con safeStorage
+    │   ├── synth/
+    │   │   ├── waveforms.js            # Motor de osciladores 8-bit configurables, barridos y acordes polifónicos
+    │   │   ├── noise.js                # Generador procedural de buffers de ruido blanco y rosa
+    │   │   └── envelope.js             # Envolventes ADSR anti-pop y rampas lineales/exponenciales
+    │   └── sfx/
+    │       ├── uiSfx.js                # Presets de interfaz, terminal, monedas y constelaciones
+    │       ├── sanctuarySfx.js         # Sonidos ambientales y hechizos elementales del Santuario
+    │       ├── arcadeSfx.js            # Efectos de minijuegos (jump, flap, attack, hit, gameover)
+    │       └── cataclysmSfx.js         # Síntesis en tiempo real del Cataclysm (alarma bitonal, descarga CRT y beep BIOS)
     ├── utils/
     │   ├── clipboard.js                # Utilidad desacoplada copyTextToClipboard con fallback seguro para portapapeles
     │   ├── colorMath.js                # Primitivas puras de color: parseHexColorToRgb, interpolateHexColor y shadeHexColorByDepth
@@ -56,6 +69,7 @@ portfolio/
     │   └── chamberRenderer.js          # Renderizador DOM puro para Armas, Reliquias (Proyectos), Crónicas (Experiencia) y Sellos
     ├── graphics/
     │   ├── sanctuary.js                # Controlador principal del Santuario: resolución virtual, touch/mouse, auto-cierre de grimorios y frame
+    │   ├── cataclysmEffect.js          # Cinemática fullscreen del Protocolo Cataclismo (glitch, lluvia Matrix, colapso CRT y arranque BIOS)
     │   ├── sprites/
     │   │   ├── index.js                # Archivo barril de primitivas Canvas y renderizadores procedurales de sprites
     │   │   ├── canvasUtils.js          # Primitivas pixel-art (drawRect, drawPixelLine, etiquetas flotantes y detección de punto)

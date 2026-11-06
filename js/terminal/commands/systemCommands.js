@@ -2,15 +2,17 @@
  * DRUKSYSTEM OS — SYSTEM & DIRECTORY COMMANDS (help, ls, clear)
  **************************************************************/
 
-import { playSound } from '../../audio/soundEngine.js';
-import { triggerSystemCataclysm } from '../../effects/cataclysmEffect.js';
+import { playSound } from '../../audio/index.js';
+import { triggerSystemCataclysm } from '../../graphics/cataclysmEffect.js';
 import { resetConstellationAttentionBlink } from '../../graphics/sanctuary/constellations.js';
 import {
     getActiveTerminalTexts,
+    getModalElement,
     appendLine,
     appendBlockLines,
     clearOutputContainer,
-    setTerminalInputDisabled
+    setTerminalInputDisabled,
+    setTerminalModalOpenState
 } from '../terminalDom.js';
 
 export function renderBootBanner() {
@@ -33,15 +35,25 @@ export function runCataclysmCommand(context) {
         appendLine(lineText, 'font-bold');
     });
 
-    triggerSystemCataclysm(() => {
-        if (context && typeof context.clearHistory === 'function') {
-            context.clearHistory();
-        }
-        renderSafeModeBanner();
-        setTerminalInputDisabled(false);
-        resetConstellationAttentionBlink();
-        if (context && typeof context.closeTerminal === 'function') {
-            context.closeTerminal();
+    triggerSystemCataclysm({
+        onRevealSanctuary: () => {
+            resetConstellationAttentionBlink();
+            setTerminalModalOpenState(false);
+            const modalElement = getModalElement();
+            if (modalElement) {
+                modalElement.classList.add('hidden');
+            }
+        },
+        onComplete: () => {
+            if (context && typeof context.clearHistory === 'function') {
+                context.clearHistory();
+            }
+            renderSafeModeBanner();
+            setTerminalInputDisabled(false);
+            resetConstellationAttentionBlink();
+            if (context && typeof context.closeTerminal === 'function') {
+                context.closeTerminal();
+            }
         }
     });
 }

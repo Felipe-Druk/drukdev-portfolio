@@ -4,7 +4,7 @@
 
 import { getLocalizedCvPath } from '../../config/links.js';
 import { getCurrentLanguage } from '../../config/i18n.js';
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import {
     getActiveTerminalTexts,
     getOutputContainer,

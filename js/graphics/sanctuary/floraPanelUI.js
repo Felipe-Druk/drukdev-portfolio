@@ -2,7 +2,7 @@
  * BOTANICAL GRIMOIRE FLOATING PANEL UI CONTROLLER (floraPanelUI.js)
  **************************************************************/
 
-import { floraSpell } from '../../audio/soundEngine.js';
+import { floraSpell } from '../../audio/index.js';
 import { clamp } from '../../utils/mathUtils.js';
 import { getFloraConfig, updateFloraConfig } from './floraSystem.js';
 import {

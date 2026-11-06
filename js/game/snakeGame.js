@@ -4,7 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { getActiveTerminalPalette } from '../config/palettes.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound } from '../audio/index.js';
 import { loadItem, saveItem } from '../utils/safeStorage.js';
 import { drawSnakeFoodNode, drawSnakeSegment } from '../graphics/sprites/index.js';
 

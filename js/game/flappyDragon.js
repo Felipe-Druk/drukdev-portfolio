@@ -7,7 +7,7 @@ import {
     DRUK_CORE_PALETTE,
     getActiveTerminalPalette
 } from '../config/palettes.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound } from '../audio/index.js';
 import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
 import { loadItem, saveItem } from '../utils/safeStorage.js';
 import { drawFlyingDragon } from '../graphics/sprites/index.js';

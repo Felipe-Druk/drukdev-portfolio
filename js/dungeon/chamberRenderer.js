@@ -11,7 +11,7 @@ import {
     filterItemsByClass,
     getWeaponsByClass
 } from '../config/dungeonData.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound } from '../audio/index.js';
 
 export function renderChamberHeaderBanner(classId, language, dungeonTexts) {
     const bannerContainer = document.getElementById('dungeonChamberBanner');

@@ -2,7 +2,7 @@
  * DRUKSYSTEM OS — COMMAND REGISTRY & DISPATCHER
  **************************************************************/
 
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import { getActiveTerminalTexts, appendLine } from '../terminalDom.js';
 import {
     runHelpCommand,

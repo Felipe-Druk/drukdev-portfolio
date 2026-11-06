@@ -3,7 +3,7 @@
  **************************************************************/
 
 import { CONTACT_LINKS } from '../../config/links.js';
-import { playSound } from '../../audio/soundEngine.js';
+import { playSound } from '../../audio/index.js';
 import {
     getActiveTerminalTexts,
     getOutputContainer,

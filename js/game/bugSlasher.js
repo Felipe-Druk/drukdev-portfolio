@@ -4,7 +4,7 @@
 
 import { TRANSLATIONS, getCurrentLanguage } from '../config/i18n.js';
 import { SPRITE_PALETTES } from '../config/palettes.js';
-import { playSound } from '../audio/soundEngine.js';
+import { playSound } from '../audio/index.js';
 import { areRectsIntersecting, removeItemSwapAndPop } from '../utils/mathUtils.js';
 import { loadItem, saveItem } from '../utils/safeStorage.js';
 import {

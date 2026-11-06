@@ -2,7 +2,7 @@
  * ATMOSPHERIC GRIMOIRE FLOATING PANEL UI CONTROLLER (cloudPanelUI.js)
  **************************************************************/
 
-import { windSpell } from '../../audio/soundEngine.js';
+import { windSpell } from '../../audio/index.js';
 import { clamp } from '../../utils/mathUtils.js';
 import { getCloudConfig, updateCloudConfig } from './cloudSystem.js';
 import {
